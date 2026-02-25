@@ -13,8 +13,7 @@ class AddMangaToWishlistAction
     public function __construct(
         private readonly VolumeRepositoryInterface $volumeRepository,
         private readonly WishlistRepositoryInterface $wishlistRepository
-    ) {
-    }
+    ) {}
 
     public function execute(AddMangaDTO $dto): Volume
     {

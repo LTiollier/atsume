@@ -4,6 +4,7 @@ namespace App\Manga\Infrastructure\Services;
 
 use App\Manga\Domain\Services\MangaLookupServiceInterface;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class OpenLibraryLookupService implements MangaLookupServiceInterface
 {
@@ -23,7 +24,7 @@ class OpenLibraryLookupService implements MangaLookupServiceInterface
         ]);
 
         if ($response->failed()) {
-            \Illuminate\Support\Facades\Log::error('OpenLibraryLookupService: Search failed.', [
+            Log::error('OpenLibraryLookupService: Search failed.', [
                 'query' => $query,
                 'status' => $response->status(),
                 'body' => $response->body(),
@@ -53,7 +54,7 @@ class OpenLibraryLookupService implements MangaLookupServiceInterface
             return null;
         }
 
-        $bibkey = 'ISBN:' . $normalizedIsbn;
+        $bibkey = 'ISBN:'.$normalizedIsbn;
         $response = Http::get(self::ISBN_URL, [
             'bibkeys' => $bibkey,
             'format' => 'json',
@@ -61,7 +62,7 @@ class OpenLibraryLookupService implements MangaLookupServiceInterface
         ]);
 
         if ($response->failed()) {
-            \Illuminate\Support\Facades\Log::error('OpenLibraryLookupService: ISBN lookup failed.', [
+            Log::error('OpenLibraryLookupService: ISBN lookup failed.', [
                 'isbn' => $normalizedIsbn,
                 'status' => $response->status(),
                 'body' => $response->body(),
@@ -87,7 +88,7 @@ class OpenLibraryLookupService implements MangaLookupServiceInterface
     public function findByApiId(string $apiId): ?array
     {
         if (preg_match('/^(\/works\/|\/books\/|OL)/', $apiId)) {
-            \Illuminate\Support\Facades\Log::warning('OpenLibraryLookupService: findByApiId is not fully implemented for OpenLibrary keys.', [
+            Log::warning('OpenLibraryLookupService: findByApiId is not fully implemented for OpenLibrary keys.', [
                 'api_id' => $apiId,
             ]);
 
@@ -111,7 +112,7 @@ class OpenLibraryLookupService implements MangaLookupServiceInterface
 
         $coverUrl = null;
         if (isset($doc['cover_i']) && is_scalar($doc['cover_i'])) {
-            $coverUrl = 'https://covers.openlibrary.org/b/id/' . (string) $doc['cover_i'] . '-L.jpg';
+            $coverUrl = 'https://covers.openlibrary.org/b/id/'.(string) $doc['cover_i'].'-L.jpg';
         }
 
         return [

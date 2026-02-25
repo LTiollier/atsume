@@ -11,8 +11,7 @@ class UpdateUserSettingsAction
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
-    ) {
-    }
+    ) {}
 
     public function execute(UpdateUserSettingsDTO $dto): User
     {

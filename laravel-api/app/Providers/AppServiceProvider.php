@@ -2,6 +2,27 @@
 
 namespace App\Providers;
 
+use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
+use App\Borrowing\Infrastructure\Repositories\EloquentLoanRepository;
+use App\Manga\Domain\Policies\SeriesPolicy;
+use App\Manga\Domain\Policies\VolumePolicy;
+use App\Manga\Domain\Repositories\EditionRepositoryInterface;
+use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
+use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
+use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
+use App\Manga\Domain\Services\MangaLookupServiceInterface;
+use App\Manga\Infrastructure\EloquentModels\Series;
+use App\Manga\Infrastructure\EloquentModels\Volume;
+use App\Manga\Infrastructure\Repositories\EloquentEditionRepository;
+use App\Manga\Infrastructure\Repositories\EloquentSeriesRepository;
+use App\Manga\Infrastructure\Repositories\EloquentVolumeRepository;
+use App\Manga\Infrastructure\Repositories\EloquentWishlistRepository;
+use App\Manga\Infrastructure\Services\OpenLibraryLookupService;
+use App\User\Domain\Repositories\UserRepositoryInterface;
+use App\User\Infrastructure\Repositories\EloquentUserRepository;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -12,38 +33,38 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \App\User\Domain\Repositories\UserRepositoryInterface::class,
-            \App\User\Infrastructure\Repositories\EloquentUserRepository::class
+            UserRepositoryInterface::class,
+            EloquentUserRepository::class
         );
 
         $this->app->bind(
-            \App\Manga\Domain\Repositories\WishlistRepositoryInterface::class,
-            \App\Manga\Infrastructure\Repositories\EloquentWishlistRepository::class
+            WishlistRepositoryInterface::class,
+            EloquentWishlistRepository::class
         );
 
         $this->app->bind(
-            \App\Manga\Domain\Repositories\VolumeRepositoryInterface::class,
-            \App\Manga\Infrastructure\Repositories\EloquentVolumeRepository::class
+            VolumeRepositoryInterface::class,
+            EloquentVolumeRepository::class
         );
 
         $this->app->bind(
-            \App\Manga\Domain\Repositories\SeriesRepositoryInterface::class,
-            \App\Manga\Infrastructure\Repositories\EloquentSeriesRepository::class
+            SeriesRepositoryInterface::class,
+            EloquentSeriesRepository::class
         );
 
         $this->app->bind(
-            \App\Manga\Domain\Repositories\EditionRepositoryInterface::class,
-            \App\Manga\Infrastructure\Repositories\EloquentEditionRepository::class
+            EditionRepositoryInterface::class,
+            EloquentEditionRepository::class
         );
 
         $this->app->bind(
-            \App\Manga\Domain\Services\MangaLookupServiceInterface::class,
-            \App\Manga\Infrastructure\Services\OpenLibraryLookupService::class
+            MangaLookupServiceInterface::class,
+            OpenLibraryLookupService::class
         );
 
         $this->app->bind(
-            \App\Borrowing\Domain\Repositories\LoanRepositoryInterface::class,
-            \App\Borrowing\Infrastructure\Repositories\EloquentLoanRepository::class
+            LoanRepositoryInterface::class,
+            EloquentLoanRepository::class
         );
     }
 
@@ -52,20 +73,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Manga\Infrastructure\EloquentModels\Volume::class,
-            \App\Manga\Domain\Policies\VolumePolicy::class
+        Gate::policy(
+            Volume::class,
+            VolumePolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Manga\Infrastructure\EloquentModels\Series::class,
-            \App\Manga\Domain\Policies\SeriesPolicy::class
+        Gate::policy(
+            Series::class,
+            SeriesPolicy::class
         );
 
-        \Illuminate\Database\Eloquent\Factories\Factory::guessFactoryNamesUsing(function (string $modelName) {
+        Factory::guessFactoryNamesUsing(function (string $modelName) {
             $className = class_basename($modelName);
 
-            /** @var class-string<\Illuminate\Database\Eloquent\Factories\Factory<\Illuminate\Database\Eloquent\Model>> $factoryName */
+            /** @var class-string<Factory<Model>> $factoryName */
             $factoryName = "Database\\Factories\\{$className}Factory";
 
             return $factoryName;

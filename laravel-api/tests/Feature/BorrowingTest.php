@@ -105,7 +105,7 @@ test('it cannot loan a manga not in collection', function () {
         'borrower_name' => 'Jean Dupont',
     ]);
 
-    $response->assertStatus(404);
+    $response->assertStatus(403);
 });
 
 test('loan model relationships', function () {

@@ -8,8 +8,7 @@ class RemoveVolumeFromCollectionAction
 {
     public function __construct(
         private readonly VolumeRepositoryInterface $volumeRepository
-    ) {
-    }
+    ) {}
 
     public function execute(int $volumeId, int $userId): void
     {

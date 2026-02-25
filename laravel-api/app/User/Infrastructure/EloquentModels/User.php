@@ -3,17 +3,21 @@
 namespace App\User\Infrastructure\EloquentModels;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Manga\Infrastructure\EloquentModels\Volume;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasApiTokens;
+
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
+
     use Notifiable;
 
     /**
@@ -54,18 +58,18 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Manga\Infrastructure\EloquentModels\Volume, $this>
+     * @return BelongsToMany<Volume, $this>
      */
-    public function volumes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function volumes(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Manga\Infrastructure\EloquentModels\Volume::class, 'user_volumes', 'user_id', 'volume_id');
+        return $this->belongsToMany(Volume::class, 'user_volumes', 'user_id', 'volume_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Manga\Infrastructure\EloquentModels\Volume, $this>
+     * @return BelongsToMany<Volume, $this>
      */
-    public function wishlistVolumes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function wishlistVolumes(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Manga\Infrastructure\EloquentModels\Volume::class, 'wishlist_volumes', 'user_id', 'volume_id')->withTimestamps();
+        return $this->belongsToMany(Volume::class, 'wishlist_volumes', 'user_id', 'volume_id')->withTimestamps();
     }
 }

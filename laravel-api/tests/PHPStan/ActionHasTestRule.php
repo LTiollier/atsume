@@ -5,6 +5,7 @@ namespace Tests\PHPStan;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * @implements Rule<Node\Stmt\Class_>
@@ -34,18 +35,18 @@ class ActionHasTestRule implements Rule
 
         // Convert /Users/.../app/... to app/...
         $relativePath = str_contains($file, '/app/')
-            ? 'app/' . explode('/app/', $file)[1]
+            ? 'app/'.explode('/app/', $file)[1]
             : $file;
 
         // Determine expected test path
         $testRelativePath = str_replace('app/', 'tests/Unit/', $relativePath);
         $testRelativePath = str_replace('.php', 'Test.php', $testRelativePath);
 
-        $fullTestPath = rtrim($cwd, '/') . '/' . ltrim($testRelativePath, '/');
+        $fullTestPath = rtrim($cwd, '/').'/'.ltrim($testRelativePath, '/');
 
         if (! file_exists($fullTestPath)) {
             return [
-                \PHPStan\Rules\RuleErrorBuilder::message(
+                RuleErrorBuilder::message(
                     sprintf(
                         "Architecture rule violation: The action class '%s' does not have a corresponding test file. Expected test file: %s",
                         $className,

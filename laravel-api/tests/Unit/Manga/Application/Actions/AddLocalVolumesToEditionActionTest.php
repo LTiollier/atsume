@@ -11,25 +11,27 @@ use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
+use Exception;
 use Illuminate\Support\Facades\Event;
+use Mockery;
 
 test('it throws exception if edition not found', function () {
-    $volumeRepo = \Mockery::mock(VolumeRepositoryInterface::class);
-    $seriesRepo = \Mockery::mock(SeriesRepositoryInterface::class);
-    $editionRepo = \Mockery::mock(EditionRepositoryInterface::class);
+    $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
+    $seriesRepo = Mockery::mock(SeriesRepositoryInterface::class);
+    $editionRepo = Mockery::mock(EditionRepositoryInterface::class);
 
     $editionRepo->shouldReceive('findById')->with(99)->andReturn(null);
 
     $action = new AddLocalVolumesToEditionAction($volumeRepo, $seriesRepo, $editionRepo);
     $dto = new AddLocalVolumesDTO(99, [1], 1);
 
-    expect(fn () => $action->execute($dto))->toThrow(\Exception::class, 'Edition not found with ID: 99');
+    expect(fn () => $action->execute($dto))->toThrow(Exception::class, 'Edition not found with ID: 99');
 });
 
 test('it throws exception if series not found', function () {
-    $volumeRepo = \Mockery::mock(VolumeRepositoryInterface::class);
-    $seriesRepo = \Mockery::mock(SeriesRepositoryInterface::class);
-    $editionRepo = \Mockery::mock(EditionRepositoryInterface::class);
+    $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
+    $seriesRepo = Mockery::mock(SeriesRepositoryInterface::class);
+    $editionRepo = Mockery::mock(EditionRepositoryInterface::class);
     $edition = new Edition(99, 88, 'Ed', 'Pub', 'fr', 10);
 
     $editionRepo->shouldReceive('findById')->with(99)->andReturn($edition);
@@ -38,15 +40,15 @@ test('it throws exception if series not found', function () {
     $action = new AddLocalVolumesToEditionAction($volumeRepo, $seriesRepo, $editionRepo);
     $dto = new AddLocalVolumesDTO(99, [1], 1);
 
-    expect(fn () => $action->execute($dto))->toThrow(\Exception::class, 'Series not found with ID: 88');
+    expect(fn () => $action->execute($dto))->toThrow(Exception::class, 'Series not found with ID: 88');
 });
 
 test('it adds local volumes and triggers event', function () {
     Event::fake();
 
-    $volumeRepo = \Mockery::mock(VolumeRepositoryInterface::class);
-    $seriesRepo = \Mockery::mock(SeriesRepositoryInterface::class);
-    $editionRepo = \Mockery::mock(EditionRepositoryInterface::class);
+    $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
+    $seriesRepo = Mockery::mock(SeriesRepositoryInterface::class);
+    $editionRepo = Mockery::mock(EditionRepositoryInterface::class);
 
     $edition = new Edition(99, 88, 'Ed', 'Pub', 'fr', 10);
     $series = new Series(88, 'api', 'Title', ['Auth'], 'Desc', 'On', 10, 'http');

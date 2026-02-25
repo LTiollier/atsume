@@ -10,6 +10,7 @@ use App\Manga\Application\Actions\AddMangaToWishlistAction;
 use App\Manga\Application\Actions\AddScannedMangaToWishlistAction;
 use App\Manga\Application\Actions\ListWishlistAction;
 use App\Manga\Application\Actions\RemoveVolumeFromWishlistAction;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -18,7 +19,7 @@ class WishlistController
 {
     public function index(Request $request, ListWishlistAction $action): AnonymousResourceCollection
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $mangas = $action->execute((int) $user->id);
@@ -46,7 +47,7 @@ class WishlistController
 
     public function destroy(RemoveFromWishlistRequest $request, RemoveVolumeFromWishlistAction $action, int $id): JsonResponse
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $action->execute($id, (int) $user->id);

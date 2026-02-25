@@ -3,6 +3,7 @@
 namespace App\Http\Api\Requests;
 
 use App\Manga\Application\DTOs\AddMangaDTO;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AddMangaRequest extends FormRequest
@@ -24,7 +25,7 @@ class AddMangaRequest extends FormRequest
 
     public function toDTO(): AddMangaDTO
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $this->user();
 
         return new AddMangaDTO(

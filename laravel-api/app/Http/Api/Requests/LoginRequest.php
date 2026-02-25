@@ -2,6 +2,8 @@
 
 namespace App\Http\Api\Requests;
 
+use App\User\Application\DTOs\LoginDTO;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
@@ -12,7 +14,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -22,9 +24,9 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    public function toDTO(): \App\User\Application\DTOs\LoginDTO
+    public function toDTO(): LoginDTO
     {
-        return new \App\User\Application\DTOs\LoginDTO(
+        return new LoginDTO(
             email: $this->string('email')->toString(),
             password: $this->string('password')->toString(),
         );

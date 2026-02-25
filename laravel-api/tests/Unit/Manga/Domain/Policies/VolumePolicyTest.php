@@ -1,15 +1,14 @@
 <?php
 
 use App\Manga\Domain\Policies\VolumePolicy;
-use App\User\Infrastructure\EloquentModels\User;
 use App\Manga\Infrastructure\EloquentModels\Volume;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Query\Builder;
 
 test('it allows loaning a volume if the user owns it', function () {
-    $policy = new VolumePolicy();
-    $user = Mockery::mock(User::class);
+    $policy = new VolumePolicy;
+    $user = new User;
     $user->id = 1;
 
     $volume = Mockery::mock(Volume::class);
@@ -23,8 +22,8 @@ test('it allows loaning a volume if the user owns it', function () {
 });
 
 test('it denies loaning a volume if the user does not own it', function () {
-    $policy = new VolumePolicy();
-    $user = Mockery::mock(User::class);
+    $policy = new VolumePolicy;
+    $user = new User;
     $user->id = 1;
 
     $volume = Mockery::mock(Volume::class);
@@ -38,8 +37,8 @@ test('it denies loaning a volume if the user does not own it', function () {
 });
 
 test('it allows returning a volume if the user owns it and it is loaned', function () {
-    $policy = new VolumePolicy();
-    $user = Mockery::mock(User::class);
+    $policy = new VolumePolicy;
+    $user = new User;
     $user->id = 1;
 
     $volume = Mockery::mock(Volume::class);
@@ -61,8 +60,8 @@ test('it allows returning a volume if the user owns it and it is loaned', functi
 });
 
 test('it allows deleting a volume if the user owns it', function () {
-    $policy = new VolumePolicy();
-    $user = Mockery::mock(User::class);
+    $policy = new VolumePolicy;
+    $user = new User;
     $user->id = 1;
 
     $volume = Mockery::mock(Volume::class);

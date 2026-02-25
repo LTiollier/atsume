@@ -1,5 +1,7 @@
 <?php
 
+use App\Borrowing\Infrastructure\EloquentModels\Loan;
+use App\Manga\Domain\Events\VolumeAddedToCollection;
 use App\Manga\Infrastructure\EloquentModels\Edition;
 use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\EloquentModels\Volume;
@@ -37,7 +39,7 @@ test('can add manga to collection by api_id', function () {
         ->assertJsonPath('data.api_id', '9781234567890')
         ->assertJsonPath('data.title', 'Naruto Vol. 1');
 
-    Event::assertDispatched(\App\Manga\Domain\Events\VolumeAddedToCollection::class);
+    Event::assertDispatched(VolumeAddedToCollection::class);
 
     assertDatabaseHas('volumes', [
         'api_id' => '9781234567890',
@@ -89,7 +91,7 @@ test('can list user mangas with ownership and loan flags', function () {
 
     $user->volumes()->attach($volume->id);
 
-    \App\Borrowing\Infrastructure\EloquentModels\Loan::create([
+    Loan::create([
         'user_id' => $user->id,
         'volume_id' => $volume->id,
         'borrower_name' => 'Alice',

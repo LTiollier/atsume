@@ -3,6 +3,7 @@
 namespace App\Http\Api\Requests;
 
 use App\Manga\Application\DTOs\AddLocalVolumesDTO;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AddLocalVolumesRequest extends FormRequest
@@ -26,7 +27,7 @@ class AddLocalVolumesRequest extends FormRequest
 
     public function toDTO(): AddLocalVolumesDTO
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $this->user();
 
         /** @var array<int, int> $numbers */

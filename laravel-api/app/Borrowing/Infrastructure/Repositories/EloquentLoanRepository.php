@@ -5,6 +5,8 @@ namespace App\Borrowing\Infrastructure\Repositories;
 use App\Borrowing\Domain\Models\Loan as DomainLoan;
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use App\Borrowing\Infrastructure\EloquentModels\Loan as EloquentLoan;
+use App\Manga\Infrastructure\Mappers\VolumeMapper;
+use Carbon\Carbon;
 use DateTimeImmutable;
 
 class EloquentLoanRepository implements LoanRepositoryInterface
@@ -59,12 +61,12 @@ class EloquentLoanRepository implements LoanRepositoryInterface
     {
         $volume = null;
         if ($eloquent->relationLoaded('volume') && $eloquent->volume) {
-            $volume = \App\Manga\Infrastructure\Mappers\VolumeMapper::toDomain($eloquent->volume);
+            $volume = VolumeMapper::toDomain($eloquent->volume);
         }
 
-        /** @var \Carbon\Carbon $loanedAt */
+        /** @var Carbon $loanedAt */
         $loanedAt = $eloquent->loaned_at;
-        /** @var \Carbon\Carbon|null $returnedAt */
+        /** @var Carbon|null $returnedAt */
         $returnedAt = $eloquent->returned_at;
 
         return new DomainLoan(

@@ -2,8 +2,9 @@
 
 namespace App\Manga\Domain\Policies;
 
-use App\User\Infrastructure\EloquentModels\User;
 use App\Manga\Infrastructure\EloquentModels\Series;
+use App\Manga\Infrastructure\EloquentModels\Volume;
+use App\User\Infrastructure\EloquentModels\User;
 
 class SeriesPolicy
 {
@@ -13,7 +14,7 @@ class SeriesPolicy
      */
     public function delete(User $user, Series $series): bool
     {
-        return \App\Manga\Infrastructure\EloquentModels\Volume::query()
+        return Volume::query()
             ->whereHas('edition', function ($q) use ($series) {
                 $q->where('series_id', $series->id);
             })

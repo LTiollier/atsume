@@ -9,8 +9,7 @@ class ListWishlistAction
 {
     public function __construct(
         private readonly WishlistRepositoryInterface $wishlistRepository
-    ) {
-    }
+    ) {}
 
     /**
      * @return Volume[]

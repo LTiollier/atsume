@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Requests;
 
+use App\Manga\Application\DTOs\SearchMangaDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SearchMangaRequest extends FormRequest
@@ -21,9 +22,9 @@ class SearchMangaRequest extends FormRequest
         ];
     }
 
-    public function toDTO(): \App\Manga\Application\DTOs\SearchMangaDTO
+    public function toDTO(): SearchMangaDTO
     {
-        return new \App\Manga\Application\DTOs\SearchMangaDTO(
+        return new SearchMangaDTO(
             query: $this->string('query')->toString()
         );
     }

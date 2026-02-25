@@ -10,6 +10,5 @@ class ScanBulkMangaDTO
     public function __construct(
         public readonly array $isbns,
         public readonly int $userId,
-    ) {
-    }
+    ) {}
 }

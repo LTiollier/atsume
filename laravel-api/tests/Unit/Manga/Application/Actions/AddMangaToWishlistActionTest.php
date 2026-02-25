@@ -8,12 +8,13 @@ use App\Manga\Domain\Exceptions\MangaNotFoundException;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
+use Mockery;
 
 test('it throws an exception if volume is not found in database', function () {
-    $volumeRepository = \Mockery::mock(VolumeRepositoryInterface::class);
+    $volumeRepository = Mockery::mock(VolumeRepositoryInterface::class);
     $volumeRepository->shouldReceive('findByApiId')->with('missing-api-id')->andReturn(null);
 
-    $wishlistRepository = \Mockery::mock(WishlistRepositoryInterface::class);
+    $wishlistRepository = Mockery::mock(WishlistRepositoryInterface::class);
 
     $action = new AddMangaToWishlistAction($volumeRepository, $wishlistRepository);
     $dto = new AddMangaDTO(api_id: 'missing-api-id', userId: 1);
@@ -36,10 +37,10 @@ test('it adds volume to user wishlist', function () {
         cover_url: null,
     );
 
-    $volumeRepository = \Mockery::mock(VolumeRepositoryInterface::class);
+    $volumeRepository = Mockery::mock(VolumeRepositoryInterface::class);
     $volumeRepository->shouldReceive('findByApiId')->with('test-api-id')->andReturn($volume);
 
-    $wishlistRepository = \Mockery::mock(WishlistRepositoryInterface::class);
+    $wishlistRepository = Mockery::mock(WishlistRepositoryInterface::class);
     $wishlistRepository->shouldReceive('addWishlistToUser')->with(1, 1)->once();
 
     $action = new AddMangaToWishlistAction($volumeRepository, $wishlistRepository);

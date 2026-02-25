@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Requests;
 
+use App\User\Application\DTOs\RegisterUserDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
@@ -23,9 +24,9 @@ class RegisterRequest extends FormRequest
         ];
     }
 
-    public function toDTO(): \App\User\Application\DTOs\RegisterUserDTO
+    public function toDTO(): RegisterUserDTO
     {
-        return new \App\User\Application\DTOs\RegisterUserDTO(
+        return new RegisterUserDTO(
             name: $this->string('name')->toString(),
             email: $this->string('email')->toString(),
             password: $this->string('password')->toString(),

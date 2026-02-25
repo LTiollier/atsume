@@ -9,6 +9,5 @@ class LoanMangaDTO
         public readonly int $volumeId,
         public readonly string $borrowerName,
         public readonly ?string $notes = null,
-    ) {
-    }
+    ) {}
 }

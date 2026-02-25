@@ -2,6 +2,7 @@
 
 namespace App\Borrowing\Domain\Models;
 
+use App\Manga\Domain\Models\Volume;
 use DateTimeImmutable;
 
 class Loan
@@ -14,11 +15,10 @@ class Loan
         private readonly DateTimeImmutable $loanedAt,
         private readonly ?DateTimeImmutable $returnedAt = null,
         private readonly ?string $notes = null,
-        private readonly ?\App\Manga\Domain\Models\Volume $volume = null,
-    ) {
-    }
+        private readonly ?Volume $volume = null,
+    ) {}
 
-    public function getVolume(): ?\App\Manga\Domain\Models\Volume
+    public function getVolume(): ?Volume
     {
         return $this->volume;
     }

@@ -8,8 +8,7 @@ class RemoveVolumeFromWishlistAction
 {
     public function __construct(
         private readonly WishlistRepositoryInterface $wishlistRepository
-    ) {
-    }
+    ) {}
 
     public function execute(int $volumeId, int $userId): void
     {

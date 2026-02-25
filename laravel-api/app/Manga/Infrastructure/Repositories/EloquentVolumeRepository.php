@@ -2,12 +2,15 @@
 
 namespace App\Manga\Infrastructure\Repositories;
 
+use App\Borrowing\Infrastructure\EloquentModels\Loan;
 use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Models\Series;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
+use App\Manga\Infrastructure\Mappers\VolumeMapper;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
+use Illuminate\Database\Eloquent\Collection;
 
 class EloquentVolumeRepository implements VolumeRepositoryInterface
 {
@@ -109,7 +112,7 @@ class EloquentVolumeRepository implements VolumeRepositoryInterface
         /** @var array<int, Volume> $volumes */
         $volumes = $eloquentVolumes
             ->map(function (EloquentVolume $v): Volume {
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Borrowing\Infrastructure\EloquentModels\Loan> $activeLoans */
+                /** @var Collection<int, Loan> $activeLoans */
                 $activeLoans = $v->loans;
                 $activeLoan = $activeLoans->first();
 
@@ -131,7 +134,7 @@ class EloquentVolumeRepository implements VolumeRepositoryInterface
         bool $isLoaned = false,
         ?string $loanedTo = null,
     ): Volume {
-        return \App\Manga\Infrastructure\Mappers\VolumeMapper::toDomain(
+        return VolumeMapper::toDomain(
             $eloquent,
             isOwned: $isOwned,
             isLoaned: $isLoaned,

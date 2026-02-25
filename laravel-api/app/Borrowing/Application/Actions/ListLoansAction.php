@@ -9,8 +9,7 @@ class ListLoansAction
 {
     public function __construct(
         private readonly LoanRepositoryInterface $loanRepository
-    ) {
-    }
+    ) {}
 
     /**
      * @return Loan[]

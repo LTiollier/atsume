@@ -5,6 +5,7 @@ namespace App\Manga\Infrastructure\Repositories;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
+use App\Manga\Infrastructure\Mappers\VolumeMapper;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 
 class EloquentWishlistRepository implements WishlistRepositoryInterface
@@ -51,7 +52,7 @@ class EloquentWishlistRepository implements WishlistRepositoryInterface
         bool $isLoaned = false,
         ?string $loanedTo = null,
     ): Volume {
-        return \App\Manga\Infrastructure\Mappers\VolumeMapper::toDomain(
+        return VolumeMapper::toDomain(
             $eloquent,
             isOwned: $isOwned,
             isLoaned: $isLoaned,

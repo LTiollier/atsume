@@ -3,6 +3,7 @@
 namespace App\Http\Api\Requests;
 
 use App\User\Application\DTOs\UpdateUserSettingsDTO;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserSettingsRequest extends FormRequest
@@ -17,18 +18,18 @@ class UpdateUserSettingsRequest extends FormRequest
      */
     public function rules(): array
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $this->user();
 
         return [
-            'username' => ['nullable', 'string', 'max:50', 'alpha_dash', 'unique:users,username,' . $user->id],
+            'username' => ['nullable', 'string', 'max:50', 'alpha_dash', 'unique:users,username,'.$user->id],
             'is_public' => ['required', 'boolean'],
         ];
     }
 
     public function toDTO(): UpdateUserSettingsDTO
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $this->user();
 
         $username = $this->input('username');

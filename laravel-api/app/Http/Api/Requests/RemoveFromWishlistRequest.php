@@ -3,7 +3,9 @@
 namespace App\Http\Api\Requests;
 
 use App\Manga\Infrastructure\EloquentModels\Volume;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 
 class RemoveFromWishlistRequest extends FormRequest
 {
@@ -20,10 +22,10 @@ class RemoveFromWishlistRequest extends FormRequest
         }
 
         // Check if the user has this volume in their wishlist
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $this->user();
 
-        return \Illuminate\Support\Facades\DB::table('wishlist_volumes')
+        return DB::table('wishlist_volumes')
             ->where('user_id', $user->id)
             ->where('volume_id', $volume->id)
             ->exists();

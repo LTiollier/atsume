@@ -1,10 +1,14 @@
 <?php
 
+use App\Manga\Infrastructure\EloquentModels\Edition;
+use App\Manga\Infrastructure\EloquentModels\Series;
+use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -45,9 +49,9 @@ test('can add manga to wishlist by api_id', function () {
     Sanctum::actingAs($user);
 
     $apiId = 'api123';
-    $series = \App\Manga\Infrastructure\EloquentModels\Series::create(['title' => 'Test Series', 'authors' => []]);
-    $edition = \App\Manga\Infrastructure\EloquentModels\Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
-    \App\Manga\Infrastructure\EloquentModels\Volume::create([
+    $series = Series::create(['title' => 'Test Series', 'authors' => []]);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+    Volume::create([
         'api_id' => $apiId,
         'title' => 'Existing Manga',
         'edition_id' => $edition->id,
@@ -125,9 +129,9 @@ test('can list wishlist items', function () {
     Sanctum::actingAs($user);
 
     // Create a volume and add to wishlist
-    $series = \App\Manga\Infrastructure\EloquentModels\Series::create(['title' => 'Wish Series', 'authors' => []]);
-    $edition = \App\Manga\Infrastructure\EloquentModels\Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
-    $volume = \App\Manga\Infrastructure\EloquentModels\Volume::create([
+    $series = Series::create(['title' => 'Wish Series', 'authors' => []]);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+    $volume = Volume::create([
         'api_id' => 'wish123',
         'title' => 'Wish Volume',
         'edition_id' => $edition->id,
@@ -146,9 +150,9 @@ test('can remove volume from wishlist', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = \App\Manga\Infrastructure\EloquentModels\Series::create(['title' => 'Wish Series', 'authors' => []]);
-    $edition = \App\Manga\Infrastructure\EloquentModels\Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
-    $volume = \App\Manga\Infrastructure\EloquentModels\Volume::create([
+    $series = Series::create(['title' => 'Wish Series', 'authors' => []]);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+    $volume = Volume::create([
         'api_id' => 'wish123',
         'title' => 'Wish Volume',
         'edition_id' => $edition->id,
@@ -160,7 +164,7 @@ test('can remove volume from wishlist', function () {
 
     $response->assertStatus(200);
 
-    \Pest\Laravel\assertDatabaseMissing('wishlist_volumes', [
+    assertDatabaseMissing('wishlist_volumes', [
         'user_id' => $user->id,
         'volume_id' => $volume->id,
     ]);

@@ -12,8 +12,7 @@ class LoginAction
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{user: User, token: string}
@@ -25,7 +24,7 @@ class LoginAction
         $user = $this->userRepository->findByEmail($dto->email);
 
         if (! $user || ! Hash::check($dto->password, $user->getPassword())) {
-            throw new InvalidCredentialsException();
+            throw new InvalidCredentialsException;
         }
 
         $token = $this->userRepository->createToken($user, 'login_token');

@@ -4,6 +4,4 @@ namespace App\Manga\Domain\Exceptions;
 
 use DomainException;
 
-class EditionNotFoundException extends DomainException
-{
-}
+class EditionNotFoundException extends DomainException {}

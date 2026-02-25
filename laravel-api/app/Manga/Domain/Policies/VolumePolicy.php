@@ -2,8 +2,8 @@
 
 namespace App\Manga\Domain\Policies;
 
-use App\User\Infrastructure\EloquentModels\User;
 use App\Manga\Infrastructure\EloquentModels\Volume;
+use App\User\Infrastructure\EloquentModels\User;
 
 class VolumePolicy
 {

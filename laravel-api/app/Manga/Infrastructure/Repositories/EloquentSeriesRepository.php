@@ -5,6 +5,7 @@ namespace App\Manga\Infrastructure\Repositories;
 use App\Manga\Domain\Models\Series;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;
+use App\Manga\Infrastructure\Mappers\SeriesMapper;
 
 class EloquentSeriesRepository implements SeriesRepositoryInterface
 {
@@ -41,6 +42,6 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
 
     private function toDomain(EloquentSeries $eloquent): Series
     {
-        return \App\Manga\Infrastructure\Mappers\SeriesMapper::toDomain($eloquent);
+        return SeriesMapper::toDomain($eloquent);
     }
 }

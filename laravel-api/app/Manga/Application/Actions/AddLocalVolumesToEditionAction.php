@@ -3,8 +3,10 @@
 namespace App\Manga\Application\Actions;
 
 use App\Manga\Application\DTOs\AddLocalVolumesDTO;
+use App\Manga\Domain\Events\VolumeAddedToCollection;
 use App\Manga\Domain\Exceptions\EditionNotFoundException;
 use App\Manga\Domain\Exceptions\SeriesNotFoundException;
+use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
@@ -16,11 +18,10 @@ class AddLocalVolumesToEditionAction
         private readonly VolumeRepositoryInterface $volumeRepository,
         private readonly SeriesRepositoryInterface $seriesRepository,
         private readonly EditionRepositoryInterface $editionRepository,
-    ) {
-    }
+    ) {}
 
     /**
-     * @return \App\Manga\Domain\Models\Volume[]
+     * @return Volume[]
      */
     public function execute(AddLocalVolumesDTO $dto): array
     {
@@ -28,13 +29,13 @@ class AddLocalVolumesToEditionAction
             $edition = $this->editionRepository->findById($dto->editionId);
 
             if (! $edition) {
-                throw new EditionNotFoundException('Edition not found with ID: ' . $dto->editionId);
+                throw new EditionNotFoundException('Edition not found with ID: '.$dto->editionId);
             }
 
             $series = $this->seriesRepository->findById($edition->getSeriesId());
 
             if (! $series) {
-                throw new SeriesNotFoundException('Series not found with ID: ' . $edition->getSeriesId());
+                throw new SeriesNotFoundException('Series not found with ID: '.$edition->getSeriesId());
             }
 
             $volumes = [];
@@ -44,7 +45,7 @@ class AddLocalVolumesToEditionAction
                 $volume = $this->volumeRepository->findByEditionAndNumber($edition->getId(), $numberStr);
 
                 if (! $volume) {
-                    $volumeTitle = trim($series->getTitle() . ' Vol. ' . $numberStr);
+                    $volumeTitle = trim($series->getTitle().' Vol. '.$numberStr);
 
                     $volume = $this->volumeRepository->create([
                         'edition_id' => $edition->getId(),
@@ -62,7 +63,7 @@ class AddLocalVolumesToEditionAction
 
                 $this->volumeRepository->attachToUser($volume->getId(), $dto->userId);
 
-                event(new \App\Manga\Domain\Events\VolumeAddedToCollection($volume, $dto->userId));
+                event(new VolumeAddedToCollection($volume, $dto->userId));
 
                 $volumes[] = $volume;
             }

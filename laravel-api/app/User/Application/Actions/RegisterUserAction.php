@@ -11,8 +11,7 @@ class RegisterUserAction
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{user: User, token: string}

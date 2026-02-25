@@ -24,8 +24,7 @@ class Volume
         private readonly bool $isOwned = false,
         private readonly bool $isLoaned = false,
         private readonly ?string $loanedTo = null,
-    ) {
-    }
+    ) {}
 
     public function getId(): int
     {

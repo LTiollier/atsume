@@ -12,6 +12,7 @@ use App\Http\Api\Requests\BulkReturnMangaRequest;
 use App\Http\Api\Requests\LoanMangaRequest;
 use App\Http\Api\Requests\ReturnMangaRequest;
 use App\Http\Api\Resources\LoanResource;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -19,7 +20,7 @@ class LoanController
 {
     public function index(Request $request, ListLoansAction $action): AnonymousResourceCollection
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $request->user();
         $loans = $action->execute($user->id);
 

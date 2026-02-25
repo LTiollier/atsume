@@ -4,6 +4,7 @@ namespace App\Http\Api\Requests;
 
 use App\Borrowing\Application\DTOs\BulkLoanMangaDTO;
 use App\Manga\Infrastructure\EloquentModels\Volume;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BulkLoanMangaRequest extends FormRequest
@@ -27,7 +28,7 @@ class BulkLoanMangaRequest extends FormRequest
     }
 
     /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

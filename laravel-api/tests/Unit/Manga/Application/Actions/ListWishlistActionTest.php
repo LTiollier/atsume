@@ -5,6 +5,7 @@ namespace Tests\Unit\Manga\Application\Actions;
 use App\Manga\Application\Actions\ListWishlistAction;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
+use Mockery;
 
 test('it lists user wishlist', function () {
     $volumes = [
@@ -36,7 +37,7 @@ test('it lists user wishlist', function () {
         ),
     ];
 
-    $wishlistRepository = \Mockery::mock(WishlistRepositoryInterface::class);
+    $wishlistRepository = Mockery::mock(WishlistRepositoryInterface::class);
     $wishlistRepository->shouldReceive('findWishlistByUserId')->with(1)->andReturn($volumes);
 
     $action = new ListWishlistAction($wishlistRepository);

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="MangaStore PHP Standard">
-    <description>MangaStore coding standard based on PSR12.</description>
+<ruleset name="MangaStore Import Standard">
+    <description>MangaStore coding standard - Only enforcing imports (no inline FQCN).</description>
 
     <!-- Paths to check -->
     <file>app</file>
@@ -12,22 +12,13 @@
     <exclude-pattern>*/bootstrap/cache/*</exclude-pattern>
     <exclude-pattern>*/storage/*</exclude-pattern>
 
-    <!-- Coding standard -->
-    <rule ref="PSR12"/>
-
-    <!-- Allow snake_case in test methods -->
-    <rule ref="PSR1.Methods.CamelCapsMethodName">
-        <exclude-pattern>tests/*</exclude-pattern>
-    </rule>
-
-    <!-- Ignore line length warnings -->
-    <rule ref="Generic.Files.LineLength">
-        <severity>0</severity>
-    </rule>
-
-    <!-- Ignore side effects (common in Pest tests) -->
-    <rule ref="PSR1.Files.SideEffects">
-        <exclude-pattern>tests/*</exclude-pattern>
+    <!-- Enforce use statements instead of inline FQCN -->
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
+        <properties>
+            <property name="allowFallbackGlobalFunctions" value="true"/>
+            <property name="allowFallbackGlobalConstants" value="true"/>
+            <property name="searchAnnotations" value="true"/>
+        </properties>
     </rule>
 
     <!-- Configuration -->

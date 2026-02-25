@@ -5,6 +5,7 @@ namespace App\Manga\Infrastructure\Repositories;
 use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;
+use App\Manga\Infrastructure\Mappers\EditionMapper;
 
 class EloquentEditionRepository implements EditionRepositoryInterface
 {
@@ -48,6 +49,6 @@ class EloquentEditionRepository implements EditionRepositoryInterface
 
     private function toDomain(EloquentEdition $eloquent): Edition
     {
-        return \App\Manga\Infrastructure\Mappers\EditionMapper::toDomain($eloquent);
+        return EditionMapper::toDomain($eloquent);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\User\Infrastructure\EloquentModels\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
 use function Pest\Laravel\postJson;
@@ -39,5 +40,5 @@ test('it can reset password with token', function () {
 
     // Verify password was changed
     $user->refresh();
-    expect(Illuminate\Support\Facades\Hash::check('newpassword123', $user->password))->toBeTrue();
+    expect(Hash::check('newpassword123', $user->password))->toBeTrue();
 });

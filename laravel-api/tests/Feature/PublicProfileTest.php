@@ -3,6 +3,8 @@
 use App\Manga\Infrastructure\EloquentModels\Edition;
 use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\EloquentModels\Volume;
+use App\User\Domain\Models\User as DomainUser;
+use App\User\Domain\Repositories\UserRepositoryInterface;
 use App\User\Infrastructure\EloquentModels\User;
 
 use function Pest\Laravel\getJson;
@@ -56,15 +58,15 @@ test('it returns 404 for collection of private profile', function () {
 });
 
 test('it returns 404 if user has no ID', function () {
-    $user = Mockery::mock(\App\User\Domain\Models\User::class);
+    $user = Mockery::mock(DomainUser::class);
     $user->shouldReceive('isPublic')->andReturn(true);
     $user->shouldReceive('getId')->andReturn(null);
 
-    $userRepository = Mockery::mock(\App\User\Domain\Repositories\UserRepositoryInterface::class);
+    $userRepository = Mockery::mock(UserRepositoryInterface::class);
     $userRepository->shouldReceive('findByUsername')->with('username')->andReturn($user);
 
     // Use the app() helper to bind the mock
-    app()->instance(\App\User\Domain\Repositories\UserRepositoryInterface::class, $userRepository);
+    app()->instance(UserRepositoryInterface::class, $userRepository);
 
     $response = getJson('/api/users/username/collection');
 

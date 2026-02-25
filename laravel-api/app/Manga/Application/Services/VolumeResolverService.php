@@ -16,8 +16,7 @@ class VolumeResolverService
         private readonly VolumeRepositoryInterface $volumeRepository,
         private readonly SeriesRepositoryInterface $seriesRepository,
         private readonly EditionRepositoryInterface $editionRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Resolve a Volume by ISBN. If it does not exist locally, fetch it from the
@@ -36,7 +35,7 @@ class VolumeResolverService
         $volumeData = $this->lookupService->findByIsbn($isbn);
 
         if (! $volumeData) {
-            throw new MangaNotFoundException('Manga not found for barcode: ' . $isbn);
+            throw new MangaNotFoundException('Manga not found for barcode: '.$isbn);
         }
 
         return $this->persistHierarchy($volumeData);
@@ -59,7 +58,7 @@ class VolumeResolverService
         $volumeData = $this->lookupService->findByApiId($apiId);
 
         if (! $volumeData) {
-            throw new MangaNotFoundException('Manga not found in external API with ID: ' . $apiId);
+            throw new MangaNotFoundException('Manga not found in external API with ID: '.$apiId);
         }
 
         return $this->persistHierarchy($volumeData);

@@ -12,12 +12,14 @@ use App\User\Application\Actions\LogoutAction;
 use App\User\Application\Actions\RegisterUserAction;
 use App\User\Domain\Exceptions\InvalidCredentialsException;
 use App\User\Domain\Models\User;
+use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Cookie as SymfonyCookie;
 
 class AuthController
 {
@@ -51,7 +53,7 @@ class AuthController
 
     public function logout(Request $request, LogoutAction $action): JsonResponse
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $eloquentUser */
+        /** @var EloquentUser $eloquentUser */
         $eloquentUser = $request->user();
 
         $domainUser = new User(
@@ -103,7 +105,7 @@ class AuthController
      * - secure : HTTPS uniquement en production
      * - sameSite : 'Lax' pour autoriser les requêtes cross-origin du SPA
      */
-    private function makeTokenCookie(string $token): \Symfony\Component\HttpFoundation\Cookie
+    private function makeTokenCookie(string $token): SymfonyCookie
     {
         /** @var int $expiration */
         $expiration = config('sanctum.expiration', 60 * 24 * 7);

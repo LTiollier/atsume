@@ -5,6 +5,7 @@ namespace Tests\Unit\Manga\Infrastructure\EloquentModels;
 use App\Manga\Infrastructure\EloquentModels\Edition;
 use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\EloquentModels\Volume;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -30,6 +31,6 @@ class ModelsRelationshipTest extends TestCase
         $this->assertEquals('Test Series', $volume->edition->series->title);
 
         // Volume -> Users
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $volume->users);
+        $this->assertInstanceOf(Collection::class, $volume->users);
     }
 }

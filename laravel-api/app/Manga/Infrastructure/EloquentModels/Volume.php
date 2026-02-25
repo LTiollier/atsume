@@ -2,6 +2,9 @@
 
 namespace App\Manga\Infrastructure\EloquentModels;
 
+use App\Borrowing\Infrastructure\EloquentModels\Loan;
+use App\User\Infrastructure\EloquentModels\User;
+use Database\Factories\VolumeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Volume extends Model
 {
-    /** @use HasFactory<\Database\Factories\VolumeFactory> */
+    /** @use HasFactory<VolumeFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -45,18 +48,18 @@ class Volume extends Model
     }
 
     /**
-     * @return BelongsToMany<\App\User\Infrastructure\EloquentModels\User, $this>
+     * @return BelongsToMany<User, $this>
      */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(\App\User\Infrastructure\EloquentModels\User::class, 'user_volumes');
+        return $this->belongsToMany(User::class, 'user_volumes');
     }
 
     /**
-     * @return HasMany<\App\Borrowing\Infrastructure\EloquentModels\Loan, $this>
+     * @return HasMany<Loan, $this>
      */
     public function loans(): HasMany
     {
-        return $this->hasMany(\App\Borrowing\Infrastructure\EloquentModels\Loan::class);
+        return $this->hasMany(Loan::class);
     }
 }

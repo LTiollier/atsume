@@ -52,7 +52,7 @@ test('it rolls back all loans if one fails', function () {
         'borrower_name' => 'Jean Failed',
     ]);
 
-    $response->assertStatus(404);
+    $response->assertStatus(403);
 
     // Verify that NO loans were created (atomicity check)
     expect(Loan::where('borrower_name', 'Jean Failed')->count())->toBe(0);

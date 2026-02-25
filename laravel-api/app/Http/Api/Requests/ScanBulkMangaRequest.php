@@ -3,6 +3,7 @@
 namespace App\Http\Api\Requests;
 
 use App\Manga\Application\DTOs\ScanBulkMangaDTO;
+use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ScanBulkMangaRequest extends FormRequest
@@ -25,7 +26,7 @@ class ScanBulkMangaRequest extends FormRequest
 
     public function toDTO(): ScanBulkMangaDTO
     {
-        /** @var \App\User\Infrastructure\EloquentModels\User $user */
+        /** @var User $user */
         $user = $this->user();
 
         /** @var array<string> $isbns */

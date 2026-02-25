@@ -7,6 +7,7 @@ use App\Manga\Application\Actions\AddScannedMangaAction;
 use App\Manga\Application\DTOs\ScanBulkMangaDTO;
 use App\Manga\Application\DTOs\ScanMangaDTO;
 use App\Manga\Domain\Models\Volume;
+use Exception;
 use Mockery;
 
 test('it processes multiple ISBNs and returns volumes', function () {
@@ -43,7 +44,7 @@ test('it continues even if some scans fail', function () {
     $addScannedMangaAction->shouldReceive('execute')
         ->once()
         ->with(Mockery::on(fn (ScanMangaDTO $dto) => $dto->isbn === 'FAIL'))
-        ->andThrow(new \Exception('API Error'));
+        ->andThrow(new Exception('API Error'));
 
     $addScannedMangaAction->shouldReceive('execute')
         ->once()
