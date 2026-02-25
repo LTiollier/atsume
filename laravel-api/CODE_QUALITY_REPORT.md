@@ -232,7 +232,7 @@
 
 ### 2.7. `MangaCollectionController` avec des FQCNs inline
 
-- [ ] 🟢 **Les méthodes `scanBulk`, `bulkAdd`, `removeVolume`, `removeSeries`** utilisent des FQCNs dans la signature de méthode au lieu d'imports `use` en haut du fichier.  
+- [x] 🟢 **Les méthodes `scanBulk`, `bulkAdd`, `removeVolume`, `removeSeries`** utilisent des FQCNs dans la signature de méthode au lieu d'imports `use` en haut du fichier.  
   C'est une violation du style PSR-12 et de la convention du projet.
 
   **Fix :** Déplacer tous les FQCNs en imports `use` au top du fichier.
@@ -272,7 +272,7 @@
 
 ### 3.2. Route `/user` expose directement le modèle Eloquent en JSON
 
-- [ ] 🟠 **La route `GET /user`** (ligne 8-10 de `api.php`) retourne directement `$request->user()` — le modèle Eloquent brut — sans passer par une `UserResource`.  
+- [x] 🟠 **La route `GET /user`** (ligne 8-10 de `api.php`) retourne directement `$request->user()` — le modèle Eloquent brut — sans passer par une `UserResource`.  
   Cela peut exposer des champs sensibles si `$hidden` n'est pas exhaustif.
 
   **Fix :**

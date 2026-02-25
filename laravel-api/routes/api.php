@@ -8,11 +8,12 @@ use App\Http\Api\Controllers\MangaSearchController;
 use App\Http\Api\Controllers\PublicProfileController;
 use App\Http\Api\Controllers\UserSettingsController;
 use App\Http\Api\Controllers\WishlistController;
+use App\Http\Api\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return new UserResource($request->user());
 })->middleware('auth:sanctum');
 
 Route::post('/auth/register', [AuthController::class, 'register']);
