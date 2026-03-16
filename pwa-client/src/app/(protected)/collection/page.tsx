@@ -15,39 +15,42 @@ export default function CollectionPage() {
     const seriesList = useGroupedCollection(mangas, searchQuery);
 
     return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
-            <LucideBook className="h-6 w-6 text-primary" />
+        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <header className="relative overflow-hidden rounded-3xl bg-card border-2 border-border p-8 shadow-xl">
+                <div className="absolute inset-0 bg-manga-dots opacity-5"></div>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div className="flex items-center gap-6">
+                        <div className="p-4 bg-primary rounded-2xl shadow-lg shadow-primary/20">
+                            <LucideBook className="h-8 w-8 text-primary-foreground" />
+                        </div>
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-display font-black uppercase tracking-tight leading-none">Ma Collection</h1>
+                            <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground mt-2">
+                                {isLoading ? "Chargement..." : `${seriesList.length} séries • ${mangas.length} tomes`}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-            <h1 className="text-3xl font-black tracking-tight">Ma Collection</h1>
-            <p className="text-slate-500 text-sm">
-                            {isLoading ? "Chargement..." : `${seriesList.length} séries, ${mangas.length} tomes`}
-                        </p>
-                    </div>
-                </div>
 
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                        <input
-                            type="text"
-                            placeholder="Filtrer ma collection..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 w-full md:w-64"
-                        />
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="relative group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="Filtrer ma collection..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="bg-background/50 border-2 border-border rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-primary/50 transition-all w-full md:w-80 font-medium"
+                            />
+                        </div>
+                        <Button asChild className="h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95 uppercase tracking-wider">
+                            <Link href="/search">
+                                <Plus className="h-5 w-5 mr-2" />
+                                Ajouter
+                            </Link>
+                        </Button>
                     </div>
-          <Button asChild className="bg-primary hover:bg-primary font-bold rounded-xl whitespace-nowrap">
-                        <Link href="/search">
-              <Plus className="h-4 w-4 mr-2" />
-                            Ajouter
-                        </Link>
-                    </Button>
                 </div>
-            </div>
+            </header>
 
 
             {isLoading ? (

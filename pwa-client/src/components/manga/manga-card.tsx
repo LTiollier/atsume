@@ -1,11 +1,11 @@
 "use client";
 
 import { MangaSearchResult } from "@/types/manga";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2, WifiOff, Heart as LucideHeart, Trash2 } from "lucide-react";
+import { Plus, Loader2, WifiOff, Heart as LucideHeart, Trash2, User } from "lucide-react";
 import Image from "next/image";
 import { useOffline } from "@/contexts/OfflineContext";
+import { cn } from "@/lib/utils";
 
 interface MangaCardProps {
     manga: MangaSearchResult;
@@ -27,93 +27,86 @@ export function MangaCard({
     isRemoveLoading
 }: MangaCardProps) {
     const { isOffline } = useOffline();
+
     return (
-    <Card className="overflow-hidden flex flex-col h-full bg-card hover:shadow-lg transition-shadow duration-300 border-slate-800">
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-muted">
+        <div className="group relative block">
+            <div className="relative aspect-[2/3] w-full bg-card rounded-2xl overflow-hidden manga-panel transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 shadow-sm hover:shadow-2xl hover:shadow-primary/20">
                 {manga.cover_url ? (
                     <Image
                         src={manga.cover_url}
                         alt={manga.title}
                         fill
-            className="object-cover"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                 ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
+                    <div className="flex items-center justify-center h-full text-muted-foreground text-[10px] font-black uppercase tracking-widest text-center px-4 bg-secondary/10">
                         Pas de couverture
                     </div>
                 )}
-            </div>
-      <CardHeader className="p-4 pb-2 text-white">
-        <CardTitle className="text-lg line-clamp-2 min-h-[3.5rem]">{manga.title}</CardTitle>
-        <p className="text-sm text-slate-400 line-clamp-1">
-                    {manga.authors && manga.authors.length > 0 ? manga.authors.join(", ") : "Auteur inconnu"}
-                </p>
-            </CardHeader>
-      <CardContent className="p-4 pt-0 flex-grow">
-                {manga.isbn && (
-          <p className="text-xs text-slate-500 mt-1">ISBN: {manga.isbn}</p>
-                )}
-            </CardContent>
-            {(onAdd || onAddToWishlist || onRemove) && (
-        <CardFooter className="p-4 pt-0 flex gap-2">
+                
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-black/10 opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Actions Grid - Appear on hover */}
+                <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
                     {onAdd && (
                         <Button
-
-              className="flex-1 bg-primary hover:bg-primary text-white border-0"
-                            onClick={() => onAdd(manga)}
+                            size="icon"
+                            className="h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg border-2 border-background"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(manga); }}
                             disabled={isLoading || isOffline}
-                            title="Ajouter à ma collection"
                         >
-                            {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : isOffline ? (
-                <WifiOff className="h-4 w-4" />
-                            ) : (
-                <Plus className="h-4 w-4" />
-                            )}
-              <span className="sr-only sm:not-sr-only sm:ml-2">Ajouter</span>
+                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-5 w-5" />}
                         </Button>
                     )}
                     {onAddToWishlist && (
                         <Button
-              className="flex-1 bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
-                            variant="secondary"
-                            onClick={() => onAddToWishlist(manga)}
+                            size="icon"
+                            className="h-10 w-10 bg-background/80 backdrop-blur-md hover:bg-background text-primary rounded-full shadow-lg border-2 border-border"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAddToWishlist(manga); }}
                             disabled={isWishlistLoading || isOffline}
-                            title="Ajouter aux souhaits"
                         >
-                            {isWishlistLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : isOffline ? (
-                <WifiOff className="h-4 w-4" />
-                            ) : (
-                <LucideHeart className="h-4 w-4" />
-                            )}
-              <span className="sr-only sm:not-sr-only sm:ml-2">Souhait</span>
+                            {isWishlistLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LucideHeart className="h-4 w-4" />}
                         </Button>
                     )}
                     {onRemove && (
                         <Button
-              className="flex-1"
-                            variant="destructive"
-                            onClick={() => onRemove(manga)}
+                            size="icon"
+                            className="h-10 w-10 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full shadow-lg border-2 border-background"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRemove(manga); }}
                             disabled={isRemoveLoading || isOffline}
-                            title="Retirer"
                         >
-                            {isRemoveLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : isOffline ? (
-                <WifiOff className="h-4 w-4" />
-                            ) : (
-                <Trash2 className="h-4 w-4" />
-                            )}
-              <span className="sr-only sm:not-sr-only sm:ml-2">
-                                {isRemoveLoading ? "Retrait..." : "Retirer"}
-                            </span>
+                            {isRemoveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                         </Button>
                     )}
-                </CardFooter>
-            )}
-        </Card>
+                </div>
+
+                {/* Bottom Info */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <div className="space-y-0.5 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <div className="flex items-center gap-1 text-[9px] text-primary font-black uppercase tracking-widest overflow-hidden">
+                            <User className="h-2.5 w-2.5 flex-shrink-0" />
+                            <span className="truncate">
+                                {manga.authors && manga.authors.length > 0 ? manga.authors[0] : "Auteur inconnu"}
+                            </span>
+                        </div>
+                        <h3 className="text-white font-display font-black text-base leading-tight line-clamp-2 uppercase tracking-tight drop-shadow-2xl">
+                            {manga.title}
+                        </h3>
+                        {manga.isbn && (
+                            <p className="text-[8px] text-white/40 font-bold uppercase tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                ISBN: {manga.isbn}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                {isOffline && (
+                    <div className="absolute top-3 left-3 p-1.5 bg-background/50 backdrop-blur-sm rounded-full">
+                        <WifiOff className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
