@@ -14,6 +14,8 @@ help:
 	@echo "  make migrate         Run database migrations"
 	@echo "  make fresh           Shortcut for migrate:fresh --seed"
 	@echo "  make all             Run pint, phpcs, stan and all tests"
+	@echo "  make clean           Clear caches"
+	@echo "  make scrape          Scrape manga data from MangaCollec API"
 
 all: pint phpcs stan test
 
@@ -46,3 +48,6 @@ clean:
 	$(DOCKER_BE) php artisan cache:clear
 	$(DOCKER_BE) php artisan route:clear
 	$(DOCKER_BE) php artisan view:clear
+
+scrape:
+	$(DOCKER_BE) php artisan app:scrape-mangacollec
