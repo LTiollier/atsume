@@ -2,9 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Manga\Application\DTOs\CreateBoxDTO;
+use App\Manga\Application\DTOs\CreateBoxSetDTO;
 use App\Manga\Application\DTOs\CreateEditionDTO;
 use App\Manga\Application\DTOs\CreateSeriesDTO;
 use App\Manga\Application\DTOs\CreateVolumeDTO;
+use App\Manga\Domain\Repositories\BoxRepositoryInterface;
+use App\Manga\Domain\Repositories\BoxSetRepositoryInterface;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
@@ -15,13 +19,16 @@ use Illuminate\Support\Facades\DB;
 class ScrapeMangaCollecCommand extends Command
 {
     protected $signature = 'app:scrape-mangacollec {--limit=2 : The number of series to scrape}';
+
     protected $description = 'Scrape manga data from MangaCollec API';
 
     public function __construct(
         private readonly MangaCollecScraperService $scraperService,
         private readonly SeriesRepositoryInterface $seriesRepository,
         private readonly EditionRepositoryInterface $editionRepository,
-        private readonly VolumeRepositoryInterface $volumeRepository
+        private readonly VolumeRepositoryInterface $volumeRepository,
+        private readonly BoxSetRepositoryInterface $boxSetRepository,
+        private readonly BoxRepositoryInterface $boxRepository
     ) {
         parent::__construct();
     }
@@ -30,8 +37,9 @@ class ScrapeMangaCollecCommand extends Command
     {
         $this->info('Starting MangaCollec Scraper...');
 
-        if (!$this->scraperService->login()) {
+        if (! $this->scraperService->login()) {
             $this->error('Failed to login to MangaCollec');
+
             return 1;
         }
 
@@ -48,19 +56,20 @@ class ScrapeMangaCollecCommand extends Command
             $this->info("Scraping series: {$seriesData['title']} ({$seriesUuid})");
 
             $detail = $this->scraperService->getSeriesDetail($seriesUuid);
-            if (!$detail) {
+            if (! $detail) {
                 $this->warn("Could not get details for series {$seriesUuid}");
+
                 continue;
             }
 
             DB::transaction(function () use ($detail, $seriesUuid) {
                 // 1. Handle Series
                 $series = $this->seriesRepository->findByApiId($seriesUuid);
-                
-                $authors = collect($detail['authors'] ?? [])->map(fn($a) => trim(($a['first_name'] ?? '') . ' ' . ($a['name'] ?? '')))->filter()->values()->toArray();
+
+                $authors = collect($detail['authors'] ?? [])->map(fn ($a) => trim(($a['first_name'] ?? '').' '.($a['name'] ?? '')))->filter()->values()->toArray();
                 $seriesTitle = $detail['series'][0]['title'] ?? $detail['title'] ?? 'Unknown';
 
-                if (!$series) {
+                if (! $series) {
                     $series = $this->seriesRepository->create(new CreateSeriesDTO(
                         title: $seriesTitle,
                         authors: $authors,
@@ -91,7 +100,7 @@ class ScrapeMangaCollecCommand extends Command
                     }
 
                     $edition = $this->editionRepository->findByNameAndSeries($editionName, $series->getId());
-                    if (!$edition) {
+                    if (! $edition) {
                         $edition = $this->editionRepository->create(new CreateEditionDTO(
                             seriesId: $series->getId(),
                             name: $editionName,
@@ -110,29 +119,32 @@ class ScrapeMangaCollecCommand extends Command
                     $isbn = $volumeData['isbn'] ?? null;
                     $coverUrl = $volumeData['image_url'] ?? null;
 
-                    if (!$firstVolumeCover && $coverUrl) {
+                    if (! $firstVolumeCover && $coverUrl) {
                         $firstVolumeCover = $coverUrl;
                     }
-                    
+
                     if ($this->volumeRepository->findByApiId($volumeUuid)) {
                         continue;
                     }
 
                     if ($isbn && $this->volumeRepository->findByIsbn($isbn)) {
                         $this->warn("Skipping volume with existing ISBN: {$isbn}");
+
                         continue;
                     }
 
                     $mappedEditionId = $editionsMap[$volumeData['edition_id']] ?? null;
-                    if (!$mappedEditionId) {
+                    if (! $mappedEditionId) {
                         $mappedEditionId = reset($editionsMap) ?: null;
                     }
 
-                    if (!$mappedEditionId) continue;
+                    if (! $mappedEditionId) {
+                        continue;
+                    }
 
                     $this->volumeRepository->create(new CreateVolumeDTO(
                         editionId: $mappedEditionId,
-                        title: ($seriesTitle) . ' #' . ($volumeData['number'] ?? '?'),
+                        title: ($seriesTitle).' #'.($volumeData['number'] ?? '?'),
                         number: (string) ($volumeData['number'] ?? ''),
                         isbn: $isbn,
                         apiId: $volumeUuid,
@@ -143,8 +155,97 @@ class ScrapeMangaCollecCommand extends Command
                 }
 
                 // Update series cover if we found one
-                if ($firstVolumeCover && $seriesModel && !$seriesModel->cover_url) {
+                if ($firstVolumeCover && $seriesModel && ! $seriesModel->cover_url) {
                     $seriesModel->update(['cover_url' => $firstVolumeCover]);
+                }
+
+                // 4. Handle Box Editions (Box Sets)
+                $boxSetsMap = [];
+                foreach ($detail['box_editions'] ?? [] as $boxEditionData) {
+                    $beUuid = $boxEditionData['id'];
+                    $beTitle = $boxEditionData['title'] ?? 'Box Set';
+                    $bePublisherId = $boxEditionData['publisher_id'] ?? null;
+                    $bePublisherName = null;
+
+                    if ($bePublisherId) {
+                        $publisher = collect($detail['publishers'] ?? [])->firstWhere('id', $bePublisherId);
+                        $bePublisherName = $publisher['title'] ?? null;
+                    }
+
+                    $boxSet = $this->boxSetRepository->findByApiId($beUuid);
+                    if (! $boxSet) {
+                        $boxSet = $this->boxSetRepository->create(new CreateBoxSetDTO(
+                            seriesId: $series->getId(),
+                            title: $beTitle,
+                            publisher: $bePublisherName,
+                            apiId: $beUuid
+                        ));
+                    }
+                    $boxSetsMap[$beUuid] = $boxSet->getId();
+                }
+
+                // 5. Handle Boxes
+                $boxesMap = [];
+                foreach ($detail['boxes'] ?? [] as $boxData) {
+                    $boxUuid = $boxData['id'];
+                    $boxIsbn = $boxData['isbn'] ?? null;
+
+                    if ($this->boxRepository->findByApiId($boxUuid)) {
+                        $boxesMap[$boxUuid] = $this->boxRepository->findByApiId($boxUuid)->getId();
+
+                        continue;
+                    }
+
+                    if ($boxIsbn && $this->boxRepository->findByIsbn($boxIsbn)) {
+                        $this->warn("Skipping box with existing ISBN: {$boxIsbn}");
+                        $boxesMap[$boxUuid] = $this->boxRepository->findByIsbn($boxIsbn)->getId();
+
+                        continue;
+                    }
+
+                    $mappedBoxSetId = $boxSetsMap[$boxData['box_edition_id'] ?? ''] ?? null;
+                    if (! $mappedBoxSetId) {
+                        continue;
+                    }
+
+                    $box = $this->boxRepository->create(new CreateBoxDTO(
+                        boxSetId: $mappedBoxSetId,
+                        title: $boxData['title'] ?? 'Box',
+                        number: (string) ($boxData['number'] ?? ''),
+                        isbn: $boxIsbn,
+                        apiId: $boxUuid,
+                        releaseDate: $boxData['release_date'] ?? null,
+                        coverUrl: $boxData['image_url'] ?? null,
+                        isEmpty: str_contains(strtolower($boxData['title'] ?? ''), 'vide')
+                    ));
+                    $boxesMap[$boxUuid] = $box->getId();
+                }
+
+                // 6. Handle Box Volumes link
+                $boxVolumesToAttach = [];
+                foreach ($detail['box_volumes'] ?? [] as $bvData) {
+                    if (! ($bvData['included'] ?? true)) {
+                        continue; // Only link if theoretically included or to signify relation? Depending on your requirement. Let's assume we link everything that is logically in the box. But actually "included: false" might mean it's an empty box.
+                    }
+
+                    $boxUuid = $bvData['box_id'];
+                    $volumeUuid = $bvData['volume_id'];
+
+                    $boxId = $boxesMap[$boxUuid] ?? null;
+                    if (! $boxId) {
+                        continue;
+                    }
+
+                    // Ideally we fetch the local volume id. Since we already synced volumes:
+                    $volume = $this->volumeRepository->findByApiId($volumeUuid);
+
+                    if ($volume) {
+                        $boxVolumesToAttach[$boxId][] = $volume->getId();
+                    }
+                }
+
+                foreach ($boxVolumesToAttach as $boxId => $volumeIds) {
+                    $this->boxRepository->attachVolumes($boxId, $volumeIds);
                 }
             });
 
@@ -153,6 +254,7 @@ class ScrapeMangaCollecCommand extends Command
         }
 
         $this->info('Scraping completed!');
+
         return 0;
     }
 }
