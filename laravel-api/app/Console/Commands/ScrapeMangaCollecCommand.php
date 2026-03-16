@@ -105,7 +105,9 @@ class ScrapeMangaCollecCommand extends Command
                             seriesId: $series->getId(),
                             name: $editionName,
                             language: 'fr',
-                            publisher: $publisherName
+                            publisher: $publisherName,
+                            totalVolumes: $editionData['volumes_count'] ?? null,
+                            isFinished: ! ($editionData['not_finished'] ?? true),
                         ));
                     }
                     $editionsMap[$editionId] = $edition->getId();

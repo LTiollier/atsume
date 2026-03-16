@@ -9,5 +9,7 @@ class CreateEditionDTO
         public readonly string $name,
         public readonly string $language,
         public readonly ?string $publisher = null,
+        public readonly ?int $totalVolumes = null,
+        public readonly bool $isFinished = false,
     ) {}
 }

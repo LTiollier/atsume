@@ -23,9 +23,7 @@ class Volume extends Model
         'number',
         'title',
         'authors',
-        'description',
         'published_date',
-        'page_count',
         'cover_url',
     ];
 

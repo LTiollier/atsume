@@ -11,6 +11,7 @@ class Edition
         private readonly ?string $publisher,
         private readonly ?string $language,
         private readonly ?int $total_volumes,
+        private readonly bool $is_finished = false,
     ) {}
 
     public function getId(): int
@@ -41,5 +42,10 @@ class Edition
     public function getTotalVolumes(): ?int
     {
         return $this->total_volumes;
+    }
+
+    public function isFinished(): bool
+    {
+        return $this->is_finished;
     }
 }

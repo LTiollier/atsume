@@ -16,6 +16,7 @@ class EditionMapper
             publisher: $eloquent->publisher,
             language: $eloquent->language,
             total_volumes: $eloquent->total_volumes,
+            is_finished: (bool) $eloquent->is_finished,
         );
     }
 }

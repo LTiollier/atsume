@@ -19,6 +19,7 @@ class Edition extends Model
         'publisher',
         'language',
         'total_volumes',
+        'is_finished',
     ];
 
     /**

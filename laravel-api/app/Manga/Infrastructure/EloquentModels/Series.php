@@ -16,9 +16,6 @@ class Series extends Model
         'api_id',
         'title',
         'authors',
-        'description',
-        'status',
-        'total_volumes',
         'cover_url',
     ];
 

@@ -12,9 +12,6 @@ class Series
         private readonly ?string $api_id,
         private readonly string $title,
         private readonly array $authors,
-        private readonly ?string $description,
-        private readonly ?string $status, // Ongoing, Finished
-        private readonly ?int $total_volumes,
         private readonly ?string $cover_url,
     ) {}
 
@@ -39,21 +36,6 @@ class Series
     public function getAuthors(): array
     {
         return $this->authors;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function getTotalVolumes(): ?int
-    {
-        return $this->total_volumes;
     }
 
     public function getCoverUrl(): ?string

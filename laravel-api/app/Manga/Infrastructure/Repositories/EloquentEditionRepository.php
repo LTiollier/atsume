@@ -45,6 +45,8 @@ class EloquentEditionRepository implements EditionRepositoryInterface
             'name' => $dto->name,
             'language' => $dto->language,
             'publisher' => $dto->publisher,
+            'total_volumes' => $dto->totalVolumes,
+            'is_finished' => $dto->isFinished,
         ]);
 
         return $this->toDomain($eloquent);

@@ -17,9 +17,6 @@ class SeriesMapper
             api_id: $eloquent->api_id,
             title: $eloquent->title,
             authors: $authors,
-            description: $eloquent->description,
-            status: $eloquent->status,
-            total_volumes: $eloquent->total_volumes,
             cover_url: $eloquent->cover_url,
         );
     }

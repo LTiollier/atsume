@@ -15,9 +15,7 @@ class Volume
         private readonly ?string $number, // Volume number (1, 2, 1-2, etc.)
         private readonly string $title,
         private readonly array $authors,
-        private readonly ?string $description,
         private readonly ?string $published_date,
-        private readonly ?int $page_count,
         private readonly ?string $cover_url,
         private readonly ?Edition $edition = null,
         private readonly ?Series $series = null,
@@ -64,19 +62,9 @@ class Volume
         return $this->authors;
     }
 
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
     public function getPublishedDate(): ?string
     {
         return $this->published_date;
-    }
-
-    public function getPageCount(): ?int
-    {
-        return $this->page_count;
     }
 
     public function getCoverUrl(): ?string
