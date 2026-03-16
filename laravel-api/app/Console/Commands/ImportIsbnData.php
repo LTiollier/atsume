@@ -28,14 +28,16 @@ class ImportIsbnData extends Command
     {
         $filePath = $this->argument('file');
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             $this->error("File not found: {$filePath}");
+
             return 1;
         }
 
         $handle = fopen($filePath, 'r');
         if ($handle === false) {
             $this->error("Could not open file: {$filePath}");
+
             return 1;
         }
 
@@ -44,11 +46,12 @@ class ImportIsbnData extends Command
         if ($header === false) {
             $this->error("Empty file: {$filePath}");
             fclose($handle);
+
             return 1;
         }
 
         // Get total rows for progress bar
-        $this->info("Counting rows in file...");
+        $this->info('Counting rows in file...');
         $rowCount = $this->countLines($filePath) - 1; // Subtract header
         $this->info("Found {$rowCount} rows to process.");
 
@@ -64,12 +67,13 @@ class ImportIsbnData extends Command
 
         while (($row = fgetcsv($handle)) !== false) {
             if (count($row) !== count($header)) {
-                $this->warn("\nSkipping invalid row " . ($processed + 2) . ": Column count mismatch.");
+                $this->warn("\nSkipping invalid row ".($processed + 2).': Column count mismatch.');
+
                 continue;
             }
 
             $data = array_combine($header, $row);
-            
+
             // Remove unwanted fields
             unset($data['min_price'], $data['offers_count'], $data['url'], $data['currency']);
 
@@ -78,8 +82,8 @@ class ImportIsbnData extends Command
                 'replaceOne' => [
                     ['isbn' => $data['isbn']],
                     $data,
-                    ['upsert' => true]
-                ]
+                    ['upsert' => true],
+                ],
             ];
 
             if (count($ops) >= $chunkSize) {
@@ -90,7 +94,7 @@ class ImportIsbnData extends Command
             }
         }
 
-        if (!empty($ops)) {
+        if (! empty($ops)) {
             $collection->bulkWrite($ops);
             $bar->advance(count($ops));
             $processed += count($ops);
@@ -114,12 +118,13 @@ class ImportIsbnData extends Command
     protected function countLines(string $filePath): int
     {
         $lineCount = 0;
-        $handle = fopen($filePath, "r");
-        while (!feof($handle)) {
+        $handle = fopen($filePath, 'r');
+        while (! feof($handle)) {
             fgets($handle);
             $lineCount++;
         }
         fclose($handle);
+
         return $lineCount;
     }
 }

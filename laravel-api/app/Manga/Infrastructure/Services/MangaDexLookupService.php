@@ -16,7 +16,7 @@ class MangaDexLookupService implements MangaLookupServiceInterface
     {
         // MangaDex API works with includes[0]=author or includes[]=author
         // Laravel's Http client with an array will produce includes[0]=author
-        $response = Http::get(self::BASE_URL . '/manga', [
+        $response = Http::get(self::BASE_URL.'/manga', [
             'title' => $query,
             'limit' => 5,
             'includes' => ['author', 'cover_art'],
@@ -28,7 +28,7 @@ class MangaDexLookupService implements MangaLookupServiceInterface
         }
 
         $data = $response->json();
-        if (!is_array($data) || empty($data['data']) || !is_array($data['data'])) {
+        if (! is_array($data) || empty($data['data']) || ! is_array($data['data'])) {
             return [];
         }
 
@@ -36,7 +36,7 @@ class MangaDexLookupService implements MangaLookupServiceInterface
     }
 
     /**
-     * MangaDex does not support ISBN directly. 
+     * MangaDex does not support ISBN directly.
      */
     public function findByIsbn(string $isbn): ?array
     {
@@ -45,8 +45,8 @@ class MangaDexLookupService implements MangaLookupServiceInterface
 
     public function findByApiId(string $apiId): ?array
     {
-        $response = Http::get(self::BASE_URL . '/manga/' . $apiId, [
-            'includes' => ['author', 'cover_art']
+        $response = Http::get(self::BASE_URL.'/manga/'.$apiId, [
+            'includes' => ['author', 'cover_art'],
         ]);
 
         if ($response->failed()) {
@@ -59,7 +59,7 @@ class MangaDexLookupService implements MangaLookupServiceInterface
     }
 
     /**
-     * @param array<string, mixed> $item
+     * @param  array<string, mixed>  $item
      * @return array<string, mixed>
      */
     private function transform(array $item): array
@@ -72,15 +72,15 @@ class MangaDexLookupService implements MangaLookupServiceInterface
         $relationships = $item['relationships'] ?? [];
 
         // Title: try French first, then English, then original
-        $title = $attributes['title']['fr'] 
-            ?? $attributes['title']['en'] 
-            ?? array_values($attributes['title'])[0] 
+        $title = $attributes['title']['fr']
+            ?? $attributes['title']['en']
+            ?? array_values($attributes['title'])[0]
             ?? 'Unknown Title';
 
         // Description: try French first, then English
-        $description = $attributes['description']['fr'] 
-            ?? $attributes['description']['en'] 
-            ?? array_values($attributes['description'])[0] 
+        $description = $attributes['description']['fr']
+            ?? $attributes['description']['en']
+            ?? array_values($attributes['description'])[0]
             ?? null;
 
         // Authors

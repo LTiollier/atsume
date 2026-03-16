@@ -33,8 +33,8 @@ class SearchIsbnData extends Command
         $filter = [
             '$or' => [
                 ['isbn' => $query],
-                ['title' => ['$regex' => $query, '$options' => 'i']]
-            ]
+                ['title' => ['$regex' => $query, '$options' => 'i']],
+            ],
         ];
 
         $cursor = $collection->find($filter, [
@@ -44,19 +44,20 @@ class SearchIsbnData extends Command
                 'title' => 1,
                 'editeur' => 1,
                 'nb_page' => 1,
-            ]
+            ],
         ]);
 
         $results = iterator_to_array($cursor);
 
         if (empty($results)) {
             $this->info("No results found for '{$query}'.");
+
             return 0;
         }
 
         $this->table(
             ['ISBN', 'Title', 'Publisher', 'Pages'],
-            array_map(fn($r) => [
+            array_map(fn ($r) => [
                 $r['isbn'],
                 $r['title'] ?? 'N/A',
                 $r['editeur'] ?? 'N/A',
