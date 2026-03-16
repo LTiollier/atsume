@@ -34,4 +34,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
+    'mangacollec' => [
+        'client_id' => env('MANGAC_CLIENT_ID'),
+        'client_secret' => env('MANGAC_CLIENT_SECRET'),
+        'username' => env('MANGAC_USERNAME'),
+        'password' => env('MANGAC_PASSWORD'),
+    ],
 ];
