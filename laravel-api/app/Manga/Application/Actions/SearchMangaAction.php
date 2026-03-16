@@ -3,19 +3,20 @@
 namespace App\Manga\Application\Actions;
 
 use App\Manga\Application\DTOs\SearchMangaDTO;
-use App\Manga\Domain\Services\MangaLookupServiceInterface;
+use App\Manga\Domain\Models\Series;
+use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 
 class SearchMangaAction
 {
     public function __construct(
-        private readonly MangaLookupServiceInterface $lookupService
+        private readonly SeriesRepositoryInterface $seriesRepository
     ) {}
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return Series[]
      */
     public function execute(SearchMangaDTO $dto): array
     {
-        return $this->lookupService->search($dto->query);
+        return $this->seriesRepository->search($dto->query);
     }
 }

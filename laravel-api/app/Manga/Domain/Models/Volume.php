@@ -11,7 +11,6 @@ class Volume
         private readonly ?string $isbn,
         private readonly ?string $number, // Volume number (1, 2, 1-2, etc.)
         private readonly string $title,
-        private readonly ?string $authors,
         private readonly ?string $published_date,
         private readonly ?string $cover_url,
         private readonly ?Edition $edition = null,
@@ -51,10 +50,6 @@ class Volume
         return $this->title;
     }
 
-    public function getAuthors(): ?string
-    {
-        return $this->authors;
-    }
 
     public function getPublishedDate(): ?string
     {

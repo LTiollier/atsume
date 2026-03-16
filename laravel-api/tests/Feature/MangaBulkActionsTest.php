@@ -2,8 +2,8 @@
 
 use App\Manga\Infrastructure\EloquentModels\Edition;
 use App\Manga\Infrastructure\EloquentModels\Series;
+use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\User\Infrastructure\EloquentModels\User;
-use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -13,47 +13,26 @@ test('can bulk scan mangas', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
+    $series = Series::create(['title' => 'Test Series', 'authors' => null]);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+
     $isbn1 = '9781111111111';
     $isbn2 = '9782222222222';
 
-    Http::fake([
-        'www.googleapis.com/books/v1/volumes*' => function ($request) {
-            $query = parse_url($request->url(), PHP_URL_QUERY);
-            parse_str($query, $params);
-            $q = $params['q'] ?? '';
+    $v1 = Volume::create([
+        'api_id' => 'api_1',
+        'title' => 'Manga 1',
+        'isbn' => $isbn1,
+        'edition_id' => $edition->id,
+        'authors' => null,
+    ]);
 
-            if (str_contains($q, 'isbn:9781111111111')) {
-                return Http::response([
-                    'items' => [
-                        [
-                            'id' => 'api_1',
-                            'volumeInfo' => [
-                                'title' => 'Manga 1',
-                                'authors' => ['Author 1'],
-                                'industryIdentifiers' => [['type' => 'ISBN_13', 'identifier' => '9781111111111']],
-                            ],
-                        ],
-                    ],
-                ], 200);
-            }
-
-            if (str_contains($q, 'isbn:9782222222222')) {
-                return Http::response([
-                    'items' => [
-                        [
-                            'id' => 'api_2',
-                            'volumeInfo' => [
-                                'title' => 'Manga 2',
-                                'authors' => ['Author 2'],
-                                'industryIdentifiers' => [['type' => 'ISBN_13', 'identifier' => '9782222222222']],
-                            ],
-                        ],
-                    ],
-                ], 200);
-            }
-
-            return Http::response(['items' => []], 200);
-        },
+    $v2 = Volume::create([
+        'api_id' => 'api_2',
+        'title' => 'Manga 2',
+        'isbn' => $isbn2,
+        'edition_id' => $edition->id,
+        'authors' => null,
     ]);
 
     $response = postJson('/api/mangas/scan-bulk', [
@@ -63,15 +42,15 @@ test('can bulk scan mangas', function () {
     $response->assertStatus(201)
         ->assertJsonCount(2, 'data');
 
-    assertDatabaseHas('volumes', ['isbn' => $isbn1]);
-    assertDatabaseHas('volumes', ['isbn' => $isbn2]);
+    expect($user->volumes()->where('volumes.id', $v1->id)->exists())->toBeTrue()
+        ->and($user->volumes()->where('volumes.id', $v2->id)->exists())->toBeTrue();
 });
 
 test('can bulk add local volumes to an edition', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Test Series', 'authors' => []]);
+    $series = Series::create(['title' => 'Test Series', 'authors' => null]);
     $edition = Edition::create([
         'series_id' => $series->id,
         'name' => 'Standard',

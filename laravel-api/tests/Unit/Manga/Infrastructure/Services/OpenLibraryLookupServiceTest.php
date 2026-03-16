@@ -155,7 +155,7 @@ test('it handles malformed author data in OpenLibrary response', function () {
         'https://openlibrary.org/api/books*' => Http::response([
             $bibkey => [
                 'title' => 'Naruto Vol 1',
-                'authors' => ['Masashi Kishimoto'], // String instead of array of arrays
+                'authors' => 'Masashi Kishimoto', // String instead of array of arrays
             ],
         ], 200),
     ]);
@@ -164,5 +164,5 @@ test('it handles malformed author data in OpenLibrary response', function () {
     $result = $service->findByIsbn($isbn);
 
     expect($result)->not->toBeNull()
-        ->and($result['authors'])->toBe(['']);
+        ->and($result['authors'])->toBe([]);
 });

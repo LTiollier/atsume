@@ -42,6 +42,21 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
         return $this->toDomain($eloquent);
     }
 
+    /**
+     * @return Series[]
+     */
+    public function search(string $query): array
+    {
+        $eloquentSeries = EloquentSeries::whereRaw('LOWER(title) LIKE ?', ['%'.strtolower($query).'%'])
+            ->orWhereRaw('LOWER(authors) LIKE ?', ['%'.strtolower($query).'%'])
+            ->get();
+
+        /** @var array<int, Series> $series */
+        $series = $eloquentSeries->map(fn (EloquentSeries $s) => $this->toDomain($s))->toArray();
+
+        return $series;
+    }
+
     private function toDomain(EloquentSeries $eloquent): Series
     {
         return SeriesMapper::toDomain($eloquent);

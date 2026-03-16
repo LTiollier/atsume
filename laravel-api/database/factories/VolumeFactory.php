@@ -27,10 +27,7 @@ class VolumeFactory extends Factory
             'isbn' => $this->faker->isbn13(),
             'number' => $this->faker->numberBetween(1, 100),
             'title' => 'Tome '.$this->faker->numberBetween(1, 100),
-            'authors' => [$this->faker->name()],
-            'description' => $this->faker->paragraph(),
             'published_date' => $this->faker->date(),
-            'page_count' => $this->faker->numberBetween(150, 250),
             'cover_url' => $this->faker->imageUrl(),
         ];
     }

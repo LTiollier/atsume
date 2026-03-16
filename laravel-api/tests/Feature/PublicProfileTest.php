@@ -32,13 +32,13 @@ test('it returns 404 for private or non-existent profile', function () {
 
 test('it retrieves collection for public profile', function () {
     $user = User::factory()->create(['username' => 'publicuser', 'is_public' => true]);
-    $series = Series::create(['title' => 'Naruto', 'authors' => []]);
+    $series = Series::create(['title' => 'Naruto', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     $volume = Volume::create([
         'api_id' => 'api123',
         'title' => 'Naruto Vol. 1',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
     $user->volumes()->attach($volume->id);
 

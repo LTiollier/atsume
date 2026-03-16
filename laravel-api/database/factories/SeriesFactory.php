@@ -23,10 +23,7 @@ class SeriesFactory extends Factory
         return [
             'api_id' => Str::orderedUuid()->toString(),
             'title' => $this->faker->sentence(3),
-            'authors' => [$this->faker->name()],
-            'description' => $this->faker->paragraph(),
-            'status' => $this->faker->randomElement(['publishing', 'finished', 'on_hiatus']),
-            'total_volumes' => $this->faker->numberBetween(1, 100),
+            'authors' => $this->faker->name(),
             'cover_url' => $this->faker->imageUrl(),
         ];
     }
@@ -36,10 +33,7 @@ class SeriesFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'api_id' => 'naruto-api-id-xxxx',
             'title' => 'Naruto',
-            'authors' => ['Masashi Kishimoto'],
-            'description' => 'Naruto is a Japanese manga series written and illustrated by Masashi Kishimoto.',
-            'status' => 'finished',
-            'total_volumes' => 72,
+            'authors' => 'Masashi Kishimoto',
             'cover_url' => 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg',
         ]);
     }
@@ -49,10 +43,7 @@ class SeriesFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'api_id' => 'dragonball-api-id-xxxx',
             'title' => 'Dragon Ball',
-            'authors' => ['Akira Toriyama'],
-            'description' => 'Dragon Ball is a Japanese manga series written and illustrated by Akira Toriyama.',
-            'status' => 'finished',
-            'total_volumes' => 42,
+            'authors' => 'Akira Toriyama',
             'cover_url' => 'https://upload.wikimedia.org/wikipedia/en/c/c3/Dragon_Ball_vol_1.png',
         ]);
     }

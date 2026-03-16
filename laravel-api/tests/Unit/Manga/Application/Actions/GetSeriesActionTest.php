@@ -12,10 +12,7 @@ test('it gets a series by id', function () {
         id: 1,
         api_id: 'api_id',
         title: 'Title',
-        authors: ['Author'],
-        description: null,
-        status: null,
-        total_volumes: null,
+        authors: 'Author',
         cover_url: null,
     );
 

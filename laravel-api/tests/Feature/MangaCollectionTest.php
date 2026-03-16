@@ -7,7 +7,6 @@ use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -19,15 +18,15 @@ test('can add manga to collection by api_id', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    Http::fake([
-        'www.googleapis.com/books/v1/volumes/9781234567890' => Http::response([
-            'id' => '9781234567890',
-            'volumeInfo' => [
-                'title' => 'Naruto Vol. 1',
-                'authors' => ['Masashi Kishimoto'],
-                'publishedDate' => '1999',
-            ],
-        ], 200),
+    // Seed local database as the action only resolves locally
+    $series = Series::create(['title' => 'Naruto', 'authors' => 'Masashi Kishimoto', 'api_id' => 's1']);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+    $volume = Volume::create([
+        'api_id' => '9781234567890',
+        'title' => 'Naruto Vol. 1',
+        'isbn' => '9781234567890',
+        'edition_id' => $edition->id,
+        'authors' => null,
     ]);
 
     Event::fake();
@@ -42,10 +41,7 @@ test('can add manga to collection by api_id', function () {
 
     Event::assertDispatched(VolumeAddedToCollection::class);
 
-    assertDatabaseHas('volumes', [
-        'api_id' => '9781234567890',
-        'title' => 'Naruto Vol. 1',
-    ]);
+    expect($user->volumes()->where('volumes.id', $volume->id)->exists())->toBeTrue();
 });
 
 test('can add manga to collection by isbn', function () {
@@ -53,22 +49,15 @@ test('can add manga to collection by isbn', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    Http::fake([
-        'www.googleapis.com/books/v1/volumes*' => Http::response([
-            'items' => [
-                [
-                    'id' => 'api_id_123',
-                    'volumeInfo' => [
-                        'title' => 'Naruto Vol. 1',
-                        'authors' => ['Masashi Kishimoto'],
-                        'publishedDate' => '1999',
-                        'industryIdentifiers' => [
-                            ['type' => 'ISBN_13', 'identifier' => '9781234567890'],
-                        ],
-                    ],
-                ],
-            ],
-        ], 200),
+    // Seed local database as the action only resolves locally
+    $series = Series::create(['title' => 'Naruto', 'authors' => 'Masashi Kishimoto', 'api_id' => 's1']);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+    $volume = Volume::create([
+        'api_id' => 'api_id_123',
+        'title' => 'Naruto Vol. 1',
+        'isbn' => '9781234567890',
+        'edition_id' => $edition->id,
+        'authors' => null,
     ]);
 
     $response = postJson('/api/mangas/scan', [
@@ -78,9 +67,7 @@ test('can add manga to collection by isbn', function () {
     $response->assertStatus(201)
         ->assertJsonPath('data.isbn', '9781234567890');
 
-    assertDatabaseHas('volumes', [
-        'isbn' => '9781234567890',
-    ]);
+    expect($user->volumes()->where('volumes.id', $volume->id)->exists())->toBeTrue();
 });
 
 test('can list user mangas with ownership and loan flags', function () {
@@ -88,14 +75,14 @@ test('can list user mangas with ownership and loan flags', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Naruto', 'authors' => []]);
+    $series = Series::create(['title' => 'Naruto', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     $volume = Volume::create([
         'api_id' => 'api123',
         'title' => 'Naruto Vol. 1',
         'isbn' => '9781234567890',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
 
     $user->volumes()->attach($volume->id);
@@ -121,17 +108,16 @@ test('it handles adding a manga that already exists in DB by ISBN', function () 
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Existing Series', 'authors' => []]);
+    $series = Series::create(['title' => 'Existing Series', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     $volume = Volume::create([
         'api_id' => 'existing_api',
         'title' => 'Existing Volume',
         'isbn' => '9781111111111',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
 
-    // No Http::fake needed as it should find it in DB
     $response = postJson('/api/mangas/scan', [
         'isbn' => '9781111111111',
     ]);
@@ -139,7 +125,6 @@ test('it handles adding a manga that already exists in DB by ISBN', function () 
     $response->assertStatus(201)
         ->assertJsonPath('data.title', 'Existing Volume');
 
-    // Should be attached to user
     expect($user->volumes()->where('volumes.id', $volume->id)->exists())->toBeTrue();
 });
 
@@ -148,13 +133,13 @@ test('can remove volume from collection', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Naruto', 'authors' => []]);
+    $series = Series::create(['title' => 'Naruto', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     $volume = Volume::create([
         'api_id' => 'api123',
         'title' => 'Naruto Vol. 1',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
 
     $user->volumes()->attach($volume->id);
@@ -171,19 +156,19 @@ test('can remove series from collection', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Naruto', 'authors' => []]);
+    $series = Series::create(['title' => 'Naruto', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     $volume1 = Volume::create([
         'api_id' => 'api1',
         'title' => 'Naruto Vol. 1',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
     $volume2 = Volume::create([
         'api_id' => 'api2',
         'title' => 'Naruto Vol. 2',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
 
     $user->volumes()->attach([$volume1->id, $volume2->id]);

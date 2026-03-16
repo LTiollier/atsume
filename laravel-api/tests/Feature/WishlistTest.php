@@ -19,20 +19,14 @@ test('can add manga to wishlist by scan', function () {
 
     $isbn = '9781234567890';
 
-    Http::fake([
-        'www.googleapis.com/books/v1/volumes*' => Http::response([
-            'items' => [
-                [
-                    'id' => 'api_id_123',
-                    'volumeInfo' => [
-                        'title' => 'Wishlist Manga',
-                        'authors' => ['Author Name'],
-                        'publishedDate' => '2023',
-                        'industryIdentifiers' => [['type' => 'ISBN_13', 'identifier' => $isbn]],
-                    ],
-                ],
-            ],
-        ], 200),
+    $series = Series::create(['title' => 'Test', 'authors' => 'Author']);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Name', 'language' => 'fr']);
+    Volume::create([
+        'api_id' => 'api_id_123',
+        'title' => 'Wishlist Manga',
+        'authors' => 'Author Name',
+        'isbn' => $isbn,
+        'edition_id' => $edition->id,
     ]);
 
     $response = postJson('/api/wishlist/scan', [
@@ -55,13 +49,13 @@ test('can add manga to wishlist by api_id', function () {
     Sanctum::actingAs($user);
 
     $apiId = 'api123';
-    $series = Series::create(['title' => 'Test Series', 'authors' => []]);
+    $series = Series::create(['title' => 'Test Series', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     Volume::create([
         'api_id' => $apiId,
         'title' => 'Existing Manga',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
 
     $response = postJson('/api/wishlist', [
@@ -92,9 +86,7 @@ test('it handles manga not found on wishlist scan', function () {
 
     $isbn = '9999999999999';
 
-    Http::fake([
-        'www.googleapis.com/books/v1/volumes*' => Http::response(['items' => []], 200),
-    ]);
+    // Volume not created in DB
 
     $response = postJson('/api/wishlist/scan', [
         'isbn' => $isbn,
@@ -109,19 +101,15 @@ test('it extracts volume number on wishlist scan', function () {
 
     $isbn = '9781234567890';
 
-    Http::fake([
-        'www.googleapis.com/books/v1/volumes*' => Http::response([
-            'items' => [
-                [
-                    'id' => 'api_id_123',
-                    'volumeInfo' => [
-                        'title' => 'Naruto Vol. 23',
-                        'authors' => ['Masashi Kishimoto'],
-                        'industryIdentifiers' => [['type' => 'ISBN_13', 'identifier' => $isbn]],
-                    ],
-                ],
-            ],
-        ], 200),
+    $series = Series::create(['title' => 'Test', 'authors' => 'Author']);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Name', 'language' => 'fr']);
+    Volume::create([
+        'api_id' => 'api_id_123',
+        'title' => 'Naruto Vol. 23',
+        'authors' => 'Masashi Kishimoto',
+        'isbn' => $isbn,
+        'edition_id' => $edition->id,
+        'number' => '23',
     ]);
 
     $response = postJson('/api/wishlist/scan', [
@@ -141,13 +129,13 @@ test('can list wishlist items', function () {
     Sanctum::actingAs($user);
 
     // Create a volume and add to wishlist
-    $series = Series::create(['title' => 'Wish Series', 'authors' => []]);
+    $series = Series::create(['title' => 'Wish Series', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     $volume = Volume::create([
         'api_id' => 'wish123',
         'title' => 'Wish Volume',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
     $user->wishlistVolumes()->attach($volume->id);
 
@@ -162,13 +150,13 @@ test('can remove volume from wishlist', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Wish Series', 'authors' => []]);
+    $series = Series::create(['title' => 'Wish Series', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     $volume = Volume::create([
         'api_id' => 'wish123',
         'title' => 'Wish Volume',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
     ]);
     $user->wishlistVolumes()->attach($volume->id);
 

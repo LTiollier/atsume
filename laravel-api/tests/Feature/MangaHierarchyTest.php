@@ -12,7 +12,7 @@ test('can show a series', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Sample Series', 'authors' => ['Test Author']]);
+    $series = Series::create(['title' => 'Sample Series', 'authors' => 'Test Author']);
 
     $response = getJson("/api/series/{$series->id}");
 
@@ -34,7 +34,7 @@ test('can list editions for a series', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Sample Series', 'authors' => []]);
+    $series = Series::create(['title' => 'Sample Series', 'authors' => null]);
     Edition::create(['series_id' => $series->id, 'name' => 'Legacy', 'language' => 'fr']);
     Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
 
@@ -49,13 +49,13 @@ test('can list volumes for an edition', function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
-    $series = Series::create(['title' => 'Sample Series', 'authors' => []]);
+    $series = Series::create(['title' => 'Sample Series', 'authors' => null]);
     $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
     Volume::create([
         'api_id' => 'v1',
         'title' => 'Vol 1',
         'edition_id' => $edition->id,
-        'authors' => [],
+        'authors' => null,
         'number' => 1,
     ]);
 

@@ -25,9 +25,9 @@ class EloquentVolumeRepositoryTest extends TestCase
     public function test_it_can_check_if_volume_is_owned_by_user()
     {
         $user = User::factory()->create();
-        $series = Series::create(['title' => 'Test', 'authors' => []]);
+        $series = Series::create(['title' => 'Test', 'authors' => null]);
         $edition = Edition::create(['series_id' => $series->id, 'name' => 'Std', 'language' => 'fr']);
-        $volume = Volume::create(['title' => 'Vol', 'edition_id' => $edition->id, 'authors' => []]);
+        $volume = Volume::create(['title' => 'Vol', 'edition_id' => $edition->id, 'authors' => null]);
 
         $this->assertFalse($this->repository->isOwnedByUser($volume->id, $user->id));
 

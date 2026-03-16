@@ -151,7 +151,6 @@ class ScrapeMangaCollecCommand extends Command
                         number: (string) ($volumeData['number'] ?? ''),
                         isbn: $isbn,
                         apiId: $volumeUuid,
-                        authors: $authors, // Volumes usually share authors
                         publishedDate: $volumeData['release_date'] ?? null,
                         coverUrl: $coverUrl
                     ));

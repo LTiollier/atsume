@@ -10,7 +10,7 @@ use Mockery;
 test('lists user mangas', function () {
     $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
 
-    $volume = new Volume(1, 1, 'api1', 'isbn1', '1', 'Title', [], null, null, null, null);
+    $volume = new Volume(1, 1, 'api1', 'isbn1', '1', 'Title', null, null, null, null);
 
     $volumeRepo->shouldReceive('findByUserId')->with(1)->andReturn([$volume]);
 

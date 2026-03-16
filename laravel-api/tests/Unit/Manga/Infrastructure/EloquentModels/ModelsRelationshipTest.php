@@ -15,9 +15,9 @@ class ModelsRelationshipTest extends TestCase
 
     public function test_relationships()
     {
-        $series = Series::create(['title' => 'Test Series', 'authors' => []]);
+        $series = Series::create(['title' => 'Test Series', 'authors' => null]);
         $edition = Edition::create(['series_id' => $series->id, 'name' => 'Std', 'language' => 'fr']);
-        $volume = Volume::create(['title' => 'Vol', 'edition_id' => $edition->id, 'authors' => []]);
+        $volume = Volume::create(['title' => 'Vol', 'edition_id' => $edition->id, 'authors' => null]);
 
         // Series -> Editions
         $this->assertTrue($series->editions->contains($edition));

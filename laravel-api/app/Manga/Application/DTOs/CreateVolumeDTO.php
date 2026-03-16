@@ -10,7 +10,6 @@ class CreateVolumeDTO
         public readonly ?string $number = null,
         public readonly ?string $isbn = null,
         public readonly ?string $apiId = null,
-        public readonly ?string $authors = null,
         public readonly ?string $publishedDate = null,
         public readonly ?string $coverUrl = null,
     ) {}

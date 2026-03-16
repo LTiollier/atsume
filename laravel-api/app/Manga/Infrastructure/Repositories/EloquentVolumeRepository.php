@@ -23,7 +23,6 @@ class EloquentVolumeRepository implements VolumeRepositoryInterface
             'number' => $dto->number,
             'isbn' => $dto->isbn,
             'api_id' => $dto->apiId,
-            'authors' => $dto->authors,
             'published_date' => $dto->publishedDate,
             'cover_url' => $dto->coverUrl,
         ]);

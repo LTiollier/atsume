@@ -9,7 +9,7 @@ use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;
 use App\Manga\Infrastructure\Repositories\EloquentEditionRepository;
 
 test('findById returns edition', function () {
-    $series = EloquentSeries::create(['title' => 'Test', 'authors' => ['Test']]);
+    $series = EloquentSeries::create(['title' => 'Test', 'authors' => 'Test']);
     $eloquent = EloquentEdition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
 
     $repo = new EloquentEditionRepository;
@@ -20,7 +20,7 @@ test('findById returns edition', function () {
 });
 
 test('findByNameAndSeries returns edition', function () {
-    $series = EloquentSeries::create(['title' => 'Test', 'authors' => ['Test']]);
+    $series = EloquentSeries::create(['title' => 'Test', 'authors' => 'Test']);
     $eloquent = EloquentEdition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
 
     $repo = new EloquentEditionRepository;
@@ -31,7 +31,7 @@ test('findByNameAndSeries returns edition', function () {
 });
 
 test('findBySeriesId returns editions', function () {
-    $series = EloquentSeries::create(['title' => 'Test', 'authors' => ['Test']]);
+    $series = EloquentSeries::create(['title' => 'Test', 'authors' => 'Test']);
     $eloquent = EloquentEdition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
 
     $repo = new EloquentEditionRepository;
@@ -43,7 +43,7 @@ test('findBySeriesId returns editions', function () {
 });
 
 test('creates an edition', function () {
-    $series = EloquentSeries::create(['title' => 'Test', 'authors' => ['Test']]);
+    $series = EloquentSeries::create(['title' => 'Test', 'authors' => 'Test']);
 
     $repo = new EloquentEditionRepository;
     $result = $repo->create(new CreateEditionDTO($series->id, 'Standard', 'fr'));

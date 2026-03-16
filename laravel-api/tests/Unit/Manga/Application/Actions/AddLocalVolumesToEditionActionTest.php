@@ -11,7 +11,8 @@ use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
-use Exception;
+use App\Manga\Domain\Exceptions\EditionNotFoundException;
+use App\Manga\Domain\Exceptions\SeriesNotFoundException;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 
@@ -25,7 +26,7 @@ test('it throws exception if edition not found', function () {
     $action = new AddLocalVolumesToEditionAction($volumeRepo, $seriesRepo, $editionRepo);
     $dto = new AddLocalVolumesDTO(99, [1], 1);
 
-    expect(fn () => $action->execute($dto))->toThrow(Exception::class, 'Edition not found with ID: 99');
+    expect(fn () => $action->execute($dto))->toThrow(EditionNotFoundException::class, 'Edition not found with ID: 99');
 });
 
 test('it throws exception if series not found', function () {
@@ -40,7 +41,7 @@ test('it throws exception if series not found', function () {
     $action = new AddLocalVolumesToEditionAction($volumeRepo, $seriesRepo, $editionRepo);
     $dto = new AddLocalVolumesDTO(99, [1], 1);
 
-    expect(fn () => $action->execute($dto))->toThrow(Exception::class, 'Series not found with ID: 88');
+    expect(fn () => $action->execute($dto))->toThrow(SeriesNotFoundException::class, 'Series not found with ID: 88');
 });
 
 test('it adds local volumes and triggers event', function () {
@@ -51,8 +52,8 @@ test('it adds local volumes and triggers event', function () {
     $editionRepo = Mockery::mock(EditionRepositoryInterface::class);
 
     $edition = new Edition(99, 88, 'Ed', 'Pub', 'fr', 10);
-    $series = new Series(88, 'api', 'Title', ['Auth'], 'Desc', 'On', 10, 'http');
-    $volume = new Volume(77, 99, null, null, '1', 'Title Vol. 1', [], null, null, null, null);
+    $series = new Series(88, 'api', 'Title', 'Auth', 'http');
+    $volume = new Volume(77, 99, null, null, '1', 'Title Vol. 1', null, null, null, null);
 
     $editionRepo->shouldReceive('findById')->with(99)->andReturn($edition);
     $seriesRepo->shouldReceive('findById')->with(88)->andReturn($series);

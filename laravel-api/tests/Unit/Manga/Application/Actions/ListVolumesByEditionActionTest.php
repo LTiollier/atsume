@@ -9,8 +9,8 @@ use Mockery;
 
 test('it lists volumes by edition id', function () {
     $volumes = [
-        new Volume(id: 1, edition_id: 1, api_id: 'a', isbn: '1', number: '1', title: 'a', authors: [], description: null, published_date: null, page_count: null, cover_url: null),
-        new Volume(id: 2, edition_id: 1, api_id: 'b', isbn: '2', number: '2', title: 'b', authors: [], description: null, published_date: null, page_count: null, cover_url: null),
+        new Volume(id: 1, edition_id: 1, api_id: 'a', isbn: '1', number: '1', title: 'a',   published_date: null,  cover_url: null),
+        new Volume(id: 2, edition_id: 1, api_id: 'b', isbn: '2', number: '2', title: 'b',   published_date: null,  cover_url: null),
     ];
 
     $repo = Mockery::mock(VolumeRepositoryInterface::class);

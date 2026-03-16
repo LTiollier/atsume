@@ -15,7 +15,7 @@ use Mockery;
 test('adds manga to collection and dispatches event', function () {
     Event::fake();
 
-    $volume = new Volume(33, 1, 'api123', 'isbn123', '1', 'Naruto 1', [], null, null, null, null);
+    $volume = new Volume(33, 1, 'api123', 'isbn123', '1', 'Naruto 1', null, null, null, null);
 
     $resolver = Mockery::mock(VolumeResolverService::class);
     $resolver->shouldReceive('resolveByApiId')->with('api123')->once()->andReturn($volume);

@@ -22,7 +22,6 @@ class Volume extends Model
         'isbn',
         'number',
         'title',
-        'authors',
         'published_date',
         'cover_url',
     ];

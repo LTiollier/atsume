@@ -52,7 +52,6 @@ class AddLocalVolumesToEditionAction
                         editionId: $edition->getId(),
                         title: $volumeTitle,
                         number: $numberStr,
-                        authors: $series->getAuthors(),
                         coverUrl: $series->getCoverUrl(),
                     ));
                 }

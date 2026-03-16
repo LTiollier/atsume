@@ -13,8 +13,6 @@ class VolumeMapper
         bool $isLoaned = false,
         ?string $loanedTo = null,
     ): Volume {
-        $authors = $eloquent->authors;
-
         $edition = null;
         $series = null;
 
@@ -33,7 +31,6 @@ class VolumeMapper
             isbn: $eloquent->isbn,
             number: $eloquent->number,
             title: $eloquent->title,
-            authors: $authors,
             published_date: $eloquent->published_date,
             cover_url: $eloquent->cover_url,
             edition: $edition,

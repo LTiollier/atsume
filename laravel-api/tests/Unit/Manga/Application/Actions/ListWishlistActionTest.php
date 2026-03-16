@@ -16,10 +16,10 @@ test('it lists user wishlist', function () {
             isbn: '1234567890123',
             number: '1',
             title: 'Test Manga 1',
-            authors: ['Author 1'],
-            description: null,
+            
+            
             published_date: null,
-            page_count: null,
+            
             cover_url: null,
         ),
         new Volume(
@@ -29,10 +29,10 @@ test('it lists user wishlist', function () {
             isbn: '1234567890124',
             number: '2',
             title: 'Test Manga 2',
-            authors: ['Author 2'],
-            description: null,
+            
+            
             published_date: null,
-            page_count: null,
+            
             cover_url: null,
         ),
     ];

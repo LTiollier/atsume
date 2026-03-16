@@ -14,4 +14,9 @@ interface SeriesRepositoryInterface
     public function findByApiId(string $apiId): ?Series;
 
     public function create(CreateSeriesDTO $dto): Series;
+
+    /**
+     * @return Series[]
+     */
+    public function search(string $query): array;
 }

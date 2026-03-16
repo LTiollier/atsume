@@ -1,7 +1,9 @@
 <?php
 
+use App\Manga\Infrastructure\EloquentModels\Edition;
+use App\Manga\Infrastructure\EloquentModels\Series;
+use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\User\Infrastructure\EloquentModels\User;
-use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -14,16 +16,15 @@ test('can add manga with a very long cover url', function () {
     $longUrl = 'https://books.google.com/books/content?id=long_id&'.str_repeat('a', 500);
     $apiId = '9781234567890';
 
-    Http::fake([
-        "www.googleapis.com/books/v1/volumes/$apiId" => Http::response([
-            'id' => $apiId,
-            'volumeInfo' => [
-                'title' => 'LongUrlSeries - Tome 23',
-                'authors' => ['Author Name'],
-                'publishedDate' => '2023',
-                'imageLinks' => ['thumbnail' => str_replace('https://', 'http://', $longUrl)],
-            ],
-        ], 200),
+    $series = Series::create(['title' => 'LongUrlSeries', 'authors' => 'Author Name']);
+    $edition = Edition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+    $volume = Volume::create([
+        'api_id' => $apiId,
+        'title' => 'LongUrlSeries - Tome 23',
+        'isbn' => $apiId,
+        'edition_id' => $edition->id,
+        'authors' => null,
+        'cover_url' => $longUrl,
     ]);
 
     $response = postJson('/api/mangas', [
@@ -40,4 +41,6 @@ test('can add manga with a very long cover url', function () {
         'api_id' => $apiId,
         'cover_url' => $longUrl,
     ]);
+
+    expect($user->volumes()->where('volumes.id', $volume->id)->exists())->toBeTrue();
 });
