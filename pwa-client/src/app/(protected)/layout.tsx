@@ -2,6 +2,7 @@
 
 import AuthGuard from '@/components/auth/AuthGuard';
 import { Shell } from '@/components/layout/Shell';
+import { PageTransition } from '@/components/common/PageTransition';
 
 export default function ProtectedLayout({
     children,
@@ -11,7 +12,9 @@ export default function ProtectedLayout({
     return (
         <AuthGuard requireAuth={true}>
             <Shell>
-                {children}
+                <PageTransition>
+                    {children}
+                </PageTransition>
             </Shell>
         </AuthGuard>
     );
