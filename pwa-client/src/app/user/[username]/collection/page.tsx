@@ -20,10 +20,10 @@ export default function PublicSeriesPage() {
     return (
         <>
             {seriesList.length === 0 ? (
-                <div className="text-center py-20">
-                    <Book className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                    <h2 className="text-xl font-bold text-slate-300">Aucune série</h2>
-                    <p className="text-slate-500">Cette collection est vide pour le moment.</p>
+        <div className="text-center py-20">
+          <Book className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-slate-300">Aucune série</h2>
+          <p className="text-slate-500">Cette collection est vide pour le moment.</p>
                 </div>
             ) : (
                 <SeriesList

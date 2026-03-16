@@ -65,21 +65,21 @@ export default function EditionPage() {
     }, [fetchMangas]);
 
     if (isLoading) {
-        return <div className="animate-pulse space-y-8 p-8">
-            <div className="h-10 w-48 bg-slate-800 rounded"></div>
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                {[1, 2, 3, 4, 5].map(i => <div key={i} className="aspect-[2/3] bg-slate-800 rounded-xl"></div>)}
+    return <div className="animate-pulse space-y-8 p-8">
+      <div className="h-10 w-48 bg-slate-800 rounded"></div>
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {[1, 2, 3, 4, 5].map(i => <div key={i} className="aspect-[2/3] bg-slate-800 rounded-xl"></div>)}
             </div>
         </div>;
     }
 
     if (!series || !edition) {
         return (
-            <div className="space-y-4">
-                <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+      <div className="space-y-4">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Retour
                 </Button>
-                <div className="p-8 text-center text-slate-500">
+        <div className="p-8 text-center text-slate-500">
                     Série ou Édition introuvable.
                 </div>
             </div>
@@ -157,55 +157,55 @@ export default function EditionPage() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
-            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                    <Button variant="ghost" asChild className="mb-2 text-slate-400 hover:text-white group -ml-4">
+          <Button variant="ghost" asChild className="mb-2 text-slate-400 hover:text-white group -ml-4">
                         <Link href={`/collection/series/${series.id}`}>
-                            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> {series.title}
+              <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> {series.title}
                         </Link>
                     </Button>
-                    <h1 className="text-3xl font-black">{edition.name}</h1>
-                    <p className="text-slate-500">
+          <h1 className="text-3xl font-black">{edition.name}</h1>
+          <p className="text-slate-500">
                         {possessedNumbers.size} / {totalTomes} tomes possédés
                     </p>
                 </div>
 
                 {selectedMissing.length > 0 && !isLoanMode && (
-                    <div className="flex items-center gap-2 bg-purple-900/40 p-2 rounded-xl border border-purple-500/30">
-                        <span className="px-3 text-purple-200 font-medium text-sm">
+          <div className="flex items-center gap-2 bg-primary/40 p-2 rounded-xl border border-primary/30">
+            <span className="px-3 text-purple-200 font-medium text-sm">
                             {selectedMissing.length} tome(s) sélectionné(s)
                         </span>
                         <Button
-                            className={isOffline ? "bg-slate-800 text-slate-500" : "bg-purple-600 hover:bg-purple-500 font-bold"}
+              className={isOffline ? "bg-slate-800 text-slate-500" : "bg-primary hover:bg-primary font-bold"}
                             onClick={handleBulkAdd}
 
                             disabled={isSaving || isOffline}
                         >
-                            {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : isOffline ? <WifiOff className="h-4 w-4 mr-2" /> : <Check className="h-4 w-4 mr-2" />}
+              {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : isOffline ? <WifiOff className="h-4 w-4 mr-2" /> : <Check className="h-4 w-4 mr-2" />}
                             {isOffline ? "Hors ligne" : "Ajouter les tomes"}
                         </Button>
                     </div>
                 )}
 
                 {selectedMangaForLoan.length > 0 && isLoanMode && (
-                    <div className="flex items-center gap-2 bg-blue-900/40 p-2 rounded-xl border border-blue-500/30">
-                        <span className="px-3 text-blue-200 font-medium text-sm">
+          <div className="flex items-center gap-2 bg-blue-900/40 p-2 rounded-xl border border-blue-500/30">
+            <span className="px-3 text-blue-200 font-medium text-sm">
                             {selectedMangaForLoan.length} tome(s) à prêter
                         </span>
                         <Button
-                            className={isOffline ? "bg-slate-800 text-slate-500" : "bg-blue-600 hover:bg-blue-500 font-bold"}
+              className={isOffline ? "bg-slate-800 text-slate-500" : "bg-blue-600 hover:bg-blue-500 font-bold"}
                             onClick={() => setIsLoanDialogOpen(true)}
                             disabled={isOffline}
                         >
-                            {isOffline ? <WifiOff className="h-4 w-4 mr-2" /> : <ArrowLeftRight className="h-4 w-4 mr-2" />}
+              {isOffline ? <WifiOff className="h-4 w-4 mr-2" /> : <ArrowLeftRight className="h-4 w-4 mr-2" />}
                             {isOffline ? "Hors ligne" : "Prêter"}
                         </Button>
                     </div>
                 )}
             </div>
 
-            <div className="flex gap-2">
+      <div className="flex gap-2">
                 <Button
                     variant={isLoanMode ? "ghost" : "outline"}
                     size="sm"
@@ -215,10 +215,10 @@ export default function EditionPage() {
                         setSelectedMangaForLoan([]);
                         selectAllMissing();
                     }}
-                    className={!isLoanMode ? "border-slate-700 bg-slate-900 text-slate-300" : "text-slate-400 hover:text-white"}
+          className={!isLoanMode ? "border-slate-700 bg-slate-900 text-slate-300" : "text-slate-400 hover:text-white"}
                     disabled={isOffline}
                 >
-                    {isOffline && <WifiOff className="mr-2 h-4 w-4" />}
+          {isOffline && <WifiOff className="mr-2 h-4 w-4" />}
                     Sélectionner tous les manquants
                 </Button>
                 <Button
@@ -228,10 +228,10 @@ export default function EditionPage() {
                         setIsLoanMode(true);
                         setSelectedMissing([]);
                     }}
-                    className={isLoanMode ? "border-blue-700 bg-blue-900/30 text-blue-300" : "text-slate-400 hover:text-white"}
+          className={isLoanMode ? "border-blue-700 bg-blue-900/30 text-blue-300" : "text-slate-400 hover:text-white"}
                     disabled={isOffline}
                 >
-                    <ArrowLeftRight className="mr-2 h-4 w-4" />
+          <ArrowLeftRight className="mr-2 h-4 w-4" />
                     Multi-sélection de prêt
                 </Button>
                 {(selectedMissing.length > 0 || isLoanMode) && (
@@ -239,7 +239,7 @@ export default function EditionPage() {
                         setSelectedMissing([]);
                         setSelectedMangaForLoan([]);
                         setIsLoanMode(false);
-                    }} className="text-slate-400 hover:text-white">
+          }} className="text-slate-400 hover:text-white">
                         Annuler
                     </Button>
                 )}
@@ -253,7 +253,7 @@ export default function EditionPage() {
                     if (isOffline) {
                         toast.error("Connexion requise", {
                             description: "Vous ne pouvez pas modifier votre collection en étant hors ligne.",
-                            icon: <WifiOff className="h-4 w-4" />
+              icon: <WifiOff className="h-4 w-4" />
                         });
                         return;
                     }

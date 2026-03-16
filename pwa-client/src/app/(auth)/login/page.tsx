@@ -69,61 +69,61 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-6 md:p-8">
-            <div className="absolute inset-0 bg-[url('/patterns/cubes.png')] opacity-20 pointer-events-none"></div>
+    <div className="min-h-screen flex items-center justify-center bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-6 md:p-8">
+      <div className="absolute inset-0 bg-[url('/patterns/cubes.png')] opacity-20 pointer-events-none"></div>
 
-            <div className="w-full max-w-md relative z-10 transition-all duration-500 animate-in fade-in zoom-in slide-in-from-bottom-8">
+      <div className="w-full max-w-md relative z-10 transition-all duration-500 animate-in fade-in zoom-in slide-in-from-bottom-8">
                 <Link
                     href="/"
-                    className="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white mb-6 transition-colors group"
+          className="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white mb-6 transition-colors group"
                 >
-                    <LucideChevronLeft className="mr-1 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          <LucideChevronLeft className="mr-1 h-4 w-4 transition-transform group-hover:-translate-x-1" />
                     Retour à l&apos;accueil
                 </Link>
 
-                <Card className="border-slate-800 bg-slate-950/80 backdrop-blur-xl shadow-2xl overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500"></div>
+        <Card className="border-slate-800 bg-slate-950/80 backdrop-blur-xl shadow-2xl overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500"></div>
 
-                    <CardHeader className="space-y-1 pb-6 text-center">
-                        <div className="flex justify-center mb-4">
-                            <div className="p-3 bg-blue-500/10 rounded-2xl ring-1 ring-blue-500/20">
-                                <LucideLogIn className="h-8 w-8 text-blue-400" />
+          <CardHeader className="space-y-1 pb-6 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-blue-500/10 rounded-2xl ring-1 ring-blue-500/20">
+                <LucideLogIn className="h-8 w-8 text-blue-400" />
                             </div>
                         </div>
-                        <CardTitle className="text-3xl font-bold tracking-tight text-white">Connexion</CardTitle>
-                        <CardDescription className="text-slate-400">
+            <CardTitle className="text-3xl font-bold tracking-tight text-white">Connexion</CardTitle>
+            <CardDescription className="text-slate-400">
                             Heureux de vous revoir sur Mangathèque
                         </CardDescription>
                     </CardHeader>
 
                     <CardContent>
                         {error && (
-                            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start gap-3 text-red-400 text-sm animate-in fade-in slide-in-from-top-2">
-                                <LucideAlertCircle className="h-5 w-5 shrink-0" />
+              <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start gap-3 text-red-400 text-sm animate-in fade-in slide-in-from-top-2">
+                <LucideAlertCircle className="h-5 w-5 shrink-0" />
                                 <p>{error}</p>
                             </div>
                         )}
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                                 <FormField
                                     control={form.control}
                                     name="email"
                                     render={({ field }) => (
-                                        <FormItem className="space-y-2">
-                                            <FormLabel className="text-slate-200">Email</FormLabel>
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-slate-200">Email</FormLabel>
                                             <FormControl>
-                                                <div className="relative">
-                                                    <LucideMail className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                        <div className="relative">
+                          <LucideMail className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
                                                     <Input
                                                         type="email"
                                                         placeholder="manga@example.com"
-                                                        className="pl-10 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus-visible:ring-blue-500 hover:border-slate-600 transition-colors"
+                            className="pl-10 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus-visible:ring-blue-500 hover:border-slate-600 transition-colors"
                                                         {...field}
 
                                                     />
                                                 </div>
                                             </FormControl>
-                                            <FormMessage className="text-pink-400" />
+                      <FormMessage className="text-pink-400" />
                                         </FormItem>
                                     )}
                                 />
@@ -132,29 +132,29 @@ export default function LoginPage() {
                                     control={form.control}
                                     name="password"
                                     render={({ field }) => (
-                                        <FormItem className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <FormLabel className="text-slate-200">Mot de passe</FormLabel>
+                    <FormItem className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <FormLabel className="text-slate-200">Mot de passe</FormLabel>
                                                 <Link
                                                     href="/forgot-password"
-                                                    className="text-xs text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+                          className="text-xs text-blue-400 hover:text-blue-300 hover:underline transition-colors"
                                                 >
                                                     Oublié ?
                                                 </Link>
                                             </div>
                                             <FormControl>
-                                                <div className="relative">
-                                                    <LucideLock className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                        <div className="relative">
+                          <LucideLock className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
                                                     <Input
                                                         type="password"
                                                         placeholder="••••••••"
-                                                        className="pl-10 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus-visible:ring-blue-500 hover:border-slate-600 transition-colors"
+                            className="pl-10 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus-visible:ring-blue-500 hover:border-slate-600 transition-colors"
                                                         {...field}
 
                                                     />
                                                 </div>
                                             </FormControl>
-                                            <FormMessage className="text-pink-400" />
+                      <FormMessage className="text-pink-400" />
                                         </FormItem>
                                     )}
                                 />
@@ -162,12 +162,12 @@ export default function LoginPage() {
                                 <Button
                                     type="submit"
 
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 transition-all duration-200 active:scale-[0.98] mt-6"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 transition-all duration-200 active:scale-[0.98] mt-6"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (
                                         <>
-                                            <LucideLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <LucideLoader2 className="mr-2 h-4 w-4 animate-spin" />
                                             Connexion...
                                         </>
                                     ) : (
@@ -178,10 +178,10 @@ export default function LoginPage() {
                         </Form>
                     </CardContent>
 
-                    <CardFooter className="flex flex-col space-y-4 border-t border-slate-800/50 bg-slate-900/30 py-6">
-                        <div className="text-sm text-center text-slate-400">
+          <CardFooter className="flex flex-col space-y-4 border-t border-slate-800/50 bg-slate-900/30 py-6">
+            <div className="text-sm text-center text-slate-400">
                             Pas encore de compte ?{' '}
-                            <Link href="/register" className="text-blue-400 hover:text-blue-300 font-medium hover:underline transition-all">
+              <Link href="/register" className="text-blue-400 hover:text-blue-300 font-medium hover:underline transition-all">
                                 S&apos;inscrire
                             </Link>
                         </div>

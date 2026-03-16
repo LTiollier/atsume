@@ -46,16 +46,16 @@ export default function AuthGuard({
 
     if (isLoading || !isAuthorized) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white p-4">
-                <div className="relative">
-                    <div className="absolute -inset-4 bg-purple-500/10 blur-2xl rounded-full animate-pulse"></div>
-                    <div className="relative p-4 bg-slate-900/50 rounded-2xl border border-slate-800 backdrop-blur-sm">
-                        <LucideLoader2 className="h-8 w-8 text-purple-500 animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white p-4">
+        <div className="relative">
+          <div className="absolute -inset-4 bg-primary/10 blur-2xl rounded-full animate-pulse"></div>
+          <div className="relative p-4 bg-slate-900/50 rounded-2xl border border-slate-800 backdrop-blur-sm">
+            <LucideLoader2 className="h-8 w-8 text-primary animate-spin" />
                     </div>
                 </div>
-                <div className="mt-8 space-y-2 text-center">
-                    <p className="text-white font-bold tracking-tight">Vérification de l&apos;accès</p>
-                    <p className="text-slate-500 text-xs uppercase tracking-widest font-medium animate-pulse">
+        <div className="mt-8 space-y-2 text-center">
+          <p className="text-white font-bold tracking-tight">Vérification de l&apos;accès</p>
+          <p className="text-slate-500 text-xs uppercase tracking-widest font-medium animate-pulse">
                         Sécurisation de la session...
                     </p>
                 </div>

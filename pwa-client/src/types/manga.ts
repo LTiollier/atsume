@@ -52,4 +52,3 @@ export interface GroupedSeries {
     series: Series;
     volumes: Manga[];
 }
-

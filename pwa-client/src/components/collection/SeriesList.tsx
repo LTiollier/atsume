@@ -1,57 +1,75 @@
 "use client";
 
 import { GroupedSeries } from "@/types/manga";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Layers } from "lucide-react";
+import { Layers, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface SeriesListProps {
     seriesList: GroupedSeries[];
-    baseUrl: string; // e.g. "/collection" or "/user/leoelmy/collection"
+    baseUrl: string;
 }
 
 export function SeriesList({ seriesList, baseUrl }: SeriesListProps) {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    <div className="manga-grid">
             {seriesList.map(({ series, volumes }) => (
-                <Card key={series.id} className="overflow-hidden flex flex-col h-full bg-slate-900 border-slate-800 hover:border-purple-500/50 transition-all duration-300 group">
-                    <Link href={`${baseUrl}/series/${series.id}`} className="flex-grow flex flex-col">
-                        <div className="relative aspect-[2/3] w-full overflow-hidden bg-slate-800">
-                            {series.cover_url ? (
-                                <Image
-                                    src={series.cover_url}
-                                    alt={series.title}
-                                    fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-slate-600 italic text-sm text-center px-4">
-                                    Pas de couverture
-                                </div>
-                            )}
-                            <div className="absolute top-2 right-2 bg-purple-600 px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-lg">
-                                {volumes.length} Tome{volumes.length > 1 ? 's' : ''}
+                <Link 
+                    key={series.id} 
+                    href={`${baseUrl}/series/${series.id}`} 
+          className="manga-card group"
+                >
+          <div className="relative aspect-[2/3] w-full bg-slate-800/50">
+                        {series.cover_url ? (
+                            <Image
+                                src={series.cover_url}
+                                alt={series.title}
+                                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                        ) : (
+              <div className="flex items-center justify-center h-full text-slate-600 text-sm text-center px-4">
+                                Pas de couverture
                             </div>
+                        )}
+                        
+                        {/* Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                        
+                        {/* Badge Tome Count */}
+            <div className="manga-badge shadow-[0_0_10px_rgba(0,0,0,0.5)]">
+                            {volumes.length} Tome{volumes.length > 1 ? 's' : ''}
                         </div>
-                        <CardHeader className="p-4 pb-2">
-                            <CardTitle className="text-lg line-clamp-1 group-hover:text-purple-400 transition-colors text-slate-100">
-                                {series.title}
-                            </CardTitle>
-                            <p className="text-sm text-slate-500 line-clamp-1">
-                                {series.authors && series.authors.length > 0 ? series.authors.join(", ") : "Auteur inconnu"}
+                        
+                        {/* Bottom Info on Image */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+              <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                Voir détails
                             </p>
-                        </CardHeader>
-                        <CardContent className="p-4 pt-0">
-                            <div className="flex items-center gap-2 text-xs text-slate-600">
-                                <Layers className="h-3 w-3" />
-                                <span>
-                                    {Array.from(new Set(volumes.map(v => v.edition?.name).filter(Boolean))).join(', ') || 'Édition Standard'}
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Link>
-                </Card>
+              <h3 className="text-white font-display font-black text-sm sm:text-base leading-tight line-clamp-2 drop-shadow-md">
+                                {series.title}
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    {/* Extra Info Panel below Image */}
+          <div className="p-3 bg-card border-t border-border/50">
+            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">
+              <User className="h-3 w-3 text-primary" />
+              <span className="truncate">
+                                {series.authors && series.authors.length > 0 ? series.authors[0] : "Auteur inconnu"}
+                            </span>
+                        </div>
+                        
+            <div className="flex items-center gap-2 text-[9px] text-slate-500 font-medium">
+              <Layers className="h-2.5 w-2.5" />
+              <span className="truncate ">
+                                {Array.from(new Set(volumes.map(v => v.edition?.name).filter(Boolean))).join(', ') || 'Édition Standard'}
+                            </span>
+                        </div>
+                    </div>
+                </Link>
             ))}
         </div>
     );

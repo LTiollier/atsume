@@ -65,19 +65,19 @@ export default function PublicCollectionLayout({ children }: { children: React.R
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         );
     }
 
     if (error || !profile) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white p-4 text-center">
-                <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 max-w-md w-full">
-                    <UserIcon className="w-12 h-12 mx-auto mb-4 text-slate-500" />
-                    <h1 className="text-xl font-bold mb-2">Oops !</h1>
-                    <p className="text-slate-400">{error || 'Une erreur est survenue'}</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white p-4 text-center">
+        <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 max-w-md w-full">
+          <UserIcon className="w-12 h-12 mx-auto mb-4 text-slate-500" />
+          <h1 className="text-xl font-bold mb-2">Oops !</h1>
+          <p className="text-slate-400">{error || 'Une erreur est survenue'}</p>
                 </div>
             </div>
         );
@@ -85,16 +85,16 @@ export default function PublicCollectionLayout({ children }: { children: React.R
 
     return (
         <PublicCollectionContext.Provider value={{ profile, mangas, isLoading, error }}>
-            <div className="min-h-screen bg-slate-950 text-slate-50 p-4 md:p-8">
-                <div className="max-w-6xl mx-auto space-y-8">
+      <div className="min-h-screen bg-slate-950 text-slate-50 p-4 md:p-8">
+        <div className="max-w-6xl mx-auto space-y-8">
                     {/* Header */}
-                    <div className="flex items-center gap-4 border-b border-slate-800 pb-6">
-                        <div className="w-16 h-16 bg-purple-500/10 rounded-full border border-purple-500/20 flex items-center justify-center">
-                            <UserIcon className="w-8 h-8 text-purple-400" />
+          <div className="flex items-center gap-4 border-b border-slate-800 pb-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-full border border-primary/20 flex items-center justify-center">
+              <UserIcon className="w-8 h-8 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black uppercase tracking-tight">Collection de {profile.username}</h1>
-                            <p className="text-slate-400">{mangas.length} serie(s) dans la bibliothèque</p>
+              <h1 className="text-3xl font-black uppercase tracking-tight">Collection de {profile.username}</h1>
+              <p className="text-slate-400">{mangas.length} serie(s) dans la bibliothèque</p>
                         </div>
                     </div>
 

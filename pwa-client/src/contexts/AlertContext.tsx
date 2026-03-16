@@ -71,23 +71,23 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
             <AlertDialog open={isOpen} onOpenChange={(open) => {
                 if (!isLoading) setIsOpen(open);
             }}>
-                <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
+        <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
                     <AlertDialogHeader>
                         <AlertDialogTitle>{options?.title}</AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-slate-400">
                             {options?.description}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleCancel} disabled={isLoading} className="bg-slate-800 text-white hover:bg-slate-700 hover:text-white border-slate-700">
+            <AlertDialogCancel onClick={handleCancel} disabled={isLoading} className="bg-slate-800 text-white hover:bg-slate-700 hover:text-white border-slate-700">
                             {options?.cancelLabel || "Annuler"}
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleConfirm}
                             disabled={isLoading}
-                            className={options?.destructive ? "bg-red-600 hover:bg-red-700 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}
+              className={options?.destructive ? "bg-red-600 hover:bg-red-700 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}
                         >
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {options?.confirmLabel || "Confirmer"}
                         </AlertDialogAction>
                     </AlertDialogFooter>

@@ -75,58 +75,58 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-2xl mx-auto">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-2xl mx-auto">
             {/* Header Section */}
-            <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wider">
-                    <LucideSettings className="h-3 w-3" />
+      <div className="space-y-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
+          <LucideSettings className="h-3 w-3" />
                     Configuration
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
                     Paramètres
                 </h1>
-                <p className="text-slate-400 font-medium">
+        <p className="text-slate-400 font-medium">
                     Gérez vos préférences et la visibilité de votre profil.
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <Card className="bg-slate-900 border-slate-800 overflow-hidden">
-                    <CardHeader className="border-b border-slate-800 bg-slate-900/50">
-                        <CardTitle className="flex items-center gap-2 text-white">
-                            <Shield className="w-5 h-5 text-purple-400" />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+          <CardHeader className="border-b border-slate-800 bg-slate-900/50">
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Shield className="w-5 h-5 text-primary" />
                             Confidentialité
                         </CardTitle>
-                        <CardDescription className="text-slate-400">
+            <CardDescription className="text-slate-400">
                             Gérez la visibilité de votre profil et de votre collection.
                         </CardDescription>
                     </CardHeader>
 
-                    <CardContent className="space-y-6 pt-6">
-                        <div className="space-y-3">
-                            <Label htmlFor="username" className="text-slate-200 font-bold">Nom d&apos;utilisateur (Pseudo)</Label>
+          <CardContent className="space-y-6 pt-6">
+            <div className="space-y-3">
+              <Label htmlFor="username" className="text-slate-200 font-bold">Nom d&apos;utilisateur (Pseudo)</Label>
                             <Input
                                 id="username"
                                 type="text"
                                 {...register('username')}
                                 placeholder="ex: otaku_fan99"
-                                className="bg-slate-950 border-slate-800 focus:ring-purple-500/20 rounded-xl"
+                className="bg-slate-950 border-slate-800 focus:ring-primary/20 rounded-xl"
                             />
                             {errors.username && (
-                                <p className="text-sm text-red-400 mt-1 font-medium">{errors.username.message}</p>
+                <p className="text-sm text-red-400 mt-1 font-medium">{errors.username.message}</p>
                             )}
-                            <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500">
                                 Ce nom sera utilisé pour votre lien de profil public si vous l&apos;activez.
                             </p>
                         </div>
 
-                        <div className="flex items-center justify-between border border-slate-800 rounded-2xl p-5 bg-slate-950/50">
-                            <div className="space-y-1 pr-4">
-                                <Label htmlFor="public-profile" className="flex items-center gap-2 text-base text-white font-bold">
-                                    <Globe className="w-4 h-4 text-purple-400" />
+            <div className="flex items-center justify-between border border-slate-800 rounded-2xl p-5 bg-slate-950/50">
+              <div className="space-y-1 pr-4">
+                <Label htmlFor="public-profile" className="flex items-center gap-2 text-base text-white font-bold">
+                  <Globe className="w-4 h-4 text-primary" />
                                     Profil Public
                                 </Label>
-                                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500">
                                     Si activé, toute personne connaissant votre pseudo pourra voir votre collection.
                                 </p>
                             </div>
@@ -134,18 +134,18 @@ export default function SettingsPage() {
                                 id="public-profile"
                                 checked={isPublic}
                                 onCheckedChange={(val) => setValue('is_public', val)}
-                                className="data-[state=checked]:bg-purple-600"
+                className="data-[state=checked]:bg-primary"
                             />
                         </div>
 
                         {isPublic && username && (
-                            <div className="p-4 bg-purple-500/5 text-purple-200 rounded-2xl text-sm border border-purple-500/10">
-                                <strong className="text-purple-400">Lien de votre profil : </strong>
+              <div className="p-4 bg-primary/5 text-purple-200 rounded-2xl text-sm border border-primary/10">
+                <strong className="text-primary">Lien de votre profil : </strong>
                                 <a
                                     href={`/user/${username}/collection`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="underline underline-offset-4 hover:text-white transition-colors break-all"
+                  className="underline underline-offset-4 hover:text-white transition-colors break-all"
                                 >
                                     {typeof window !== 'undefined' ? `${window.location.origin}/user/${username}/collection` : `/user/${username}/collection`}
                                 </a>
@@ -153,19 +153,19 @@ export default function SettingsPage() {
                         )}
 
                         {isPublic && !username && (
-                            <div className="p-4 bg-amber-500/5 text-amber-400 rounded-2xl text-sm border border-amber-500/10 font-medium">
+              <div className="p-4 bg-amber-500/5 text-amber-400 rounded-2xl text-sm border border-amber-500/10 font-medium">
                                 ⚠️ Vous devez définir un nom d&apos;utilisateur pour avoir un profil public.
                             </div>
                         )}
                     </CardContent>
 
-                    <CardFooter className="bg-slate-950/50 border-t border-slate-800 px-6 py-4 flex justify-end">
+          <CardFooter className="bg-slate-950/50 border-t border-slate-800 px-6 py-4 flex justify-end">
                         <Button
                             type="submit"
                             disabled={isLoading || (isPublic && !username)}
-                            className="bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl px-8"
+              className="bg-primary hover:bg-primary text-white font-bold rounded-xl px-8"
                         >
-                            {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                             Enregistrer les modifications
                         </Button>
                     </CardFooter>

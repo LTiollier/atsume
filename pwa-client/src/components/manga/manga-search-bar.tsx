@@ -21,13 +21,13 @@ export function MangaSearchBar({ onSearch, isLoading = false }: MangaSearchBarPr
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex w-full gap-2">
-            <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+    <form onSubmit={handleSubmit} className="flex w-full gap-2">
+      <div className="relative flex-1">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                     type="search"
                     placeholder="Rechercher par titre ou ISBN..."
-                    className="pl-9"
+          className="pl-9"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
 

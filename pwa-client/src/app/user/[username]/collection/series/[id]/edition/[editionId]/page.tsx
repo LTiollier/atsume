@@ -22,11 +22,11 @@ export default function PublicVolumesPage() {
 
     if (editionMangas.length === 0) {
         return (
-            <div className="space-y-4">
-                <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+      <div className="space-y-4">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Retour
                 </Button>
-                <div className="p-8 text-center text-slate-500">
+        <div className="p-8 text-center text-slate-500">
                     Édition introuvable ou vide.
                 </div>
             </div>
@@ -62,16 +62,16 @@ export default function PublicVolumesPage() {
     }
 
     return (
-        <div className="space-y-8 pb-20">
-            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+    <div className="space-y-8 pb-20">
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                    <Button variant="ghost" asChild className="mb-2 text-slate-400 hover:text-white group -ml-4">
+          <Button variant="ghost" asChild className="mb-2 text-slate-400 hover:text-white group -ml-4">
                         <Link href={`/user/${username}/collection/series/${series.id}`}>
-                            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> {series.title}
+              <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> {series.title}
                         </Link>
                     </Button>
-                    <h1 className="text-3xl font-black">{edition.name}</h1>
-                    <p className="text-slate-500">
+          <h1 className="text-3xl font-black">{edition.name}</h1>
+          <p className="text-slate-500">
                         {possessedNumbers.size} / {totalTomes} tomes possédés
                     </p>
                 </div>

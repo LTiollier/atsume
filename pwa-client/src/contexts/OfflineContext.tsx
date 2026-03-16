@@ -29,7 +29,7 @@ export function OfflineProvider({ children }: { children: React.ReactNode }) {
         } else {
             toast.error("Vous êtes hors ligne", {
                 description: "Les modifications sont désactivées jusqu'au retour de la connexion.",
-                icon: <WifiOff className="h-4 w-4" />,
+        icon: <WifiOff className="h-4 w-4" />,
                 duration: Infinity,
             });
         }
