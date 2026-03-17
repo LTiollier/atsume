@@ -252,10 +252,23 @@ To guarantee a clean and easy-to-read history, the project applies strict rules 
 ## 5. Validation Workflow (Post-Development)
 
 Before considering a task complete, the agent or developer must **systematically**:
-1. Run the linter: `./vendor/bin/pint` (in the `laravel-api` folder).
-2. Analyze via Larastan: `./vendor/bin/phpstan analyse --memory-limit=2G` (in the `laravel-api` folder).
-3. Run the tests: `php artisan test` or `./vendor/bin/pest`.
-4. Perform the commit respecting the Gitmoji rules mentioned above.
+
+### 5.1. Changes in `laravel-api/`
+Run the following command (via Docker as per section 6):
+```
+docker-compose exec backend make all
+```
+This single command covers linting (Pint), static analysis (PHPStan level 9), and tests (PestPHP). It must pass entirely before committing.
+
+### 5.2. Changes in `pwa-client/`
+Run the following command from the `pwa-client/` folder:
+```
+npm run ci
+```
+This command covers type checking, linting, and build validation. It must pass entirely before committing.
+
+### 5.3. Commit
+Perform the commit respecting the Gitmoji rules mentioned above.
 
 ---
 
