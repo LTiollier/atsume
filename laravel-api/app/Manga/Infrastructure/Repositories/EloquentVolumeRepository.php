@@ -49,6 +49,7 @@ class EloquentVolumeRepository implements VolumeRepositoryInterface
      */
     public function findByEditionId(int $editionId): array
     {
+        /** @var int|null $userId */
         $userId = auth()->id();
 
         $eloquentVolumes = EloquentVolume::where('edition_id', $editionId)
