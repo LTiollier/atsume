@@ -40,6 +40,7 @@ class EloquentBoxRepository implements BoxRepositoryInterface
         return $this->toDomain($eloquent);
     }
 
+    /** @param array<int> $volumeIds */
     public function attachVolumes(int $boxId, array $volumeIds): void
     {
         /** @var EloquentBox|null $box */

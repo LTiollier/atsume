@@ -15,11 +15,13 @@ class BoxSet extends Model
         'publisher',
     ];
 
+    /** @return BelongsTo<Series, $this> */
     public function series(): BelongsTo
     {
         return $this->belongsTo(Series::class);
     }
 
+    /** @return HasMany<Box, $this> */
     public function boxes(): HasMany
     {
         return $this->hasMany(Box::class);

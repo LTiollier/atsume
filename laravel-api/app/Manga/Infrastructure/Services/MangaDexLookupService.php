@@ -32,7 +32,13 @@ class MangaDexLookupService implements MangaLookupServiceInterface
             return [];
         }
 
-        return array_map(fn (array $item) => $this->transform($item), $data['data']);
+        /** @var array<int, mixed> $items */
+        $items = $data['data'];
+
+        return array_map(function (mixed $item) {
+            /** @var array<string, mixed> $item */
+            return $this->transform($item);
+        }, $items);
     }
 
     /**
@@ -54,8 +60,14 @@ class MangaDexLookupService implements MangaLookupServiceInterface
         }
 
         $data = $response->json();
+        if (! is_array($data) || ! isset($data['data']) || ! is_array($data['data'])) {
+            return null;
+        }
 
-        return $this->transform($data['data'] ?? []);
+        /** @var array<string, mixed> $item */
+        $item = $data['data'];
+
+        return $this->transform($item);
     }
 
     /**
@@ -68,37 +80,56 @@ class MangaDexLookupService implements MangaLookupServiceInterface
             return [];
         }
 
-        $attributes = $item['attributes'] ?? [];
-        $relationships = $item['relationships'] ?? [];
+        /** @var array<string, mixed> $attributes */
+        $attributes = is_array($item['attributes'] ?? null) ? $item['attributes'] : [];
+        /** @var array<int, mixed> $relationships */
+        $relationships = is_array($item['relationships'] ?? null) ? $item['relationships'] : [];
 
-        // Title: try French first, then English, then original
-        $title = $attributes['title']['fr']
-            ?? $attributes['title']['en']
-            ?? array_values($attributes['title'])[0]
-            ?? 'Unknown Title';
+        /** @var array<string, mixed> $titleData */
+        $titleData = is_array($attributes['title'] ?? null) ? $attributes['title'] : [];
+        $titleValues = array_values($titleData);
+        /** @var string $title */
+        $title = $titleData['fr']
+            ?? $titleData['en']
+            ?? ($titleValues[0] ?? 'Unknown Title');
 
-        // Description: try French first, then English
-        $description = $attributes['description']['fr']
-            ?? $attributes['description']['en']
-            ?? array_values($attributes['description'])[0]
-            ?? null;
+        /** @var array<string, mixed> $descData */
+        $descData = is_array($attributes['description'] ?? null) ? $attributes['description'] : [];
+        $descValues = array_values($descData);
+        /** @var string|null $description */
+        $description = $descData['fr']
+            ?? $descData['en']
+            ?? ($descValues[0] ?? null);
 
         // Authors
         $authors = [];
+        /** @var array<int, mixed> $relationships */
         foreach ($relationships as $rel) {
-            if ($rel['type'] === 'author' || $rel['type'] === 'artist') {
-                $authors[] = $rel['attributes']['name'] ?? 'Unknown Author';
+            if (! is_array($rel)) {
+                continue;
+            }
+            if (($rel['type'] ?? '') === 'author' || ($rel['type'] ?? '') === 'artist') {
+                $relAttr = $rel['attributes'] ?? [];
+                /** @var array<string, mixed> $relAttr */
+                $authors[] = is_string($relAttr['name'] ?? null) ? $relAttr['name'] : 'Unknown Author';
             }
         }
         $authors = array_unique($authors);
 
         // Cover
         $coverUrl = null;
+        /** @var array<int, mixed> $relationships */
         foreach ($relationships as $rel) {
-            if ($rel['type'] === 'cover_art') {
-                $fileName = $rel['attributes']['fileName'] ?? null;
-                if ($fileName) {
-                    $coverUrl = "https://uploads.mangadex.org/covers/{$item['id']}/{$fileName}";
+            if (! is_array($rel)) {
+                continue;
+            }
+            if (($rel['type'] ?? '') === 'cover_art') {
+                $relAttr = $rel['attributes'] ?? [];
+                /** @var array<string, mixed> $relAttr */
+                $fileName = $relAttr['fileName'] ?? null;
+                if (is_string($fileName)) {
+                    $itemId = is_string($item['id'] ?? null) ? $item['id'] : '';
+                    $coverUrl = 'https://uploads.mangadex.org/covers/'.$itemId.'/'.$fileName;
                 }
             }
         }
@@ -108,8 +139,8 @@ class MangaDexLookupService implements MangaLookupServiceInterface
             'title' => $title,
             'authors' => $authors,
             'description' => $description,
-            'status' => $attributes['status'] ?? null,
-            'total_volumes' => $attributes['lastVolume'] ?? null,
+            'status' => is_string($attributes['status'] ?? null) ? $attributes['status'] : null,
+            'total_volumes' => is_string($attributes['lastVolume'] ?? null) ? $attributes['lastVolume'] : null,
             'cover_url' => $coverUrl,
         ];
     }

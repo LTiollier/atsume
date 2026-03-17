@@ -2,11 +2,12 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Manga\Domain\Models\Series;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property \App\Manga\Domain\Models\Series $resource
+ * @property Series $resource
  */
 class MangaSearchResultResource extends JsonResource
 {

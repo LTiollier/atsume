@@ -33,7 +33,9 @@ class MangaCollecScraperService
             return false;
         }
 
-        $this->accessToken = $response->json('access_token');
+        /** @var mixed $token */
+        $token = $response->json('access_token');
+        $this->accessToken = is_string($token) ? $token : null;
 
         return true;
     }
@@ -47,7 +49,7 @@ class MangaCollecScraperService
             return [];
         }
 
-        $response = Http::withToken($this->accessToken)
+        $response = Http::withToken((string) $this->accessToken)
             ->withHeaders([
                 'x-app-version' => '2.15.0',
                 'x-system-name' => 'Web',
@@ -61,7 +63,12 @@ class MangaCollecScraperService
             return [];
         }
 
-        return $response->json('series') ?? [];
+        /** @var mixed $series */
+        $series = $response->json('series');
+        /** @var array<int, array<string, mixed>> $seriesArray */
+        $seriesArray = is_array($series) ? $series : [];
+
+        return $seriesArray;
     }
 
     /**
@@ -73,7 +80,7 @@ class MangaCollecScraperService
             return null;
         }
 
-        $response = Http::withToken($this->accessToken)
+        $response = Http::withToken((string) $this->accessToken)
             ->withHeaders([
                 'x-app-version' => '2.15.0',
                 'x-system-name' => 'Web',
@@ -87,6 +94,11 @@ class MangaCollecScraperService
             return null;
         }
 
-        return $response->json();
+        /** @var mixed $json */
+        $json = $response->json();
+        /** @var array<string, mixed>|null $detail */
+        $detail = is_array($json) ? $json : null;
+
+        return $detail;
     }
 }

@@ -13,5 +13,6 @@ interface BoxRepositoryInterface
 
     public function create(CreateBoxDTO $dto): Box;
 
+    /** @param array<int> $volumeIds */
     public function attachVolumes(int $boxId, array $volumeIds): void;
 }

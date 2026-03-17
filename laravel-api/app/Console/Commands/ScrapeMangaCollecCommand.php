@@ -12,6 +12,7 @@ use App\Manga\Domain\Repositories\BoxSetRepositoryInterface;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
+use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\Services\MangaCollecScraperService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -74,20 +75,21 @@ class ScrapeMangaCollecCommand extends Command
             }
 
             DB::transaction(function () use ($detail, $seriesUuid) {
-                if ($detail === null) {
-                    return;
-                }
-
                 // 1. Handle Series
                 $series = $this->seriesRepository->findByApiId($seriesUuid);
 
                 /** @var array<int, array<string, mixed>> $authorsRaw */
-                $authorsRaw = $detail['authors'] ?? [];
-                $authorsArray = collect($authorsRaw)->map(fn ($a) => trim(($a['first_name'] ?? '').' '.($a['name'] ?? '')))->filter()->values()->toArray();
+                $authorsRaw = is_array($detail['authors']) ? $detail['authors'] : [];
+                $authorsArray = collect($authorsRaw)->map(function ($a) {
+                    $fName = $a['first_name'] ?? '';
+                    $lName = $a['name'] ?? '';
+
+                    return trim((is_string($fName) ? $fName : '').' '.(is_string($lName) ? $lName : ''));
+                })->filter()->values()->toArray();
                 $authors = ! empty($authorsArray) ? implode(', ', $authorsArray) : null;
                 /** @var array<int, array<string, mixed>> $seriesRaw */
                 $seriesRaw = $detail['series'] ?? [];
-                $seriesTitle = (string) ($seriesRaw[0]['title'] ?? $detail['title'] ?? 'Unknown');
+                $seriesTitle = is_string($seriesRaw[0]['title'] ?? null) ? $seriesRaw[0]['title'] : (is_string($detail['title'] ?? null) ? $detail['title'] : 'Unknown');
 
                 if (! $series) {
                     $series = $this->seriesRepository->create(new CreateSeriesDTO(
@@ -97,8 +99,8 @@ class ScrapeMangaCollecCommand extends Command
                     ));
                 }
 
-                /** @var \App\Manga\Infrastructure\EloquentModels\Series|null $seriesModel */
-                $seriesModel = \App\Manga\Infrastructure\EloquentModels\Series::find($series->getId());
+                /** @var Series|null $seriesModel */
+                $seriesModel = Series::find($series->getId());
                 if ($seriesModel) {
                     $seriesModel->update([
                         'authors' => $authors,
@@ -109,16 +111,24 @@ class ScrapeMangaCollecCommand extends Command
                 // 2. Handle Editions
                 $editionsMap = [];
                 /** @var array<int, array<string, mixed>> $editionsRaw */
-                $editionsRaw = $detail['editions'] ?? [];
+                $editionsRaw = is_array($detail['editions']) ? $detail['editions'] : [];
                 foreach ($editionsRaw as $editionData) {
-                    $editionName = (string) ($editionData['title'] ?? 'Standard');
-                    $editionId = (string) ($editionData['id'] ?? '');
-                    $publisherId = $editionData['publisher_id'] ?? null;
+                    $editionName = is_string($editionData['title'] ?? null) ? $editionData['title'] : 'Standard';
+                    $editionId = is_string($editionData['id'] ?? null) ? $editionData['id'] : '';
+                    $publisherId = is_string($editionData['publisher_id'] ?? null) ? $editionData['publisher_id'] : '';
                     $publisherName = null;
 
                     if ($publisherId) {
-                        $publisher = collect($detail['publishers'] ?? [])->firstWhere('id', $publisherId);
-                        $publisherName = $publisher['title'] ?? null;
+                        /** @var array<int, array<string, mixed>> $publishers */
+                        $publishers = is_array($detail['publishers'] ?? null) ? $detail['publishers'] : [];
+                        $publisher = null;
+                        foreach ($publishers as $p) {
+                            if (($p['id'] ?? null) === $publisherId) {
+                                $publisher = $p;
+                                break;
+                            }
+                        }
+                        $publisherName = is_string($publisher['title'] ?? null) ? $publisher['title'] : null;
                     }
 
                     $edition = $this->editionRepository->findByNameAndSeries($editionName, $series->getId());
@@ -128,8 +138,8 @@ class ScrapeMangaCollecCommand extends Command
                             name: $editionName,
                             language: 'fr',
                             publisher: $publisherName,
-                            totalVolumes: isset($editionData['volumes_count']) ? (int) $editionData['volumes_count'] : null,
-                            isFinished: ! ($editionData['not_finished'] ?? true),
+                            totalVolumes: isset($editionData['volumes_count']) && is_numeric($editionData['volumes_count']) ? (int) $editionData['volumes_count'] : null,
+                            isFinished: ! ((bool) ($editionData['not_finished'] ?? true)),
                         ));
                     }
                     $editionsMap[$editionId] = $edition->getId();
@@ -141,9 +151,9 @@ class ScrapeMangaCollecCommand extends Command
                 /** @var array<int, array<string, mixed>> $volumesRaw */
                 $volumesRaw = $detail['volumes'] ?? [];
                 foreach ($volumesRaw as $volumeData) {
-                    $volumeUuid = (string) ($volumeData['id'] ?? '');
-                    $isbn = isset($volumeData['isbn']) ? (string) $volumeData['isbn'] : null;
-                    $coverUrl = isset($volumeData['image_url']) ? (string) $volumeData['image_url'] : null;
+                    $volumeUuid = is_string($volumeData['id'] ?? null) ? $volumeData['id'] : '';
+                    $isbn = is_string($volumeData['isbn'] ?? null) ? $volumeData['isbn'] : null;
+                    $coverUrl = is_string($volumeData['image_url'] ?? null) ? $volumeData['image_url'] : null;
 
                     if (! $firstVolumeCover && $coverUrl) {
                         $firstVolumeCover = $coverUrl;
@@ -159,7 +169,7 @@ class ScrapeMangaCollecCommand extends Command
                         continue;
                     }
 
-                    $editionIdRaw = isset($volumeData['edition_id']) ? (string) $volumeData['edition_id'] : '';
+                    $editionIdRaw = is_string($volumeData['edition_id'] ?? null) ? $volumeData['edition_id'] : '';
                     $mappedEditionId = $editionsMap[$editionIdRaw] ?? null;
                     if (! $mappedEditionId) {
                         $mappedEditionId = reset($editionsMap) ?: null;
@@ -171,11 +181,11 @@ class ScrapeMangaCollecCommand extends Command
 
                     $this->volumeRepository->create(new CreateVolumeDTO(
                         editionId: $mappedEditionId,
-                        title: ($seriesTitle).' #'.(string) ($volumeData['number'] ?? '?'),
-                        number: (string) ($volumeData['number'] ?? ''),
+                        title: ($seriesTitle).' #'.(is_string($volumeData['number'] ?? null) ? $volumeData['number'] : '?'),
+                        number: is_string($volumeData['number'] ?? null) ? $volumeData['number'] : '',
                         isbn: $isbn,
                         apiId: $volumeUuid,
-                        publishedDate: isset($volumeData['release_date']) ? (string) $volumeData['release_date'] : null,
+                        publishedDate: is_string($volumeData['release_date'] ?? null) ? $volumeData['release_date'] : null,
                         coverUrl: $coverUrl
                     ));
                 }
@@ -188,16 +198,24 @@ class ScrapeMangaCollecCommand extends Command
                 // 4. Handle Box Editions (Box Sets)
                 $boxSetsMap = [];
                 /** @var array<int, array<string, mixed>> $boxEditionsRaw */
-                $boxEditionsRaw = $detail['box_editions'] ?? [];
+                $boxEditionsRaw = is_array($detail['box_editions']) ? $detail['box_editions'] : [];
                 foreach ($boxEditionsRaw as $boxEditionData) {
-                    $beUuid = (string) ($boxEditionData['id'] ?? '');
-                    $beTitle = (string) ($boxEditionData['title'] ?? 'Box Set');
-                    $bePublisherId = $boxEditionData['publisher_id'] ?? null;
+                    $beUuid = is_string($boxEditionData['id'] ?? null) ? $boxEditionData['id'] : '';
+                    $beTitle = is_string($boxEditionData['title'] ?? null) ? $boxEditionData['title'] : 'Box Set';
+                    $bePublisherId = is_string($boxEditionData['publisher_id'] ?? null) ? $boxEditionData['publisher_id'] : '';
                     $bePublisherName = null;
 
                     if ($bePublisherId) {
-                        $publisher = collect($detail['publishers'] ?? [])->firstWhere('id', $bePublisherId);
-                        $bePublisherName = $publisher['title'] ?? null;
+                        /** @var array<int, array<string, mixed>> $bePublishers */
+                        $bePublishers = is_array($detail['publishers'] ?? null) ? $detail['publishers'] : [];
+                        $publisher = null;
+                        foreach ($bePublishers as $p) {
+                            if (($p['id'] ?? null) === $bePublisherId) {
+                                $publisher = $p;
+                                break;
+                            }
+                        }
+                        $bePublisherName = is_string($publisher['title'] ?? null) ? $publisher['title'] : null;
                     }
 
                     $boxSet = $this->boxSetRepository->findByApiId($beUuid);
@@ -215,10 +233,10 @@ class ScrapeMangaCollecCommand extends Command
                 // 5. Handle Boxes
                 $boxesMap = [];
                 /** @var array<int, array<string, mixed>> $boxesRaw */
-                $boxesRaw = $detail['boxes'] ?? [];
+                $boxesRaw = is_array($detail['boxes']) ? $detail['boxes'] : [];
                 foreach ($boxesRaw as $boxData) {
-                    $boxUuid = (string) ($boxData['id'] ?? '');
-                    $boxIsbn = isset($boxData['isbn']) ? (string) $boxData['isbn'] : null;
+                    $boxUuid = is_string($boxData['id'] ?? null) ? $boxData['id'] : '';
+                    $boxIsbn = is_string($boxData['isbn'] ?? null) ? $boxData['isbn'] : null;
 
                     if ($this->boxRepository->findByApiId($boxUuid)) {
                         $boxesMap[$boxUuid] = $this->boxRepository->findByApiId($boxUuid)->getId();
@@ -228,25 +246,29 @@ class ScrapeMangaCollecCommand extends Command
 
                     if ($boxIsbn && $this->boxRepository->findByIsbn($boxIsbn)) {
                         $this->warn("Skipping box with existing ISBN: {$boxIsbn}");
-                        $boxesMap[$boxUuid] = $this->boxRepository->findByIsbn($boxIsbn)->getId();
+                        $existingBox = $this->boxRepository->findByIsbn($boxIsbn);
+                        if ($existingBox) {
+                            $boxesMap[$boxUuid] = $existingBox->getId();
+                        }
 
                         continue;
                     }
 
-                    $mappedBoxSetId = $boxSetsMap[$boxData['box_edition_id'] ?? ''] ?? null;
+                    $boxEditionId = is_string($boxData['box_edition_id'] ?? null) ? $boxData['box_edition_id'] : '';
+                    $mappedBoxSetId = $boxSetsMap[$boxEditionId] ?? null;
                     if (! $mappedBoxSetId) {
                         continue;
                     }
 
                     $box = $this->boxRepository->create(new CreateBoxDTO(
                         boxSetId: $mappedBoxSetId,
-                        title: (string) ($boxData['title'] ?? 'Box'),
-                        number: (string) ($boxData['number'] ?? ''),
+                        title: is_string($boxData['title'] ?? null) ? $boxData['title'] : 'Box',
+                        number: is_string($boxData['number'] ?? null) ? $boxData['number'] : '',
                         isbn: $boxIsbn,
                         apiId: $boxUuid,
-                        releaseDate: isset($boxData['release_date']) ? (string) $boxData['release_date'] : null,
-                        coverUrl: isset($boxData['image_url']) ? (string) $boxData['image_url'] : null,
-                        isEmpty: str_contains(strtolower((string) ($boxData['title'] ?? '')), 'vide')
+                        releaseDate: is_string($boxData['release_date'] ?? null) ? $boxData['release_date'] : null,
+                        coverUrl: is_string($boxData['image_url'] ?? null) ? $boxData['image_url'] : null,
+                        isEmpty: str_contains(strtolower(is_string($boxData['title'] ?? null) ? $boxData['title'] : ''), 'vide')
                     ));
                     $boxesMap[$boxUuid] = $box->getId();
                 }
@@ -254,14 +276,14 @@ class ScrapeMangaCollecCommand extends Command
                 // 6. Handle Box Volumes link
                 $boxVolumesToAttach = [];
                 /** @var array<int, array<string, mixed>> $boxVolumesRaw */
-                $boxVolumesRaw = $detail['box_volumes'] ?? [];
+                $boxVolumesRaw = is_array($detail['box_volumes']) ? $detail['box_volumes'] : [];
                 foreach ($boxVolumesRaw as $bvData) {
                     if (! ($bvData['included'] ?? true)) {
                         continue; // Only link if theoretically included or to signify relation? Depending on your requirement. Let's assume we link everything that is logically in the box. But actually "included: false" might mean it's an empty box.
                     }
 
-                    $boxUuid = (string) ($bvData['box_id'] ?? '');
-                    $volumeUuid = (string) ($bvData['volume_id'] ?? '');
+                    $boxUuid = is_string($bvData['box_id'] ?? null) ? $bvData['box_id'] : '';
+                    $volumeUuid = is_string($bvData['volume_id'] ?? null) ? $bvData['volume_id'] : '';
 
                     $boxId = $boxesMap[$boxUuid] ?? null;
                     if (! $boxId) {

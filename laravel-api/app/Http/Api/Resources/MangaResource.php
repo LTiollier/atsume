@@ -16,19 +16,22 @@ class MangaResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $series = $this->resource->getSeries();
+        $authorsStr = $series?->getAuthors();
+
         return [
             'id' => $this->resource->getId(),
             'api_id' => $this->resource->getApiId(),
             'isbn' => $this->resource->getIsbn(),
             'number' => $this->resource->getNumber(),
             'title' => $this->resource->getTitle(),
-            'authors' => $this->resource->getSeries()?->getAuthors() ? explode(', ', $this->resource->getSeries()?->getAuthors()) : [],
+            'authors' => $authorsStr ? explode(', ', $authorsStr) : [],
             'published_date' => $this->resource->getPublishedDate(),
             'cover_url' => $this->resource->getCoverUrl(),
             'is_owned' => $this->resource->isOwned(),
             'is_loaned' => $this->resource->isLoaned(),
             'loaned_to' => $this->resource->getLoanedTo(),
-            'series' => $this->resource->getSeries() ? new SeriesResource($this->resource->getSeries()) : null,
+            'series' => $series ? new SeriesResource($series) : null,
             'edition' => $this->resource->getEdition() ? new EditionResource($this->resource->getEdition()) : null,
         ];
     }

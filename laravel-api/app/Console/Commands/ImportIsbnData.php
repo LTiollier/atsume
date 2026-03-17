@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use MongoDB\Laravel\Connection;
 
 class ImportIsbnData extends Command
 {
@@ -63,7 +64,9 @@ class ImportIsbnData extends Command
         $processed = 0;
 
         // Get the underlying MongoDB collection for maximum performance
-        $collection = DB::connection('mongodb')->getCollection('isbn_data');
+        /** @var Connection $mongoConnection */
+        $mongoConnection = DB::connection('mongodb');
+        $collection = $mongoConnection->getCollection('isbn_data');
 
         while (($row = fgetcsv($handle)) !== false) {
             if (count($row) !== count($header)) {
@@ -72,7 +75,12 @@ class ImportIsbnData extends Command
                 continue;
             }
 
-            $data = array_combine($header, $row);
+            /** @var array<int|string, string> $headerFields */
+            $headerFields = array_filter($header, fn ($v) => is_string($v));
+            if (count($headerFields) !== count($row)) {
+                continue;
+            }
+            $data = array_combine($headerFields, $row);
 
             // Remove unwanted fields
             unset($data['min_price'], $data['offers_count'], $data['url'], $data['currency']);
@@ -119,6 +127,9 @@ class ImportIsbnData extends Command
     {
         $lineCount = 0;
         $handle = fopen($filePath, 'r');
+        if ($handle === false) {
+            return 0;
+        }
         while (! feof($handle)) {
             fgets($handle);
             $lineCount++;

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use MongoDB\Laravel\Connection;
 
 class SearchIsbnData extends Command
 {
@@ -27,7 +28,9 @@ class SearchIsbnData extends Command
     public function handle(): int
     {
         $query = $this->argument('query');
-        $collection = DB::connection('mongodb')->getCollection('isbn_data');
+        /** @var Connection $mongoConnection */
+        $mongoConnection = DB::connection('mongodb');
+        $collection = $mongoConnection->getCollection('isbn_data');
 
         // Search by ISBN (exact) or Title (regex)
         $filter = [
@@ -57,12 +60,17 @@ class SearchIsbnData extends Command
 
         $this->table(
             ['ISBN', 'Title', 'Publisher', 'Pages'],
-            array_map(fn ($r) => [
-                $r['isbn'],
-                $r['title'] ?? 'N/A',
-                $r['editeur'] ?? 'N/A',
-                $r['nb_page'] ?? 'N/A',
-            ], $results)
+            array_map(function ($r) {
+                $r = (array) $r;
+
+                /** @var array<string, mixed> $r */
+                return [
+                    is_string($r['isbn'] ?? null) ? $r['isbn'] : 'N/A',
+                    is_string($r['title'] ?? null) ? $r['title'] : 'N/A',
+                    is_string($r['editeur'] ?? null) ? $r['editeur'] : 'N/A',
+                    is_scalar($r['nb_page'] ?? null) ? (string) $r['nb_page'] : 'N/A',
+                ];
+            }, $results)
         );
 
         return 0;

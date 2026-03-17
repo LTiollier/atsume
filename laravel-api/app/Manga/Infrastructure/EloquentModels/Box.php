@@ -19,11 +19,13 @@ class Box extends Model
         'is_empty',
     ];
 
+    /** @return BelongsTo<BoxSet, $this> */
     public function boxSet(): BelongsTo
     {
         return $this->belongsTo(BoxSet::class);
     }
 
+    /** @return BelongsToMany<Volume, $this> */
     public function volumes(): BelongsToMany
     {
         return $this->belongsToMany(Volume::class, 'box_volumes', 'box_id', 'volume_id');

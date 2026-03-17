@@ -50,7 +50,6 @@ class Volume
         return $this->title;
     }
 
-
     public function getPublishedDate(): ?string
     {
         return $this->published_date;
