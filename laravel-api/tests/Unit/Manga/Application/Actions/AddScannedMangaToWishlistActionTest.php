@@ -18,10 +18,9 @@ test('adds existing scanned manga to user wishlist', function () {
         isbn: '1234567890123',
         number: '1',
         title: 'Test Manga',
-        
-        
+
         published_date: null,
-        
+
         cover_url: null,
     );
 

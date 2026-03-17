@@ -22,7 +22,6 @@ test('resolveByIsbn returns existing volume from repository', function () {
     expect($service->resolveByIsbn('9781234567890'))->toBe($volume);
 });
 
-
 test('resolveByIsbn throws MangaNotFoundException when not found in DB', function () {
     $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
 

@@ -11,10 +11,9 @@ test('VolumeAddedToCollection event stores volume and userId', function () {
         isbn: '123456',
         number: '1',
         title: 'Title',
-        
-        
+
         published_date: null,
-        
+
         cover_url: null
     );
 
