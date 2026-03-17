@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Edition extends Model
 {
@@ -36,5 +37,13 @@ class Edition extends Model
     public function volumes(): HasMany
     {
         return $this->hasMany(Volume::class);
+    }
+
+    /**
+     * @return HasOne<Volume, $this>
+     */
+    public function firstVolume(): HasOne
+    {
+        return $this->hasOne(Volume::class)->orderBy('number');
     }
 }

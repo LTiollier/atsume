@@ -20,6 +20,7 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
                     $q->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
                         $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
                     }]);
+                    $q->with('firstVolume');
                     $q->with(['volumes' => function ($v) use ($userId) {
                         $v->select('volumes.id', 'volumes.edition_id', 'volumes.number', 'volumes.title', 'volumes.cover_url')
                             ->whereHas('users', fn ($u) => $u->where('users.id', $userId));

@@ -19,6 +19,7 @@ class Edition
         private readonly ?int $possessed_count = null,
         private readonly array $possessed_numbers = [],
         private readonly array $volumes = [],
+        private readonly ?string $cover_url = null,
         private readonly ?Series $series = null,
     ) {}
 
@@ -81,5 +82,18 @@ class Edition
     public function getPossessedCount(): ?int
     {
         return $this->possessed_count;
+    }
+
+    public function getCoverUrl(): ?string
+    {
+        if (isset($this->cover_url)) {
+            return $this->cover_url;
+        }
+
+        if (! empty($this->volumes)) {
+            return $this->volumes[0]->getCoverUrl();
+        }
+
+        return null;
     }
 }

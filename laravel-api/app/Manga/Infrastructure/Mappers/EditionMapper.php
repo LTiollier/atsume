@@ -38,6 +38,7 @@ class EditionMapper
             possessed_count: isset($eloquent->possessed_volumes_count) ? (int) $eloquent->possessed_volumes_count : null,
             possessed_numbers: $possessed_numbers,
             volumes: $volumes,
+            cover_url: $eloquent->relationLoaded('firstVolume') && $eloquent->firstVolume ? $eloquent->firstVolume->cover_url : null,
             series: $eloquent->relationLoaded('series') && $eloquent->series
                 ? SeriesMapper::toDomain($eloquent->series)
                 : null,
