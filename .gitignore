@@ -1,3 +1,4 @@
+.claude/*
 laravel-api/phpstan-report.txt
 laravel-api/phpstan_errors.json
 laravel-api/open4goods-isbn-dataset.csv
