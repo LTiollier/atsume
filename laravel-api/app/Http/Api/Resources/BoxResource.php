@@ -2,7 +2,7 @@
 
 namespace App\Http\Api\Resources;
 
-use App\Manga\Infrastructure\EloquentModels\Box;
+use App\Manga\Domain\Models\Box;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,14 +17,14 @@ class BoxResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->resource->id,
-            'api_id' => $this->resource->api_id,
-            'title' => $this->resource->title,
-            'number' => $this->resource->number,
-            'isbn' => $this->resource->isbn,
-            'release_date' => $this->resource->release_date,
-            'cover_url' => $this->resource->cover_url,
-            'is_empty' => (bool) $this->resource->is_empty,
+            'id' => $this->resource->getId(),
+            'api_id' => $this->resource->getApiId(),
+            'title' => $this->resource->getTitle(),
+            'number' => $this->resource->getNumber(),
+            'isbn' => $this->resource->getIsbn(),
+            'release_date' => $this->resource->getReleaseDate(),
+            'cover_url' => $this->resource->getCoverUrl(),
+            'is_empty' => $this->resource->isEmpty(),
         ];
     }
 }
