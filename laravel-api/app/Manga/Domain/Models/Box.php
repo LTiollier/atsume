@@ -19,7 +19,19 @@ class Box
         private readonly bool $is_empty,
         private readonly ?bool $is_owned = null,
         private readonly array $volumes = [],
+        private readonly ?int $total_volumes = null,
+        private readonly ?int $possessed_count = null,
     ) {}
+
+    public function getTotalVolumes(): ?int
+    {
+        return $this->total_volumes;
+    }
+
+    public function getPossessedCount(): ?int
+    {
+        return $this->possessed_count;
+    }
 
     /**
      * @return Volume[]

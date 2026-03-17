@@ -17,6 +17,8 @@ export interface Box {
     cover_url: string | null;
     is_empty: boolean;
     is_owned: boolean | null;
+    total_volumes?: number | null;
+    possessed_count?: number | null;
     volumes?: Manga[];
 }
 

@@ -32,6 +32,8 @@ class BoxMapper
             is_empty: (bool) $eloquent->is_empty,
             is_owned: isset($eloquent->is_owned) ? (bool) $eloquent->is_owned : null,
             volumes: $volumes,
+            total_volumes: isset($eloquent->volumes_count) ? (int) $eloquent->volumes_count : null,
+            possessed_count: isset($eloquent->possessed_volumes_count) ? (int) $eloquent->possessed_volumes_count : null,
         );
     }
 }
