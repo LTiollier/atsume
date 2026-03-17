@@ -31,7 +31,7 @@ class ServiceHasTestRule implements Rule
         }
 
         $file = $scope->getFile();
-        $cwd = getcwd() ?: '';
+        $rootDir = realpath(__DIR__.'/../../') ?: '';
 
         // Convert /Users/.../app/... to app/...
         $relativePath = str_contains($file, '/app/')
@@ -42,7 +42,7 @@ class ServiceHasTestRule implements Rule
         $testRelativePath = str_replace('app/', 'tests/Unit/', $relativePath);
         $testRelativePath = str_replace('.php', 'Test.php', $testRelativePath);
 
-        $fullTestPath = rtrim($cwd, '/').'/'.ltrim($testRelativePath, '/');
+        $fullTestPath = rtrim($rootDir, '/').'/'.ltrim($testRelativePath, '/');
 
         if (! file_exists($fullTestPath)) {
             return [

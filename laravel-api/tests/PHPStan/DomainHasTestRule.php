@@ -36,7 +36,7 @@ class DomainHasTestRule implements Rule
         // Let's at least skip abstract classes or empty exceptions if needed, but for now we enforce it.
 
         $file = $scope->getFile();
-        $cwd = getcwd() ?: '';
+        $rootDir = realpath(__DIR__.'/../../') ?: '';
 
         // Convert /Users/.../app/... to app/...
         $relativePath = str_contains($file, '/app/')
@@ -47,7 +47,7 @@ class DomainHasTestRule implements Rule
         $testRelativePath = str_replace('app/', 'tests/Unit/', $relativePath);
         $testRelativePath = str_replace('.php', 'Test.php', $testRelativePath);
 
-        $fullTestPath = rtrim($cwd, '/').'/'.ltrim($testRelativePath, '/');
+        $fullTestPath = rtrim($rootDir, '/').'/'.ltrim($testRelativePath, '/');
 
         if (! file_exists($fullTestPath)) {
             return [
