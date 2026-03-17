@@ -11,8 +11,8 @@ class GetSeriesAction
         private readonly SeriesRepositoryInterface $seriesRepository
     ) {}
 
-    public function execute(int $id): ?Series
+    public function execute(int $id, ?int $userId = null): ?Series
     {
-        return $this->seriesRepository->findById($id);
+        return $this->seriesRepository->findById($id, $userId);
     }
 }

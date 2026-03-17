@@ -17,7 +17,7 @@ test('it gets a series by id', function () {
     );
 
     $repo = Mockery::mock(SeriesRepositoryInterface::class);
-    $repo->shouldReceive('findById')->with(1)->once()->andReturn($series);
+    $repo->shouldReceive('findById')->with(1, null)->once()->andReturn($series);
 
     $action = new GetSeriesAction($repo);
 
@@ -26,7 +26,7 @@ test('it gets a series by id', function () {
 
 test('it returns null if series not found', function () {
     $repo = Mockery::mock(SeriesRepositoryInterface::class);
-    $repo->shouldReceive('findById')->with(1)->once()->andReturn(null);
+    $repo->shouldReceive('findById')->with(1, null)->once()->andReturn(null);
 
     $action = new GetSeriesAction($repo);
 

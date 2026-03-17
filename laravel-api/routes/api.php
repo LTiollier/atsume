@@ -42,7 +42,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     Route::get('/series/{id}', [MangaHierarchyController::class, 'showSeries']);
     Route::get('/series/{seriesId}/editions', [MangaHierarchyController::class, 'listEditions']);
+    Route::get('/editions/{editionId}', [MangaHierarchyController::class, 'showEdition']);
     Route::get('/editions/{editionId}/volumes', [MangaHierarchyController::class, 'listVolumes']);
+    Route::get('/boxes/{boxId}', [MangaHierarchyController::class, 'showBox']);
 
     Route::get('/loans', [LoanController::class, 'index']);
     Route::post('/loans', [LoanController::class, 'store']);

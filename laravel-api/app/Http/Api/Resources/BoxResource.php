@@ -25,6 +25,8 @@ class BoxResource extends JsonResource
             'release_date' => $this->resource->getReleaseDate(),
             'cover_url' => $this->resource->getCoverUrl(),
             'is_empty' => $this->resource->isEmpty(),
+            'is_owned' => $this->resource->isOwned(),
+            'volumes' => MangaResource::collection($this->when($this->resource->getVolumes() !== [], $this->resource->getVolumes())),
         ];
     }
 }

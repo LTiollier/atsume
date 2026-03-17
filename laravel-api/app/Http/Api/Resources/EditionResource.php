@@ -23,6 +23,10 @@ class EditionResource extends JsonResource
             'publisher' => $this->resource->getPublisher(),
             'language' => $this->resource->getLanguage(),
             'total_volumes' => $this->resource->getTotalVolumes(),
+            'possessed_count' => $this->resource->getPossessedCount(),
+            'possessed_numbers' => $this->when($this->resource->getPossessedNumbers() !== [], $this->resource->getPossessedNumbers()),
+            'series' => $this->when($this->resource->getSeries() !== null, $this->resource->getSeries() ? new SeriesResource($this->resource->getSeries()) : null),
+            'volumes' => MangaResource::collection($this->when($this->resource->getVolumes() !== [], $this->resource->getVolumes())),
         ];
     }
 }
