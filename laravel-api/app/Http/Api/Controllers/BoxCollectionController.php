@@ -15,7 +15,7 @@ class BoxCollectionController
         /** @var User $user */
         $user = $request->user();
 
-        $action->execute($boxId, (int) $user->id);
+        $action->execute($boxId, (int) $user->id, (bool) $request->input('include_volumes', true));
 
         return response()->json(['message' => 'Box added to collection'], 201);
     }

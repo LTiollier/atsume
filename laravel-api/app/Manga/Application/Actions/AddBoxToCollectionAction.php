@@ -13,9 +13,9 @@ class AddBoxToCollectionAction
         private readonly VolumeRepositoryInterface $volumeRepository,
     ) {}
 
-    public function execute(int $boxId, int $userId): void
+    public function execute(int $boxId, int $userId, bool $includeVolumes = true): void
     {
-        DB::transaction(function () use ($boxId, $userId) {
+        DB::transaction(function () use ($boxId, $userId, $includeVolumes) {
             $box = $this->boxRepository->findById($boxId);
             if (! $box) {
                 return;
@@ -23,7 +23,7 @@ class AddBoxToCollectionAction
 
             $this->boxRepository->attachToUser($boxId, $userId);
 
-            if (! $box->isEmpty()) {
+            if ($includeVolumes && ! $box->isEmpty()) {
                 foreach ($box->getVolumes() as $volume) {
                     $this->volumeRepository->attachToUser($volume->getId(), $userId);
                 }
