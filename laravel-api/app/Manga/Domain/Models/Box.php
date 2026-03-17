@@ -4,6 +4,9 @@ namespace App\Manga\Domain\Models;
 
 class Box
 {
+    /**
+     * @param  Volume[]  $volumes
+     */
     public function __construct(
         private readonly int $id,
         private readonly int $box_set_id,
@@ -14,7 +17,17 @@ class Box
         private readonly ?string $release_date,
         private readonly ?string $cover_url,
         private readonly bool $is_empty,
+        private readonly ?bool $is_owned = null,
+        private readonly array $volumes = [],
     ) {}
+
+    /**
+     * @return Volume[]
+     */
+    public function getVolumes(): array
+    {
+        return $this->volumes;
+    }
 
     public function getId(): int
     {
@@ -59,5 +72,10 @@ class Box
     public function isEmpty(): bool
     {
         return $this->is_empty;
+    }
+
+    public function isOwned(): ?bool
+    {
+        return $this->is_owned;
     }
 }

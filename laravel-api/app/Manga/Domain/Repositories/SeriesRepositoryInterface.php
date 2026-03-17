@@ -7,7 +7,7 @@ use App\Manga\Domain\Models\Series;
 
 interface SeriesRepositoryInterface
 {
-    public function findById(int $id): ?Series;
+    public function findById(int $id, ?int $userId = null): ?Series;
 
     public function findByTitle(string $title): ?Series;
 

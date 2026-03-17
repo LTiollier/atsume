@@ -7,6 +7,8 @@ use App\Manga\Domain\Models\Box;
 
 interface BoxRepositoryInterface
 {
+    public function findById(int $id, ?int $userId = null): ?Box;
+
     public function findByApiId(string $apiId): ?Box;
 
     public function findByIsbn(string $isbn): ?Box;

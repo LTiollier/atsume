@@ -7,7 +7,7 @@ use App\Manga\Domain\Models\Edition;
 
 interface EditionRepositoryInterface
 {
-    public function findById(int $id): ?Edition;
+    public function findById(int $id, ?int $userId = null): ?Edition;
 
     public function findByNameAndSeries(string $name, int $seriesId): ?Edition;
 
