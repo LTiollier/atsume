@@ -6,6 +6,26 @@ import { z } from "zod";
  * en cas de données incomplètes ou divergentes entre le backend et le frontend.
  */
 
+export const BoxSchema = z.object({
+    id: z.number(),
+    api_id: z.string().nullable().default(null),
+    title: z.string(),
+    number: z.string().nullable().default(null),
+    isbn: z.string().nullable().default(null),
+    release_date: z.string().nullable().default(null),
+    cover_url: z.string().nullable().default(null),
+    is_empty: z.boolean().default(false),
+});
+
+export const BoxSetSchema = z.object({
+    id: z.number(),
+    series_id: z.number(),
+    title: z.string(),
+    publisher: z.string().nullable().default(null),
+    api_id: z.string().nullable().default(null),
+    boxes: z.array(BoxSchema).default([]),
+});
+
 export const SeriesSchema = z.object({
     id: z.number(),
     title: z.string(),
@@ -14,6 +34,8 @@ export const SeriesSchema = z.object({
     cover_url: z.string().nullable().default(null),
     status: z.string().nullable().default(null),
     total_volumes: z.number().nullable().default(null),
+    editions: z.array(z.lazy(() => EditionSchema)).optional().default([]),
+    box_sets: z.array(BoxSetSchema).optional().default([]),
 });
 
 export const EditionSchema = z.object({
@@ -25,6 +47,7 @@ export const EditionSchema = z.object({
 });
 
 export const MangaSearchResultSchema = z.object({
+    id: z.number().nullable().default(null),
     api_id: z.string().nullable().default(null),
     title: z.string(),
     authors: z.array(z.string()).nullable().default([]),

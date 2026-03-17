@@ -1,6 +1,6 @@
 import api, { ApiResponse } from '@/lib/api';
-import { Manga, MangaSearchResult } from '@/types/manga';
-import { MangaSchema, MangaSearchResultSchema } from '@/schemas/manga';
+import { Manga, MangaSearchResult, Series } from '@/types/manga';
+import { MangaSchema, MangaSearchResultSchema, SeriesSchema } from '@/schemas/manga';
 import { z } from 'zod';
 
 export const mangaService = {
@@ -44,4 +44,26 @@ export const mangaService = {
     /** Supprime un volume de la collection */
     removeVolume: (volumeId: number) =>
         api.delete(`/mangas/${volumeId}`),
+
+    /** Récupère les détails d'une série */
+    getSeries: (id: number) =>
+        api.get<ApiResponse<Series>>(`/series/${id}`).then(r => {
+            try {
+                return SeriesSchema.parse(r.data.data);
+            } catch (error) {
+                console.error("Series validation failed:", error);
+                return r.data.data as unknown as Series;
+            }
+        }),
+
+    /** Récupère les tomes d'une édition */
+    getEditionVolumes: (editionId: number) =>
+        api.get<ApiResponse<Manga[]>>(`/editions/${editionId}/volumes`).then(r => {
+            try {
+                return z.array(MangaSchema).parse(r.data.data);
+            } catch (error) {
+                console.error("Edition volumes validation failed:", error);
+                return r.data.data as unknown as Manga[];
+            }
+        }),
 };

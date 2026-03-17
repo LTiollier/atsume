@@ -3,25 +3,21 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BookOpen, Search, Plus, Loader2 } from 'lucide-react';
 import { Manga, Series, Edition } from '@/types/manga';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-import { useAlert } from '@/contexts/AlertContext';
 import { useOffline } from '@/contexts/OfflineContext';
-import { LoanDialog } from '@/components/manga/loan-dialog';
 import { VolumeGrid } from '@/components/collection/VolumeGrid';
 import { ActionToolbar } from '@/components/collection/ActionToolbar';
 import { mangaService } from '@/services/manga.service';
-import { userService } from '@/services/user.service';
-import { loanService } from '@/services/loan.service';
+import { motion } from 'framer-motion';
 
-export default function EditionPage() {
+export default function SearchEditionPage() {
     const params = useParams();
     const seriesId = params.id as string;
     const editionId = params.editionId as string;
-    const { confirm } = useAlert();
     const { isOffline } = useOffline();
 
     const [mangas, setMangas] = useState<Manga[]>([]);
@@ -33,33 +29,30 @@ export default function EditionPage() {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [lastSelectedNum, setLastSelectedNum] = useState<number | null>(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
 
-    const fetchMangas = useCallback(async () => {
+    const fetchData = useCallback(async () => {
         try {
-            const editionVolumes = await userService.getEditionVolumes(editionId);
+            const editionVolumes = await mangaService.getEditionVolumes(parseInt(editionId));
             setMangas(editionVolumes);
 
-            const seriesData = await userService.getSeries(seriesId);
+            const seriesData = await mangaService.getSeries(parseInt(seriesId));
             setSeries(seriesData);
 
-            const editions = await userService.getSeriesEditions(seriesId);
-            const currentEdition = editions.find(e => e.id.toString() === editionId);
-            if (currentEdition) {
-                setEdition(currentEdition);
-            } else if (editionVolumes.length > 0 && editionVolumes[0].edition) {
-                setEdition(editionVolumes[0].edition);
+            if (seriesData.editions) {
+                const currentEdition = seriesData.editions.find(e => e.id.toString() === editionId);
+                setEdition(currentEdition || null);
             }
         } catch (error) {
             console.error('Failed to fetch data:', error);
+            toast.error("Erreur lors de la récupération des données.");
         } finally {
             setIsLoading(false);
         }
     }, [editionId, seriesId]);
 
     useEffect(() => {
-        fetchMangas();
-    }, [fetchMangas]);
+        fetchData();
+    }, [fetchData]);
 
     // Data Mapping
     const { ownedMap, totalTomes } = useMemo(() => {
@@ -105,7 +98,6 @@ export default function EditionPage() {
                 const end = Math.max(lastSelectedNum, vol.number);
                 const rangeIds = volumesUI
                     .filter(v => v.number >= start && v.number <= end)
-                    // Only select items of the SAME type in the range
                     .filter(v => v.isPossessed === isOwned)
                     .map(v => v.isPossessed ? `o-${v.manga?.id}` : `m-${v.number}`);
                 
@@ -127,9 +119,9 @@ export default function EditionPage() {
         setIsSaving(true);
         try {
             await mangaService.addBulk(edition!.id, toAdd);
-            toast.success(`${toAdd.length} tome(s) ajouté(s)`);
+            toast.success(`${toAdd.length} tome(s) ajouté(s) à votre collection`);
             setSelectedIds([]);
-            await fetchMangas();
+            await fetchData();
         } catch (error) {
             toast.error("Erreur lors de l'ajout");
         } finally {
@@ -137,66 +129,45 @@ export default function EditionPage() {
         }
     };
 
-    const handleBatchRemove = () => {
-        const ownedIds = selectedIds
-            .filter(id => id.startsWith('o-'))
-            .map(id => parseInt(id.replace('o-', '')));
-            
-        const toRemove = mangas.filter(m => ownedIds.includes(m.id));
-        if (toRemove.length === 0) return;
-
-        confirm({
-            title: `RETIRER ${toRemove.length} TOME(S) ?`,
-            description: "Cette action supprimera ces tomes de votre collection.",
-            confirmLabel: "RETIRER",
-            destructive: true,
-            onConfirm: async () => {
-                await Promise.all(toRemove.map(m => mangaService.removeVolume(m.id)));
-                toast.success("Tomes retirés");
-                setSelectedIds([]);
-                await fetchMangas();
-            }
-        });
-    };
-
-    const selectedMangaForLoan = mangas.filter(m => 
-        selectedIds.includes(`o-${m.id}`) && !m.is_loaned
-    );
-
     if (isLoading) {
         return (
-            <div className="space-y-8 animate-pulse">
-                <div className="h-8 w-48 bg-slate-800 rounded-full"></div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-                    {[1, 2, 3, 4, 5].map(i => <div key={i} className="aspect-[2/3] bg-slate-800 rounded-2xl"></div>)}
-                </div>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-slate-400 font-medium">Chargement des volumes...</p>
             </div>
         );
     }
 
     if (!series || !edition) return null;
 
+    const possessedCount = mangas.filter(v => v.is_owned).length;
+
     return (
-        <div className="space-y-8 pb-32">
+        <div className="space-y-8 pb-32 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row justify-between md:items-end gap-6">
-                <div className="space-y-2">
+                <div className="space-y-4">
                     <Button variant="ghost" asChild className="text-muted-foreground hover:text-white group -ml-4">
-                        <Link href={`/collection/series/${series.id}`}>
+                        <Link href={`/search/series/${series.id}`}>
                             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
                             <span className="font-black uppercase tracking-widest text-[10px]">{series.title}</span>
                         </Link>
                     </Button>
-                    <h1 className="text-4xl font-display font-black uppercase tracking-tight">{edition.name}</h1>
-                </div>
-                <div className="flex items-center gap-4 bg-card/50 backdrop-blur-xl px-6 py-3 rounded-2xl border border-border/50">
-                    <div className="flex flex-col">
-                        <span className="text-2xl font-display font-black text-primary leading-none">
-                            {mangas.length} / {totalTomes}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Tomes possédés</span>
+                    <div className="space-y-1">
+                        <h1 className="text-4xl font-display font-black uppercase tracking-tight text-white">{edition.name}</h1>
+                        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                            <Search className="h-3 w-3" /> Mode Exploration
+                        </p>
                     </div>
-                    <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary flex items-center justify-center">
-                        <span className="text-xs font-black">{Math.round((mangas.length / totalTomes) * 100)}%</span>
+                </div>
+                <div className="flex items-center gap-4 bg-white/5 backdrop-blur-xl px-6 py-4 rounded-[2rem] border border-white/10 shadow-2xl">
+                    <div className="flex flex-col">
+                        <span className="text-3xl font-display font-black text-primary leading-none">
+                            {possessedCount} / {totalTomes}
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">Possédés</span>
+                    </div>
+                    <div className="w-12 h-12 rounded-full border-4 border-white/5 border-t-primary flex items-center justify-center">
+                        <span className="text-xs font-black text-white">{Math.round((possessedCount / totalTomes) * 100)}%</span>
                     </div>
                 </div>
             </div>
@@ -209,16 +180,8 @@ export default function EditionPage() {
                         toast.error("Mode hors ligne actif");
                         return;
                     }
-                    if (vol.manga?.is_loaned) {
-                        confirm({
-                            title: "MARQUER COMME RENDU ?",
-                            description: `Le tome ${vol.number} a-t-il été récupéré ?`,
-                            confirmLabel: "OUI, RÉCUPÉRÉ",
-                            onConfirm: async () => {
-                                await loanService.markReturned(vol.manga!.id);
-                                await fetchMangas();
-                            }
-                        });
+                    if (vol.isPossessed) {
+                        toast.info("Vous possédez déjà ce tome !");
                         return;
                     }
                     const isShift = typeof window !== 'undefined' ? (window.event as unknown as MouseEvent)?.shiftKey || false : false;
@@ -226,32 +189,28 @@ export default function EditionPage() {
                 }}
             />
 
-            <ActionToolbar
-                selectedCount={selectedIds.length}
-                hasMissing={selectedIds.length > 0 && selectedIds[0].startsWith('m-')}
-                hasOwned={selectedIds.length > 0 && selectedIds[0].startsWith('o-')}
-                onAdd={handleBatchAdd}
-                onLoan={() => {
-                    if (selectedMangaForLoan.length === 0) {
-                        toast.error("Aucun tome disponible pour le prêt");
-                        return;
-                    }
-                    setIsLoanDialogOpen(true);
-                }}
-                onRemove={handleBatchRemove}
-                onCancel={() => setSelectedIds([])}
-                isSaving={isSaving}
-            />
-
-            <LoanDialog
-                mangas={selectedMangaForLoan}
-                open={isLoanDialogOpen}
-                onOpenChange={setIsLoanDialogOpen}
-                onSuccess={() => {
-                    fetchMangas();
-                    setSelectedIds([]);
-                }}
-            />
+            {selectedIds.length > 0 && selectedIds[0].startsWith('m-') && (
+                <ActionToolbar
+                    selectedCount={selectedIds.length}
+                    hasMissing={true}
+                    hasOwned={false}
+                    onAdd={handleBatchAdd}
+                    onLoan={() => {}} // Disabled for search
+                    onRemove={() => {}} // Disabled for search
+                    onCancel={() => setSelectedIds([])}
+                    isSaving={isSaving}
+                />
+            )}
+            
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="fixed bottom-10 inset-x-0 flex justify-center pointer-events-none"
+            >
+                <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 shadow-2xl pointer-events-auto">
+                    Sélectionnez les volumes à ajouter à votre mangathèque
+                </div>
+            </motion.div>
         </div>
     );
 }

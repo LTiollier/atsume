@@ -105,6 +105,7 @@ export default function SearchPage() {
                         <MangaCard
                             key={manga.api_id}
                             manga={manga}
+                            href={manga.id ? `/search/series/${manga.id}` : undefined}
                             onAdd={handleAddToCollection}
                             onAddToWishlist={handleAddToWishlist}
                             isLoading={isAdding === manga.api_id}

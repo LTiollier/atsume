@@ -6,6 +6,28 @@ export interface Series {
     cover_url: string | null;
     status: string | null;
     total_volumes: number | null;
+    editions?: Edition[];
+    box_sets?: BoxSet[];
+}
+
+export interface Box {
+    id: number;
+    api_id: string | null;
+    title: string;
+    number: string | null;
+    isbn: string | null;
+    release_date: string | null;
+    cover_url: string | null;
+    is_empty: boolean;
+}
+
+export interface BoxSet {
+    id: number;
+    series_id: number;
+    title: string;
+    publisher: string | null;
+    api_id: string | null;
+    boxes: Box[];
 }
 
 export interface Edition {
@@ -17,6 +39,7 @@ export interface Edition {
 }
 
 export interface MangaSearchResult {
+    id: number | null;
     api_id: string | null;
     title: string;
     authors: string[] | null;
