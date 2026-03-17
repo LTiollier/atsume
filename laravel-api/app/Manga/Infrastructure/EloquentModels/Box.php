@@ -28,6 +28,12 @@ class Box extends Model
     /** @return BelongsToMany<Volume, $this> */
     public function volumes(): BelongsToMany
     {
-        return $this->belongsToMany(Volume::class, 'box_volumes', 'box_id', 'volume_id');
+        return $this->belongsToMany(Volume::class, 'box_volumes', 'box_id', 'volume_id')->withTimestamps();
+    }
+
+    /** @return BelongsToMany<User, $this> */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_boxes', 'box_id', 'user_id')->withTimestamps();
     }
 }

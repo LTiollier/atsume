@@ -179,10 +179,15 @@ class ScrapeMangaCollecCommand extends Command
                         continue;
                     }
 
+                    $volumeNumber = isset($volumeData['number']) ? (string) $volumeData['number'] : '';
+                    $volumeTitle = (is_string($volumeData['title'] ?? null) && ! empty($volumeData['title']))
+                        ? $volumeData['title']
+                        : $seriesTitle.' #'.($volumeNumber ?: '?');
+
                     $this->volumeRepository->create(new CreateVolumeDTO(
                         editionId: $mappedEditionId,
-                        title: ($seriesTitle).' #'.(is_string($volumeData['number'] ?? null) ? $volumeData['number'] : '?'),
-                        number: is_string($volumeData['number'] ?? null) ? $volumeData['number'] : '',
+                        title: $volumeTitle,
+                        number: $volumeNumber,
                         isbn: $isbn,
                         apiId: $volumeUuid,
                         publishedDate: is_string($volumeData['release_date'] ?? null) ? $volumeData['release_date'] : null,
@@ -263,7 +268,7 @@ class ScrapeMangaCollecCommand extends Command
                     $box = $this->boxRepository->create(new CreateBoxDTO(
                         boxSetId: $mappedBoxSetId,
                         title: is_string($boxData['title'] ?? null) ? $boxData['title'] : 'Box',
-                        number: is_string($boxData['number'] ?? null) ? $boxData['number'] : '',
+                        number: isset($boxData['number']) ? (string) $boxData['number'] : '',
                         isbn: $boxIsbn,
                         apiId: $boxUuid,
                         releaseDate: is_string($boxData['release_date'] ?? null) ? $boxData['release_date'] : null,

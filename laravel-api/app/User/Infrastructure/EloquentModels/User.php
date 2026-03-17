@@ -3,6 +3,7 @@
 namespace App\User\Infrastructure\EloquentModels;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Manga\Infrastructure\EloquentModels\Box;
 use App\Manga\Infrastructure\EloquentModels\Volume;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -62,7 +63,15 @@ class User extends Authenticatable
      */
     public function volumes(): BelongsToMany
     {
-        return $this->belongsToMany(Volume::class, 'user_volumes', 'user_id', 'volume_id');
+        return $this->belongsToMany(Volume::class, 'user_volumes', 'user_id', 'volume_id')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany<Box, $this>
+     */
+    public function boxes(): BelongsToMany
+    {
+        return $this->belongsToMany(Box::class, 'user_boxes', 'user_id', 'box_id')->withTimestamps();
     }
 
     /**

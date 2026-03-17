@@ -39,7 +39,15 @@ class Volume extends Model
      */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_volumes');
+        return $this->belongsToMany(User::class, 'user_volumes')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany<Box, $this>
+     */
+    public function boxes(): BelongsToMany
+    {
+        return $this->belongsToMany(Box::class, 'box_volumes', 'volume_id', 'box_id')->withTimestamps();
     }
 
     /**
