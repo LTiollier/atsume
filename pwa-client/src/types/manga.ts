@@ -2,10 +2,7 @@ export interface Series {
     id: number;
     title: string;
     authors: string[] | null;
-    description: string | null;
     cover_url: string | null;
-    status: string | null;
-    total_volumes: number | null;
     editions?: Edition[];
     box_sets?: BoxSet[];
 }

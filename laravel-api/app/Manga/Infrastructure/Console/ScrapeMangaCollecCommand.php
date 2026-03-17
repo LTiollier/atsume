@@ -87,6 +87,7 @@ class ScrapeMangaCollecCommand extends Command
                     return trim((is_string($fName) ? $fName : '').' '.(is_string($lName) ? $lName : ''));
                 })->filter()->values()->toArray();
                 $authors = ! empty($authorsArray) ? implode(', ', $authorsArray) : null;
+
                 /** @var array<int, array<string, mixed>> $seriesRaw */
                 $seriesRaw = $detail['series'] ?? [];
                 $seriesTitle = is_string($seriesRaw[0]['title'] ?? null) ? $seriesRaw[0]['title'] : (is_string($detail['title'] ?? null) ? $detail['title'] : 'Unknown');

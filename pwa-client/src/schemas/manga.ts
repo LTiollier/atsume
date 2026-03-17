@@ -30,10 +30,7 @@ export const SeriesSchema = z.object({
     id: z.number(),
     title: z.string(),
     authors: z.array(z.string()).nullable().default([]),
-    description: z.string().nullable().default(null),
     cover_url: z.string().nullable().default(null),
-    status: z.string().nullable().default(null),
-    total_volumes: z.number().nullable().default(null),
     editions: z.array(z.lazy(() => EditionSchema)).optional().default([]),
     box_sets: z.array(BoxSetSchema).optional().default([]),
 });

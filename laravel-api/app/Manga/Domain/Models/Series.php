@@ -14,27 +14,9 @@ class Series
         private readonly string $title,
         private readonly ?string $authors,
         private readonly ?string $cover_url,
-        private readonly ?string $description = null,
-        private readonly ?string $status = null,
-        private readonly ?int $totalVolumes = null,
         private readonly array $editions = [],
         private readonly array $boxSets = [],
     ) {}
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function getTotalVolumes(): ?int
-    {
-        return $this->totalVolumes;
-    }
 
     /**
      * @return Edition[]
