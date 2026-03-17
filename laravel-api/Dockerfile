@@ -7,9 +7,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    libssl-dev \
-    && pecl install pcov mongodb \
-    && docker-php-ext-enable pcov mongodb \
+    && pecl install pcov \
+    && docker-php-ext-enable pcov \
     && docker-php-ext-install pdo pdo_pgsql zip
 
 # Install Composer globally

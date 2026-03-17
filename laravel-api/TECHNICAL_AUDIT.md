@@ -54,8 +54,7 @@
 - [x] 🟢 Eloquent Models séparés des Domain Models (pattern `EloquentModels/`)
 - [x] 🟢 Mappers présents pour convertir Eloquent ↔ Domain (`VolumeMapper`, `SeriesMapper`…)
 - [x] 🟢 Implémentations concrètes des repositories dans `Infrastructure/Repositories/`
-- [ ] 🔴 **`Console/Commands/` hors des bounded contexts** — `ScrapeMangaCollecCommand`, `ImportIsbnData`, `SearchIsbnData` sont dans `app/Console/Commands/` global, alors qu'ils appartiennent clairement au domaine `Manga`. Ils devraient être dans `app/Manga/Infrastructure/Console/`.
-- [ ] 🟠 **Dépendance MongoDB dans `composer.json`** — Le package `mongodb/laravel-mongodb: ^5.6` est installé, mais la documentation (`AGENTS.md`) définit **PostgreSQL via Supabase** comme base de données unique. Cette dépendance est soit morte (à supprimer), soit non documentée.
+- [ ] 🔴 **`Console/Commands/` hors des bounded contexts** — `ScrapeMangaCollecCommand` est dans `app/Console/Commands/` global, alors qu'il appartient clairement au domaine `Manga`. Il devrait être dans `app/Manga/Infrastructure/Console/`.
 - [ ] 🟡 **`MangaCollecScraperService` non derrière une interface** — Les autres services de lookup implémentent `MangaLookupServiceInterface`, mais `MangaCollecScraperService` est une classe concrète appelée directement. Incohérence de pattern.
 
 ---
@@ -103,7 +102,6 @@
 - [x] 🔴 **Coverage réel non vérifié** — La cible est 95% global / 100% domain, mais sans un rapport de coverage récent dans le repo, il est impossible de confirmer que c'est atteint. `make coverage` doit passer sans exception.
 - [ ] 🟠 **Absence de tests de contrat pour les services externes** — `MangaDexLookupService`, `OpenLibraryLookupService` et `MangaCollecScraperService` sont mockés, mais aucun test de contrat (consumer-driven contract) ne garantit que l'API externe n'a pas changé de format.
 - [ ] 🟡 **Seeders de test non documentés** — La stratégie de seeding pour les tests est mentionnée dans `AGENTS.md` mais aucun seeder spécifique aux tests n'est visible dans `database/`. À confirmer que les factories couvrent tous les cas edge.
-- [ ] 🟢 **`samples.csv` et `open4goods-isbn-dataset.csv` à la racine** — Fichiers de données utilisés pour `ImportIsbnData`. Ils devraient être dans `database/data/` ou `storage/data/` pour une meilleure organisation.
 
 ---
 
@@ -126,7 +124,6 @@
 - [x] 🟢 `.env.testing` et `.env.ci` séparés
 - [ ] 🟠 **`Makefile` sans vérification du statut Docker** — Si Docker n'est pas démarré, `make all` échoue silencieusement avec une erreur Docker peu explicite. Ajouter une cible de pré-check.
 - [ ] 🟡 **`vite.config.js` dans `laravel-api/`** — Vite est un outil frontend. Sa présence dans le backend Laravel est inhabituelle (peut-être pour les assets Laravel Mix/Vite par défaut). Si aucun asset frontend n'est compilé ici, ce fichier est un artefact à supprimer.
-- [ ] 🟢 **`open4goods-isbn-dataset.csv` (~volumineux) commité** — Un dataset CSV à la racine du projet API est un anti-pattern. Il devrait être dans `.gitignore` ou dans un bucket de stockage externe.
 
 ---
 
@@ -140,10 +137,9 @@
 - [ ] Absence de pagination sur les endpoints de listing → risque mémoire en production
 - [x] Coverage réel non confirmé → faire tourner `make coverage` et corriger les gaps
 
-### 🟠 Hautes (8)
+### 🟠 Hautes (7)
 - [ ] Aucun Domain Event dans le contexte `Borrowing`
 - [ ] `VolumeResolverService` : clarifier le rôle et les dépendances
-- [ ] Dépendance MongoDB non documentée → supprimer ou documenter
 - [ ] `MangaCollecScraperService` non derrière une interface
 - [ ] `phpstan_errors.json` présent → erreurs non résolues
 - [ ] Tests de contrat absents pour les services externes
@@ -162,13 +158,12 @@
 - [ ] Validation du format ISBN manquante
 - [x] `toignore.md` à traiter
 
-### 🟢 Faibles (5)
+### 🟢 Faibles (4)
 - [ ] Contexte `Search` à extraire de `Manga/`
 - [ ] Pas de rate limiting sur `GET /mangas/search` (endpoint public)
 - [ ] `vite.config.js` à supprimer si inutilisé
-- [x] `samples.csv` / `open4goods-isbn-dataset.csv` à déplacer
 - [ ] Seeders de test à documenter et localiser
 
 ---
 
-*Total : 6 critiques · 8 hautes · 10 moyennes · 5 faibles = **29 points d'action***
+*Total : 6 critiques · 7 hautes · 10 moyennes · 4 faibles = **27 points d'action***
