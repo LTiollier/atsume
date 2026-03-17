@@ -46,8 +46,8 @@ export const mangaService = {
         api.delete(`/mangas/${volumeId}`),
 
     /** Ajoute un coffret à la collection */
-    addBoxToCollection: (boxId: number) =>
-        api.post(`/boxes/${boxId}`),
+    addBoxToCollection: (boxId: number, includeVolumes: boolean = true) =>
+        api.post(`/boxes/${boxId}`, { include_volumes: includeVolumes }),
 
     /** Supprime un coffret de la collection */
     removeBoxFromCollection: (boxId: number) =>

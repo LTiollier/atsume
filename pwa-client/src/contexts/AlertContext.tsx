@@ -19,6 +19,7 @@ interface AlertOptions {
     confirmLabel?: string;
     cancelLabel?: string;
     onConfirm: () => Promise<void> | void;
+    onCancel?: () => Promise<void> | void;
     destructive?: boolean;
 }
 
@@ -61,8 +62,23 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const handleCancel = () => {
-        setIsOpen(false);
+    const handleCancel = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!options) return;
+
+        if (options.onCancel) {
+            setIsLoading(true);
+            try {
+                await options.onCancel();
+                setIsOpen(false);
+            } catch (error) {
+                console.error("Alert cancel action failed:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
+            setIsOpen(false);
+        }
     };
 
     return (
