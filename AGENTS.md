@@ -256,7 +256,7 @@ Before considering a task complete, the agent or developer must **systematically
 ### 5.1. Changes in `laravel-api/`
 Run the following command (via Docker as per section 6):
 ```
-docker-compose exec backend make all
+make all
 ```
 This single command covers linting (Pint), static analysis (PHPStan level 9), and tests (PestPHP). It must pass entirely before committing.
 
