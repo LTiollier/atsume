@@ -21,7 +21,7 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
                         $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
                     }]);
                     $q->with(['volumes' => function ($v) use ($userId) {
-                        $v->select('volumes.id', 'volumes.edition_id', 'volumes.number')
+                        $v->select('volumes.id', 'volumes.edition_id', 'volumes.number', 'volumes.title', 'volumes.cover_url')
                             ->whereHas('users', fn ($u) => $u->where('users.id', $userId));
                     }]);
                 },
