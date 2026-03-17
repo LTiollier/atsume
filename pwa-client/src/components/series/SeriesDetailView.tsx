@@ -46,7 +46,7 @@ export function SeriesDetailView({
     editionsTitle = "Éditions disponibles"
 }: SeriesDetailViewProps) {
     const possessedTotal = series.editions?.reduce((acc, ed) => acc + (ed.possessed_count || 0), 0) || 0;
-    const totalPossible = series.editions?.reduce((acc, ed) => acc + (ed.total_volumes || 0), 0) || 0;
+    const boxSetsTotal = series.box_sets?.reduce((acc, bs) => acc + (bs.boxes?.filter(b => b.is_owned).length || 0), 0) || 0;
 
     return (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -107,9 +107,19 @@ export function SeriesDetailView({
                                 <span className="text-[8px] md:text-[10px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Total Possédés</span>
                                 <div className="flex items-baseline gap-1.5">
                                     <span className="text-xl md:text-2xl font-display font-black text-white">{possessedTotal}</span>
-                                    <span className="text-slate-600 font-black text-[10px]">/ {totalPossible} tomes</span>
+                                    <span className="text-slate-600 font-black text-[10px]">tomes</span>
                                 </div>
                             </div>
+
+                            {series.box_sets && series.box_sets.length > 0 && (
+                                <div className="flex flex-col px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
+                                    <span className="text-[8px] md:text-[10px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Coffrets/Intégrales</span>
+                                    <div className="flex items-baseline gap-1.5">
+                                        <span className="text-xl md:text-2xl font-display font-black text-primary">{boxSetsTotal}</span>
+                                        <span className="text-slate-600 font-black text-[10px]">coffrets</span>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="flex flex-col px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
                                 <span className="text-[8px] md:text-[10px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Éditions</span>
