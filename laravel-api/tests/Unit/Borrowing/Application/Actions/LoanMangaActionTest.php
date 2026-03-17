@@ -4,6 +4,7 @@ namespace Tests\Unit\Borrowing\Application\Actions;
 
 use App\Borrowing\Application\Actions\LoanMangaAction;
 use App\Borrowing\Application\DTOs\LoanMangaDTO;
+use App\Borrowing\Domain\Exceptions\VolumeNotInCollectionException;
 use App\Borrowing\Domain\Models\Loan;
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
@@ -32,4 +33,19 @@ test('it loans a manga', function () {
 
     $result = $action->execute($dto);
     expect($result)->not->toBeNull();
+});
+
+test('it throws VolumeNotInCollectionException when volume not owned', function () {
+    $loanRepo = Mockery::mock(LoanRepositoryInterface::class);
+    $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
+
+    $volumeRepo->shouldReceive('isOwnedByUser')
+        ->once()
+        ->with(10, 1)
+        ->andReturn(false);
+
+    $action = new LoanMangaAction($loanRepo, $volumeRepo);
+    $dto = new LoanMangaDTO(userId: 1, volumeId: 10, borrowerName: 'Jean', notes: null);
+
+    expect(fn () => $action->execute($dto))->toThrow(VolumeNotInCollectionException::class);
 });

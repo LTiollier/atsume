@@ -108,6 +108,26 @@ test('it cannot loan a manga not in collection', function () {
     $response->assertStatus(403);
 });
 
+test('it returns 403 when return request has no volume_id', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    $response = postJson('/api/loans/return', []);
+
+    $response->assertStatus(403);
+});
+
+test('it returns 403 when return request volume does not exist', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    $response = postJson('/api/loans/return', [
+        'volume_id' => 99999,
+    ]);
+
+    $response->assertStatus(403);
+});
+
 test('loan model relationships', function () {
     $user = User::factory()->create();
     $volume = Volume::factory()->create();
