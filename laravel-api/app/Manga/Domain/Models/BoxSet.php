@@ -14,6 +14,7 @@ class BoxSet
         private readonly ?string $publisher,
         private readonly ?string $api_id,
         private readonly array $boxes = [],
+        private readonly ?string $cover_url = null,
     ) {}
 
     /** @return Box[] */
@@ -45,5 +46,18 @@ class BoxSet
     public function getApiId(): ?string
     {
         return $this->api_id;
+    }
+
+    public function getCoverUrl(): ?string
+    {
+        if (isset($this->cover_url)) {
+            return $this->cover_url;
+        }
+
+        if (! empty($this->boxes)) {
+            return $this->boxes[0]->getCoverUrl();
+        }
+
+        return null;
     }
 }

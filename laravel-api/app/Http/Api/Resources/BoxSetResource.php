@@ -22,6 +22,7 @@ class BoxSetResource extends JsonResource
             'title' => $this->resource->getTitle(),
             'publisher' => $this->resource->getPublisher(),
             'api_id' => $this->resource->getApiId(),
+            'cover_url' => $this->resource->getCoverUrl(),
             'boxes' => BoxResource::collection($this->resource->getBoxes()),
         ];
     }

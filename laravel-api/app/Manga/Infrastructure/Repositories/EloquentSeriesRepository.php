@@ -26,13 +26,16 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
                             ->whereHas('users', fn ($u) => $u->where('users.id', $userId));
                     }]);
                 },
-                'boxSets.boxes' => function ($q) use ($userId) {
-                    $q->withCount('volumes');
-                    $q->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
-                        $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
-                    }]);
-                    $q->withExists(['users as is_owned' => function ($u) use ($userId) {
-                        $u->where('users.id', $userId);
+                'boxSets' => function ($q) use ($userId) {
+                    $q->with('firstBox');
+                    $q->with(['boxes' => function ($q) use ($userId) {
+                        $q->withCount('volumes');
+                        $q->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
+                            $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
+                        }]);
+                        $q->withExists(['users as is_owned' => function ($u) use ($userId) {
+                            $u->where('users.id', $userId);
+                        }]);
                     }]);
                 },
             ]);

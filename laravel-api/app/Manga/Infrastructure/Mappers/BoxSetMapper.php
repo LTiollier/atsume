@@ -22,6 +22,7 @@ class BoxSetMapper
             publisher: $eloquent->publisher,
             api_id: $eloquent->api_id,
             boxes: $boxes,
+            cover_url: $eloquent->relationLoaded('firstBox') && $eloquent->firstBox ? $eloquent->firstBox->cover_url : null,
         );
     }
 }

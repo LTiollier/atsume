@@ -5,6 +5,7 @@ namespace App\Manga\Infrastructure\EloquentModels;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class BoxSet extends Model
 {
@@ -25,5 +26,11 @@ class BoxSet extends Model
     public function boxes(): HasMany
     {
         return $this->hasMany(Box::class);
+    }
+
+    /** @return HasOne<Box, $this> */
+    public function firstBox(): HasOne
+    {
+        return $this->hasOne(Box::class)->orderBy('number');
     }
 }
