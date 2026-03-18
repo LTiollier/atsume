@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, Plus, Trash2, X, Heart, Loader2 } from "lucide-react";
+import { ArrowLeftRight, Plus, Trash2, X, Heart, Loader2, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ActionToolbarProps {
@@ -11,10 +11,12 @@ interface ActionToolbarProps {
     onAdd: () => void;
     onWishlist?: () => void;
     onLoan: () => void;
+    onToggleRead?: () => void;
     onRemove: () => void;
     onCancel: () => void;
     isSaving?: boolean;
     isWishlistSaving?: boolean;
+    isReadSaving?: boolean;
 }
 
 export function ActionToolbar({
@@ -24,10 +26,12 @@ export function ActionToolbar({
     onAdd,
     onWishlist,
     onLoan,
+    onToggleRead,
     onRemove,
     onCancel,
     isSaving = false,
-    isWishlistSaving = false
+    isWishlistSaving = false,
+    isReadSaving = false,
 }: ActionToolbarProps) {
     if (selectedCount === 0) return null;
 
@@ -84,12 +88,22 @@ export function ActionToolbar({
                         )}
                         {hasOwned && (
                             <>
+                                {onToggleRead && (
+                                    <Button
+                                        onClick={onToggleRead}
+                                        disabled={isReadSaving}
+                                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-display font-black uppercase tracking-tight px-4 h-10 rounded-xl shadow-lg shadow-emerald-500/20"
+                                    >
+                                        {isReadSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookOpen className="mr-2 h-4 w-4" />}
+                                        <span className="hidden sm:inline">Lu</span>
+                                    </Button>
+                                )}
                                 <Button
                                     onClick={onLoan}
                                     className="bg-blue-600 hover:bg-blue-500 text-white font-display font-black uppercase tracking-tight px-4 h-10 rounded-xl shadow-lg shadow-blue-500/20"
                                 >
                                     <ArrowLeftRight className="mr-2 h-4 w-4" />
-                                    Prêter
+                                    <span className="hidden sm:inline">Prêter</span>
                                 </Button>
                                 <Button
                                     variant="destructive"

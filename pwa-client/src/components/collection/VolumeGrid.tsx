@@ -2,7 +2,7 @@
 
 import { Manga } from "@/types/manga";
 import { MangaCover } from "../ui/manga-cover";
-import { ArrowLeftRight, CheckCircle2, Circle, Plus } from "lucide-react";
+import { ArrowLeftRight, BookOpen, CheckCircle2, Circle, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -18,6 +18,7 @@ interface VolumeListProps {
     volumesUI: VolumeUI[];
     isReadOnly?: boolean;
     selectedIds?: string[]; // Consistent identification (e.g. m-number for missing, o-id for possessed)
+    readVolumeIds?: number[];
     onVolumeToggle?: (vol: VolumeUI) => void;
 }
 
@@ -25,6 +26,7 @@ export function VolumeGrid({
     volumesUI,
     isReadOnly = false,
     selectedIds = [],
+    readVolumeIds = [],
     onVolumeToggle,
 }: VolumeListProps) {
     return (
@@ -33,6 +35,7 @@ export function VolumeGrid({
                 const uniqueId = vol.isPossessed ? `o-${vol.manga?.id}` : `m-${vol.number}`;
                 const isSelected = selectedIds.includes(uniqueId);
                 const isLoaned = vol.manga?.is_loaned;
+                const isRead = vol.manga?.id !== undefined && readVolumeIds.includes(vol.manga.id);
 
                 return (
                     <motion.div
@@ -99,10 +102,17 @@ export function VolumeGrid({
                         
                         {!isLoaned && vol.isPossessed && !isSelected && (
                              <div className="absolute bottom-2 right-2 z-20">
-                                <div className="bg-primary/20 backdrop-blur-md px-2 py-1 rounded-lg border border-primary/20 flex items-center gap-1.5">
-                                    <CheckCircle2 className="h-3 w-3 text-primary" />
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-primary">Possédé</span>
-                                </div>
+                                {isRead ? (
+                                    <div className="bg-emerald-500/20 backdrop-blur-md px-2 py-1 rounded-lg border border-emerald-500/30 flex items-center gap-1.5">
+                                        <BookOpen className="h-3 w-3 text-emerald-400" />
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">Lu</span>
+                                    </div>
+                                ) : (
+                                    <div className="bg-primary/20 backdrop-blur-md px-2 py-1 rounded-lg border border-primary/20 flex items-center gap-1.5">
+                                        <CheckCircle2 className="h-3 w-3 text-primary" />
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-primary">Possédé</span>
+                                    </div>
+                                )}
                              </div>
                         )}
 

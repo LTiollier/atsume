@@ -117,6 +117,12 @@ export const WishlistItemSchema = z.union([
     BoxSchema.and(z.object({ type: z.literal('box') })),
 ]);
 
+export const ReadingProgressSchema = z.object({
+    id: z.number(),
+    volume_id: z.number(),
+    read_at: z.string(),
+});
+
 /**
  * Types inférés via Zod
  */

@@ -16,6 +16,7 @@ import { ActionToolbar } from '@/components/collection/ActionToolbar';
 import { mangaService } from '@/services/manga.service';
 import { wishlistService } from '@/services/wishlist.service';
 import { loanService } from '@/services/loan.service';
+import { useReadingProgressQuery, useBulkToggleReadingProgress } from '@/hooks/queries';
 
 export default function EditionPage() {
     const params = useParams();
@@ -35,6 +36,11 @@ export default function EditionPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [isWishlistSaving, setIsWishlistSaving] = useState(false);
     const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
+
+    // Reading progress
+    const { data: readingProgress = [] } = useReadingProgressQuery();
+    const bulkToggleRead = useBulkToggleReadingProgress();
+    const readVolumeIds = readingProgress.map(rp => rp.volume_id);
 
     const fetchMangas = useCallback(async () => {
         try {
@@ -187,7 +193,16 @@ export default function EditionPage() {
         });
     };
 
-    const selectedMangaForLoan = mangas.filter(m => 
+    const handleBatchToggleRead = async () => {
+        const ownedIds = selectedIds
+            .filter(id => id.startsWith('o-'))
+            .map(id => parseInt(id.replace('o-', '')));
+        if (ownedIds.length === 0) return;
+        await bulkToggleRead.mutateAsync(ownedIds);
+        setSelectedIds([]);
+    };
+
+    const selectedMangaForLoan = mangas.filter(m =>
         selectedIds.includes(`o-${m.id}`) && !m.is_loaned
     );
 
@@ -232,6 +247,7 @@ export default function EditionPage() {
             <VolumeGrid
                 volumesUI={volumesUI}
                 selectedIds={selectedIds}
+                readVolumeIds={readVolumeIds}
                 onVolumeToggle={(vol) => {
                     if (isOffline) {
                         toast.error("Mode hors ligne actif");
@@ -267,10 +283,12 @@ export default function EditionPage() {
                     }
                     setIsLoanDialogOpen(true);
                 }}
+                onToggleRead={handleBatchToggleRead}
                 onRemove={handleBatchRemove}
                 onCancel={() => setSelectedIds([])}
                 isSaving={isSaving}
                 isWishlistSaving={isWishlistSaving}
+                isReadSaving={bulkToggleRead.isPending}
             />
 
             <LoanDialog

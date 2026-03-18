@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { mangaService } from "@/services/manga.service";
 import { loanService } from "@/services/loan.service";
 import { wishlistService } from "@/services/wishlist.service";
+import { readingProgressService } from "@/services/readingProgress.service";
 import { Loan } from "@/types/manga";
 import { toast } from "sonner";
 
@@ -11,6 +12,7 @@ export const queryKeys = {
     mangas: ["mangas"] as const,
     loans: ["loans"] as const,
     wishlist: ["wishlist"] as const,
+    readingProgress: ["readingProgress"] as const,
     publicCollection: (username: string) => ["publicCollection", username] as const,
     publicProfile: (username: string) => ["publicProfile", username] as const,
 };
@@ -105,6 +107,37 @@ export function useBulkReturnLoans() {
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.loans });
+        },
+    });
+}
+
+// ─── Reading Progress ─────────────────────────────────────────────────────────
+
+/** Récupère tout le suivi de lecture de l'utilisateur */
+export function useReadingProgressQuery() {
+    return useQuery({
+        queryKey: queryKeys.readingProgress,
+        queryFn: readingProgressService.getAll,
+    });
+}
+
+/** Toggle le statut lu/non lu pour plusieurs volumes */
+export function useBulkToggleReadingProgress() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (volumeIds: number[]) => readingProgressService.toggleBulk(volumeIds),
+        onSuccess: (result) => {
+            if (result.removed.length > 0 && result.toggled.length === 0) {
+                toast.success(`${result.removed.length} tome(s) marqué(s) comme non lu(s)`);
+            } else if (result.toggled.length > 0 && result.removed.length === 0) {
+                toast.success(`${result.toggled.length} tome(s) marqué(s) comme lu(s)`);
+            } else {
+                toast.success("Progression mise à jour");
+            }
+            queryClient.invalidateQueries({ queryKey: queryKeys.readingProgress });
+        },
+        onError: () => {
+            toast.error("Erreur lors de la mise à jour de la progression");
         },
     });
 }

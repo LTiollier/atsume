@@ -100,6 +100,12 @@ export interface Loan {
     loanable: Manga | Box | null;
 }
 
+export interface ReadingProgress {
+    id: number;
+    volume_id: number;
+    read_at: string;
+}
+
 export interface GroupedSeries {
     series: Series;
     volumes: Manga[];

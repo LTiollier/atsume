@@ -12,6 +12,7 @@ import {
     User as LucideUser,
     ScanBarcode as LucideScanBarcode,
     ArrowLeftRight as LucideArrowLeftRight,
+    BookOpen as LucideBookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -33,6 +34,7 @@ export function Shell({ children }: ShellProps) {
         { name: "Recherche", href: "/search", icon: LucideSearch },
         { name: "Ma Collection", href: "/collection", icon: LucideBook },
         { name: "Prêts", href: "/loans", icon: LucideArrowLeftRight },
+        { name: "Lecture", href: "/reading-progress", icon: LucideBookOpen },
         { name: "Wishlist", href: "/wishlist", icon: LucideHeart },
         { name: "Paramètres", href: "/settings", icon: LucideSettings },
     ];
