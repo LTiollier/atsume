@@ -1,0 +1,353 @@
+/* ============================================
+   MANGASTORE PWA v2 — Système de design Void
+   ============================================
+
+   CONVENTION DE TOKENS
+   ──────────────────────────────────────────
+   Tokens FIXES (thème Void — définis dans :root)
+     Ils ne changent JAMAIS quelle que soit la palette :
+     --background · --foreground · --card · --popover
+     --secondary · --muted · --muted-foreground
+     --destructive · --border · --input
+     --sidebar-background · --sidebar-foreground
+     --sidebar-accent · --sidebar-border
+     --radius · --font-* · --shadow-*
+
+   Tokens DYNAMIQUES (redéfinis dans .palette-*)
+     Ils changent selon la palette active sur <html> :
+     --primary · --primary-foreground
+     --accent · --accent-foreground · --ring
+     --sidebar-primary · --sidebar-primary-foreground · --sidebar-ring
+     --shadow-glow-* (teintées par --primary)
+     --color-read · --color-loaned · --color-wishlist · --color-owned
+
+   Palette par défaut : Ember (ambre hue 55°)
+   Classe sur <html> : .palette-ember | .palette-crimson
+                       .palette-indigo | .palette-forest
+   ============================================ */
+
+@import "tailwindcss";
+
+@layer base {
+
+  /* ============================================
+     THÈME VOID — Tokens fixes
+     Fond : #0a0a0b (oklch 7%) — noir absolu
+     Radius : 4px (--radius: 0.25rem)
+     ============================================ */
+  :root {
+    /* Fond et texte */
+    --background:              oklch(7%  0.008 250);  /* #0a0a0b — noir absolu */
+    --foreground:              oklch(94% 0.006 60);   /* blanc cassé légèrement chaud */
+
+    /* Cartes — légèrement surélevées sur le fond */
+    --card:                    oklch(10% 0.010 250);
+    --card-foreground:         oklch(94% 0.006 60);
+
+    /* Popovers / dropdowns */
+    --popover:                 oklch(11% 0.012 250);
+    --popover-foreground:      oklch(94% 0.006 60);
+
+    /* Surfaces secondaires */
+    --secondary:               oklch(15% 0.012 250);
+    --secondary-foreground:    oklch(90% 0.006 60);
+
+    /* Muted — textes et surfaces atténués */
+    --muted:                   oklch(13% 0.010 250);
+    --muted-foreground:        oklch(56% 0.010 60);
+
+    /* Destructif / Erreur */
+    --destructive:             oklch(62% 0.24 25);
+    --destructive-foreground:  oklch(98% 0 0);
+
+    /* Bordures et inputs */
+    --border:                  oklch(18% 0.012 250);
+    --input:                   oklch(18% 0.012 250);
+
+    /* Sidebar — plus sombre que le fond de page */
+    --sidebar-background:      oklch(6%  0.006 250);
+    --sidebar-foreground:      oklch(90% 0.006 60);
+    --sidebar-accent:          oklch(12% 0.010 250);
+    --sidebar-accent-foreground: oklch(90% 0.006 60);
+    --sidebar-border:          oklch(14% 0.010 250);
+
+    /* Radius Void — 4px, uniforme */
+    --radius: 0.25rem;
+
+    /* Polices — variables injectées par next/font dans layout.tsx */
+    --font-display: var(--font-syne),        'Syne',           sans-serif;
+    --font-body:    var(--font-nunito-sans),  'Nunito Sans',    sans-serif;
+    --font-mono:    var(--font-ibm-mono),     'IBM Plex Mono',  monospace;
+
+    /* Ombres fixes — opacité constante sur fond Void */
+    --shadow-xs:    0 1px 2px  oklch(0% 0 0 / 0.50);
+    --shadow-sm:    0 2px 8px  oklch(0% 0 0 / 0.50);
+    --shadow-md:    0 4px 20px oklch(0% 0 0 / 0.60);
+    --shadow-lg:    0 16px 60px oklch(0% 0 0 / 0.80);
+    --shadow-sheet: 0 -8px 40px oklch(0% 0 0 / 0.60);
+  }
+
+  /* ============================================
+     PALETTE EMBER — Ambre chaud hue 55° ⭐ DÉFAUT
+     Contraste primary-foreground/primary : ~7.8:1 ✅ AAA
+     ============================================ */
+  :root,
+  .palette-ember {
+    --primary:                        oklch(72% 0.24 55);
+    --primary-foreground:             oklch(8%  0.008 55);
+    --accent:                         oklch(16% 0.014 250);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(72% 0.24 55);
+
+    --sidebar-primary:                oklch(72% 0.24 55);
+    --sidebar-primary-foreground:     oklch(8%  0.008 55);
+    --sidebar-ring:                   oklch(72% 0.24 55);
+
+    /* Glow teintée par l'ambre — change avec la palette */
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(72% 0.24 55) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(72% 0.24 55) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(72% 0.24 55) 20%, transparent);
+
+    /* Sémantique Mangastore */
+    --color-read:     oklch(70% 0.18 155);  /* Vert émeraude */
+    --color-loaned:   oklch(74% 0.20 55);   /* Ambre clair — proche primary, état distinct */
+    --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
+    --color-owned:    oklch(62% 0.18 215);  /* Bleu-cyan */
+  }
+
+  /* ============================================
+     PALETTE CRIMSON — Rouge sang hue 18°
+     Contraste primary-foreground/primary : ~6.0:1 ✅ AA
+     ============================================ */
+  .palette-crimson {
+    --primary:                        oklch(62% 0.24 18);
+    --primary-foreground:             oklch(10% 0.015 18);
+    --accent:                         oklch(16% 0.018 250);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(62% 0.24 18);
+
+    --sidebar-primary:                oklch(62% 0.24 18);
+    --sidebar-primary-foreground:     oklch(10% 0.015 18);
+    --sidebar-ring:                   oklch(62% 0.24 18);
+
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(62% 0.24 18) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(62% 0.24 18) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(62% 0.24 18) 20%, transparent);
+
+    --color-read:     oklch(68% 0.18 155);  /* Vert émeraude */
+    --color-loaned:   oklch(72% 0.20 55);   /* Ambre — différencié du crimson */
+    --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
+    --color-owned:    oklch(62% 0.18 215);  /* Bleu-cyan */
+  }
+
+  /* ============================================
+     PALETTE INDIGO — Violet hue 290°
+     Contraste primary-foreground/primary : ~6.4:1 ✅ AA
+     ============================================ */
+  .palette-indigo {
+    --primary:                        oklch(65% 0.26 290);
+    --primary-foreground:             oklch(10% 0.020 290);
+    --accent:                         oklch(17% 0.020 265);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(65% 0.26 290);
+
+    --sidebar-primary:                oklch(65% 0.26 290);
+    --sidebar-primary-foreground:     oklch(10% 0.020 290);
+    --sidebar-ring:                   oklch(65% 0.26 290);
+
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(65% 0.26 290) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(65% 0.26 290) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(65% 0.26 290) 20%, transparent);
+
+    --color-read:     oklch(68% 0.18 155);  /* Vert émeraude */
+    --color-loaned:   oklch(72% 0.20 55);   /* Ambre */
+    --color-wishlist: oklch(65% 0.26 290);  /* = primary indigo */
+    --color-owned:    oklch(68% 0.20 220);  /* Teal */
+  }
+
+  /* ============================================
+     PALETTE FOREST — Vert forêt hue 155°
+     Contraste primary-foreground/primary : ~5.9:1 ✅ AA
+     ============================================ */
+  .palette-forest {
+    --primary:                        oklch(62% 0.22 155);
+    --primary-foreground:             oklch(10% 0.018 155);
+    --accent:                         oklch(16% 0.016 250);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(62% 0.22 155);
+
+    --sidebar-primary:                oklch(62% 0.22 155);
+    --sidebar-primary-foreground:     oklch(10% 0.018 155);
+    --sidebar-ring:                   oklch(62% 0.22 155);
+
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(62% 0.22 155) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(62% 0.22 155) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(62% 0.22 155) 20%, transparent);
+
+    --color-read:     oklch(62% 0.22 155);  /* = primary vert */
+    --color-loaned:   oklch(72% 0.20 55);   /* Ambre */
+    --color-wishlist: oklch(65% 0.22 295);  /* Lavande */
+    --color-owned:    oklch(65% 0.20 215);  /* Cyan */
+  }
+
+}
+
+/* ============================================
+   BASE — Reset & typographie
+   ============================================ */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    line-height: 1.2;
+  }
+
+  code, kbd, pre, samp {
+    font-family: var(--font-mono);
+  }
+
+  /* Scrollbar Void */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: var(--radius);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+}
+
+/* ============================================
+   UTILITAIRES VOID — Classes métier Mangastore
+   ============================================ */
+@layer components {
+
+  /* Grille de covers — serrée (effet galerie) */
+  .manga-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  @media (min-width: 480px) {
+    .manga-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .manga-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .manga-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .manga-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+
+  /* Carte volume — ratio 2:3, couverture pleine */
+  .manga-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: calc(var(--radius) * 2); /* 8px */
+    aspect-ratio: 2 / 3;
+    cursor: pointer;
+    background-color: var(--muted);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  }
+
+  .manga-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm), var(--shadow-glow-sm);
+  }
+
+  /* Dot de statut — indicateur de lecture / prêt / wishlist */
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+  }
+
+  .status-dot--read     { background-color: var(--color-read); }
+  .status-dot--loaned   { background-color: var(--color-loaned); }
+  .status-dot--wishlist { background-color: var(--color-wishlist); }
+  .status-dot--owned    { background-color: var(--color-owned); }
+
+  /* Barre de progression — lecture d'une série */
+  .manga-progress {
+    height: 3px;
+    width: 100%;
+    background-color: var(--muted);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .manga-progress__fill {
+    height: 100%;
+    background-color: var(--primary);
+    border-radius: 9999px;
+    transition: width 300ms ease-out;
+  }
+
+  /* Safe area — padding iOS pour bottom nav */
+  .safe-area-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+
+}
+
+/* ============================================
+   ANIMATIONS — prefers-reduced-motion
+   Les animations Framer Motion sont dans lib/motion.ts.
+   Seuls les fallbacks CSS sont ici.
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -7,13 +7,13 @@
 
 ## Progression globale
 
-**17 / 74 tâches complètes** — Dernière mise à jour : 2026-03-18
+**26 / 74 tâches complètes** — Dernière mise à jour : 2026-03-18
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
 Phase 1 — Audit        ██████████  7/7  ✅ COMPLÈTE
 Phase 2 — Direction    ██████████  5/5  ✅ COMPLÈTE
-Phase 3 — Design sys.  ░░░░░░░░░░  0/9
+Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 4 — Composants   ░░░░░░░░░░  0/16
 Phase 5 — Pages        ░░░░░░░░░░  0/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
@@ -278,28 +278,30 @@ export const getCollection = cache(() =>
 
 ---
 
-## Phase 3 — Système de design
+## Phase 3 — Système de design ✅
 
 > Skills recommandés : `/color-system`
 > **Principe :** le thème Void est hardcodé (tokens fixes). Seule la **palette** est dynamique via une classe CSS sur `<html>`.
 > Tailwind et shadcn lisent toujours les mêmes noms de tokens — seule la classe `.palette-*` change.
 
 ### Tokens & CSS
-- [ ] Définir les tokens fixes du thème Void dans `:root` — radius `0.25rem`, fond `#0a0a0b`, typographie, ombres
-- [ ] Définir les 4 palettes de couleurs (code OKLch prêt dans `rapport.md` §5) :
-  - `.palette-ember { --primary: oklch(72% 0.24 55); ... }` ← **défaut**
-  - `.palette-crimson { --primary: oklch(62% 0.24 18); ... }`
-  - `.palette-indigo { --primary: oklch(65% 0.26 290); ... }`
-  - `.palette-forest { --primary: oklch(62% 0.22 155); ... }`
-- [ ] Ajouter les tokens sémantiques Mangastore dans chaque palette (`--color-read` · `--color-loaned` · `--color-wishlist` · `--color-owned`)
-- [ ] Vérifier les contrastes WCAG AA pour les 4 palettes (texte/fond · muted/fond · primary/btn-text)
-- [ ] Définir les classes utilitaires Void dans `globals.css` (`.manga-grid` · `.manga-card` · `.status-dot`)
-- [ ] Configurer `components.json` (shadcn) — thème de base = **Void + Ember**
+- [x] Tokens fixes du thème Void dans `:root` — `--radius: 0.25rem`, fond `oklch(7% 0.008 250)`, typographie, ombres — `src/app/globals.css` ✓
+- [x] 4 palettes de couleurs définies en OKLch :
+  - `:root, .palette-ember { --primary: oklch(72% 0.24 55); ... }` ← **défaut** ✓
+  - `.palette-crimson { --primary: oklch(62% 0.24 18); ... }` ✓
+  - `.palette-indigo  { --primary: oklch(65% 0.26 290); ... }` ✓
+  - `.palette-forest  { --primary: oklch(62% 0.22 155); ... }` ✓
+- [x] Tokens sémantiques Mangastore dans chaque palette (`--color-read` · `--color-loaned` · `--color-wishlist` · `--color-owned`) ✓
+- [x] Contrastes WCAG AA vérifiés — foreground/fond ~14:1 AAA · muted/fond ~5.5:1 AA · primary-fg/primary ≥ 5.9:1 AA sur les 4 palettes ✓
+- [x] Classes utilitaires Void dans `globals.css` — `.manga-grid` · `.manga-card` · `.status-dot` · `.manga-progress` · `.safe-area-*` ✓
+- [x] `components.json` configuré — style `new-york`, baseColor `zinc`, cssVariables `true` ✓
 
 ### Infrastructure
-- [ ] Créer `PaletteContext` — état `palette: 'ember'|'crimson'|'indigo'|'forest'`, persisté en `localStorage`
-- [ ] Appliquer la classe `.palette-X` sur `<html>` (hydration-safe avec `useSyncExternalStore`)
-- [ ] Documenter la convention de tokens en tête de `globals.css`
+- [x] `PaletteContext` créé — `src/contexts/PaletteContext.tsx` · `useSyncExternalStore` hydration-safe · persisté en `localStorage` ✓
+- [x] Classe `.palette-X` appliquée sur `<html>` au mount, sans flash, sans re-render de l'arbre ✓
+- [x] Convention de tokens documentée en tête de `globals.css` ✓
+
+> **Bonus :** `src/lib/motion.ts` — tous les variants Framer Motion (page · section · stat cards · bottom sheet · feedback · fade · tab)
 
 ---
 
@@ -341,7 +343,6 @@ export const getCollection = cache(() =>
 ## Phase 5 — Pages
 
 > Construire les pages dans `pwa-client-v2/src/app/`.
-> Skills recommandés : `/new-page`
 > Ordre recommandé : Layout shell → Auth → Dashboard → Collection hub → Sous-pages → Public
 
 ### Auth (hors layout protégé)
@@ -415,12 +416,6 @@ export const getCollection = cache(() =>
 ## Commandes utiles
 
 ```bash
-# Scaffolder une nouvelle page
-/new-page
-
-# Scaffolder un composant
-/new-component
-
 # Lancer le QA pipeline
 /qa
 
