@@ -13,7 +13,12 @@ class EditionMapper
     {
         /** @var int[] $possessed_numbers */
         $possessed_numbers = $eloquent->relationLoaded('volumes')
-            ? $eloquent->volumes->map(fn ($v) => (int) $v->number)->filter(fn ($n) => $n > 0)->values()->all()
+            ? $eloquent->volumes
+                ->filter(fn ($v) => (bool) ($v->is_owned ?? false))
+                ->map(fn ($v) => (int) $v->number)
+                ->filter(fn ($n) => $n > 0)
+                ->values()
+                ->all()
             : [];
 
         /** @var Volume[] $volumes */

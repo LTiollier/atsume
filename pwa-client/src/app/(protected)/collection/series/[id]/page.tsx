@@ -53,28 +53,23 @@ export default function SeriesPage() {
         return series.editions
             .map(edition => ({
                 edition: edition,
-                // On simule des volumes owned via possessed_count si on veut garder la compatibilité
-                // avec le composant qui s'attend à une liste de volumes.
-                // OU alors on adapte le composant EditionList.
-                volumes: (edition.possessed_numbers || []).map(num => ({ 
-                    id: 0, // ID fictif car on n'en a pas besoin ici
-                    number: num.toString(),
-                    is_owned: true,
+                // On utilise les volumes renvoyés par le backend s'ils existent
+                volumes: (edition.volumes || []).map(v => ({ 
+                    ...v,
+                    is_owned: !!v.is_owned,
                     edition: edition
                 })) as Manga[]
             }))
             .filter(item => item.volumes.length > 0 || (item.edition.total_volumes && item.edition.total_volumes > 0));
     }, [series]);
 
-    const handleAddAll = async (edition: Edition, totalVolumes: number, possessedNumbers: Set<number>) => {
-        if (totalVolumes <= 0) return;
-
-        const missing = [];
-        for (let i = 1; i <= totalVolumes; i++) {
-            if (!possessedNumbers.has(i)) {
-                missing.push(i);
-            }
-        }
+    const handleAddAll = async (edition: Edition) => {
+        // Au lieu de deviner les numéros de 1 à total_volumes,
+        // on regarde quels volumes réels de l'édition ne sont pas possédés.
+        const missing = (edition.volumes || [])
+            .filter(v => !v.is_owned)
+            .map(v => parseInt(v.number || '0'))
+            .filter(n => !isNaN(n) && n > 0);
 
         if (missing.length === 0) return;
 

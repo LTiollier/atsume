@@ -20,7 +20,7 @@ interface EditionListProps {
     isReadOnly?: boolean;
     isAddingAll?: number | null;
     isOffline?: boolean;
-    onAddAll?: (edition: Edition, totalVolumes: number, possessedNumbers: Set<number>) => void;
+    onAddAll?: (edition: Edition) => void;
     onLoanEdition?: (volumes: Manga[]) => void;
 }
 
@@ -57,13 +57,14 @@ export function EditionList({
             {editionsList.map(({ edition, volumes }) => {
                 const total = edition.total_volumes;
                 const hasTotal = Boolean(total && total > 0);
-                const possessedCount = volumes.length;
+                const possessedCount = volumes.filter(v => v.is_owned).length;
                 const percentage = hasTotal && total ? Math.min(100, (possessedCount / total) * 100) : null;
-                const possessedNumbers = new Set(volumes.map(v => parseInt(v.number || '0')).filter(n => !isNaN(n)));
+                const possessedNumbers = new Set(volumes.filter(v => v.is_owned).map(v => parseInt(v.number || '0')).filter(n => !isNaN(n)));
                 const isComplete = hasTotal && possessedCount >= (total || 0);
 
                 // Use the first possessed volume's cover if available, otherwise edition cover, otherwise series cover
-                const coverUrl = volumes.length > 0 ? (volumes[0].cover_url || edition.cover_url || series.cover_url) : (edition.cover_url || series.cover_url);
+                const ownedVolumes = volumes.filter(v => v.is_owned);
+                const coverUrl = ownedVolumes.length > 0 ? (ownedVolumes[0].cover_url || edition.cover_url || series.cover_url) : (edition.cover_url || series.cover_url);
 
                 return (
                     <motion.div key={edition.id} variants={item}>
@@ -134,7 +135,7 @@ export function EditionList({
                                             variant="ghost"
                                             size="sm"
                                             className="h-10 px-4 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary border border-primary/20"
-                                            onClick={() => onAddAll(edition, total || 0, possessedNumbers)}
+                                            onClick={() => onAddAll(edition)}
                                             disabled={isAddingAll === edition.id || isOffline}
                                         >
                                             {isAddingAll === edition.id ? (

@@ -22,8 +22,10 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
                     }]);
                     $q->with('firstVolume');
                     $q->with(['volumes' => function ($v) use ($userId) {
-                        $v->select('volumes.id', 'volumes.edition_id', 'volumes.number', 'volumes.title', 'volumes.cover_url')
-                            ->whereHas('users', fn ($u) => $u->where('users.id', $userId));
+                        $v->withExists(['users as is_owned' => function ($u) use ($userId) {
+                            $u->where('users.id', $userId);
+                        }]);
+                        $v->orderByRaw('CAST(number AS DECIMAL) ASC');
                     }]);
                 },
                 'boxSets' => function ($q) use ($userId) {

@@ -26,7 +26,7 @@ interface SeriesDetailViewProps {
     isAddingAll?: number | null;
     isOffline?: boolean;
     isReadOnly?: boolean;
-    onAddAll?: (edition: Edition, total: number, numbers: Set<number>) => void;
+    onAddAll?: (edition: Edition) => void;
     onLoanEdition?: (volumes: Manga[]) => void;
     editionsTitle?: string;
 }
