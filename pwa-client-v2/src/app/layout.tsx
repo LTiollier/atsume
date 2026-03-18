@@ -4,6 +4,7 @@ import { Syne, Nunito_Sans, IBM_Plex_Mono } from 'next/font/google';
 import { ReactQueryProvider } from '@/providers/ReactQueryProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { OfflineProvider } from '@/contexts/OfflineContext';
+import { PaletteProvider } from '@/contexts/PaletteContext';
 
 import './globals.css';
 
@@ -53,11 +54,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body style={{ fontFamily: 'var(--font-body)', background: 'var(--background)', color: 'var(--foreground)' }}>
         <ReactQueryProvider>
-          <AuthProvider>
-            <OfflineProvider>
-              {children}
-            </OfflineProvider>
-          </AuthProvider>
+          <PaletteProvider>
+            <AuthProvider>
+              <OfflineProvider>
+                {children}
+              </OfflineProvider>
+            </AuthProvider>
+          </PaletteProvider>
         </ReactQueryProvider>
       </body>
     </html>
