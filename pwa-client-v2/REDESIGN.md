@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**55 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
+**59 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -17,7 +17,7 @@ Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
 Phase 4 — Composants   ██████████  16/16  ✅ COMPLÈTE
-Phase 5 — Pages        ░░░░░░░░░░  0/20
+Phase 5 — Pages        ██░░░░░░░░  4/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
 
@@ -403,10 +403,10 @@ export const getCollection = cache(() =>
 > Ordre recommandé : Layout shell → Auth → Dashboard → Collection hub → Sous-pages → Public
 
 ### Auth (hors layout protégé)
-- [ ] `/login` — Email + password, lien register + forgot
-- [ ] `/register` — Name + email + password
-- [ ] `/forgot-password` — Email input
-- [ ] `/reset-password` — New password + confirm
+- [x] `/login` — Email + password, lien register + forgot ✓
+- [x] `/register` — Name + email + password ✓
+- [x] `/forgot-password` — Email input ✓
+- [x] `/reset-password` — New password + confirm ✓
 
 ### App (layout protégé)
 - [ ] `layout.tsx` (protected) — Shell + BottomNav + AuthGuard + transitions de page

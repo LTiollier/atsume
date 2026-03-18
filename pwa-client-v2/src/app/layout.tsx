@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Syne, Nunito_Sans, IBM_Plex_Mono } from 'next/font/google';
 
+import { Toaster } from 'sonner';
 import { ReactQueryProvider } from '@/providers/ReactQueryProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { OfflineProvider } from '@/contexts/OfflineContext';
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <AuthProvider>
               <OfflineProvider>
                 {children}
+                <Toaster position="top-center" richColors />
               </OfflineProvider>
             </AuthProvider>
           </PaletteProvider>
