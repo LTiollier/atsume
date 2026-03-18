@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**45 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
+**48 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -16,7 +16,7 @@ Phase 2 — Direction    ██████████  5/5  ✅ COMPLÈTE
 Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
-Phase 4 — Composants   ████░░░░░░  6/16  ← EN COURS
+Phase 4 — Composants   █████░░░░░  9/16  ← EN COURS
 Phase 5 — Pages        ░░░░░░░░░░  0/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
@@ -378,9 +378,9 @@ export const getCollection = cache(() =>
 - [x] **MangaGrid** — Wrapper grille responsive (2 col mobile → 4-5 desktop) ✓
 
 ### Formulaires & Inputs
-- [ ] **SearchBar** — Icône loupe intégrée, placeholder, clear button
-- [ ] **LoanForm** — Bottom sheet : nom emprunteur (autocomplete), date, note, CTA
-- [ ] **AuthForms** — Login · Register · ForgotPassword (style cohérent)
+- [x] **SearchBar** — Icône loupe intégrée, placeholder, clear button ✓
+- [x] **LoanForm** — Bottom sheet : nom emprunteur (autocomplete), date, note, CTA ✓
+- [x] **AuthForms** — Login · Register · ForgotPassword (style cohérent) ✓
 
 ### Feedback & États
 - [ ] **EmptyState** — Illustration + titre + CTA, déclinable par contexte (collection vide, wishlist vide…)
