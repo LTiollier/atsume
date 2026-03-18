@@ -124,8 +124,9 @@ export default function ReadingProgressPage() {
     const groupedSeries = useMemo(() => groupBySeries(filteredVolumes), [filteredVolumes]);
 
     // Stats
-    const totalRead = readingProgress.length;
-    const totalOwned = mangas.filter(m => m.is_owned).length;
+    const ownedVolumeIds = useMemo(() => new Set(mangas.filter(m => m.is_owned).map(m => m.id)), [mangas]);
+    const totalRead = readingProgress.filter(rp => ownedVolumeIds.has(rp.volume_id)).length;
+    const totalOwned = ownedVolumeIds.size;
     const allEditions = groupedSeries.flatMap(s => s.editions);
     const completedEditions = allEditions.filter(e => e.readCount >= e.totalOwned && e.totalOwned > 0);
     const completedSeries = groupedSeries.filter(s => s.editions.every(e => e.readCount >= e.totalOwned && e.totalOwned > 0));
