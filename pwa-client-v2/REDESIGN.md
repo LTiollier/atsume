@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**34 / 82 tâches complètes** — Dernière mise à jour : 2026-03-18
+**39 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -15,6 +15,7 @@ Phase 1 — Audit        ██████████  7/7  ✅ COMPLÈTE
 Phase 2 — Direction    ██████████  5/5  ✅ COMPLÈTE
 Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
+Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
 Phase 4 — Composants   ░░░░░░░░░░  0/16  ← PROCHAINE ÉTAPE
 Phase 5 — Pages        ░░░░░░░░░░  0/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
@@ -332,6 +333,33 @@ export const getCollection = cache(() =>
 - [x] Providers : `ReactQueryProvider.tsx` ✓
 
 > **Non porté (audit Phase 1)** : `AlertContext.tsx` → remplacé par `sonner` · `useLoans.ts` → doublon de `queries.ts` supprimé
+
+---
+
+## Phase 3.6 — Environnement local (cohabitation v1/v2) ✅
+
+> `pwa-client` (port 3000) et `pwa-client-v2` (port 3001) tournent simultanément
+> avec le même backend Laravel sur le port 8000.
+
+### Décision de port
+- [x] **Port 3001** retenu pour `pwa-client-v2` — `package.json` : `"dev": "next dev --port 3001"` ✓
+
+### Docker
+- [x] Service `frontend-v2` ajouté dans `../docker-compose.yml` — port `3001:3001`, volume `./pwa-client-v2:/app` ✓
+
+### Laravel Sanctum
+- [x] `laravel-api/.env` déjà correct — `SANCTUM_STATEFUL_DOMAINS` et `CORS_ALLOWED_ORIGINS` incluaient déjà `localhost:3001` ✓
+  ```
+  FRONTEND_URL=http://localhost:3000
+  SANCTUM_STATEFUL_DOMAINS=localhost:3000,127.0.0.1:3000,localhost:3001
+  CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001
+  ```
+
+### Variables d'environnement
+- [x] `pwa-client-v2/.env.local` créé — `NEXT_PUBLIC_API_URL=http://localhost:8000` ✓
+
+> **Note Phase 5** : pour les Server Components qui fetchent côté serveur (dans le conteneur Docker),
+> ajouter `API_URL=http://backend:8000` (sans `NEXT_PUBLIC_`) pour les appels internes Docker.
 
 ---
 
