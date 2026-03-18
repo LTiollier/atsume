@@ -34,7 +34,7 @@ class BulkLoanMangaAction
                 }
 
                 // 2. Check if the manga is already loaned
-                $activeLoan = $this->loanRepository->findActiveByVolumeIdAndUserId($volumeId, $dto->userId);
+                $activeLoan = $this->loanRepository->findActiveByLoanableIdAndType($volumeId, 'volume', $dto->userId);
                 if ($activeLoan) {
                     throw new AlreadyLoanedException("Volume {$volumeId} is already loaned to {$activeLoan->getBorrowerName()}.");
                 }
@@ -43,7 +43,8 @@ class BulkLoanMangaAction
                 $loan = new Loan(
                     id: null,
                     userId: $dto->userId,
-                    volumeId: $volumeId,
+                    loanableId: $volumeId,
+                    loanableType: 'volume',
                     borrowerName: $dto->borrowerName,
                     loanedAt: new DateTimeImmutable,
                     notes: $dto->notes

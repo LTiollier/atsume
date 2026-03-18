@@ -3,16 +3,17 @@
 namespace App\Http\Api\Controllers;
 
 use App\Borrowing\Application\Actions\BulkLoanMangaAction;
-use App\Borrowing\Application\Actions\BulkReturnMangaAction;
+use App\Borrowing\Application\Actions\BulkReturnItemAction;
 use App\Borrowing\Application\Actions\ListLoansAction;
-use App\Borrowing\Application\Actions\LoanMangaAction;
-use App\Borrowing\Application\Actions\ReturnMangaAction;
+use App\Borrowing\Application\Actions\LoanItemAction;
+use App\Borrowing\Application\Actions\ReturnItemAction;
 use App\Http\Api\Requests\BulkLoanMangaRequest;
-use App\Http\Api\Requests\BulkReturnMangaRequest;
-use App\Http\Api\Requests\LoanMangaRequest;
-use App\Http\Api\Requests\ReturnMangaRequest;
+use App\Http\Api\Requests\BulkReturnItemRequest;
+use App\Http\Api\Requests\LoanItemRequest;
+use App\Http\Api\Requests\ReturnItemRequest;
 use App\Http\Api\Resources\LoanResource;
 use App\User\Infrastructure\EloquentModels\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -27,12 +28,12 @@ class LoanController
         return LoanResource::collection($loans);
     }
 
-    public function store(LoanMangaRequest $request, LoanMangaAction $action): LoanResource
+    public function store(LoanItemRequest $request, LoanItemAction $action): JsonResponse
     {
         $dto = $request->toDTO();
         $loan = $action->execute($dto);
 
-        return new LoanResource($loan);
+        return (new LoanResource($loan))->response()->setStatusCode(201);
     }
 
     public function bulkStore(BulkLoanMangaRequest $request, BulkLoanMangaAction $action): AnonymousResourceCollection
@@ -43,7 +44,7 @@ class LoanController
         return LoanResource::collection($loans);
     }
 
-    public function return(ReturnMangaRequest $request, ReturnMangaAction $action): LoanResource
+    public function return(ReturnItemRequest $request, ReturnItemAction $action): LoanResource
     {
         $dto = $request->toDTO();
         $loan = $action->execute($dto);
@@ -51,7 +52,7 @@ class LoanController
         return new LoanResource($loan);
     }
 
-    public function bulkReturn(BulkReturnMangaRequest $request, BulkReturnMangaAction $action): AnonymousResourceCollection
+    public function bulkReturn(BulkReturnItemRequest $request, BulkReturnItemAction $action): AnonymousResourceCollection
     {
         $dto = $request->toDTO();
         $loans = $action->execute($dto);

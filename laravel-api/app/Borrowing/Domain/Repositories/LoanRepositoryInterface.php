@@ -10,7 +10,7 @@ interface LoanRepositoryInterface
 
     public function findById(int $id): ?Loan;
 
-    public function findActiveByVolumeIdAndUserId(int $volumeId, int $userId): ?Loan;
+    public function findActiveByLoanableIdAndType(int $loanableId, string $loanableType, int $userId): ?Loan;
 
     /** @return Loan[] */
     public function findAllByUserId(int $userId): array;

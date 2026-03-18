@@ -2,13 +2,13 @@
 
 namespace App\Borrowing\Application\DTOs;
 
-class BulkReturnMangaDTO
+class BulkReturnItemDTO
 {
     /**
-     * @param  int[]  $volumeIds
+     * @param  array<array{id: int, type: string}>  $items
      */
     public function __construct(
         public readonly int $userId,
-        public readonly array $volumeIds,
+        public readonly array $items,
     ) {}
 }

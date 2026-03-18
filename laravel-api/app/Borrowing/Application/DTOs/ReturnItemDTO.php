@@ -2,10 +2,11 @@
 
 namespace App\Borrowing\Application\DTOs;
 
-class ReturnMangaDTO
+class ReturnItemDTO
 {
     public function __construct(
         public readonly int $userId,
-        public readonly int $volumeId,
+        public readonly int $loanableId,
+        public readonly string $loanableType,
     ) {}
 }

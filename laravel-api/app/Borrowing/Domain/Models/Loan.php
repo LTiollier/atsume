@@ -2,6 +2,7 @@
 
 namespace App\Borrowing\Domain\Models;
 
+use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Models\Volume;
 use DateTimeImmutable;
 
@@ -10,17 +11,18 @@ class Loan
     public function __construct(
         private readonly ?int $id,
         private readonly int $userId,
-        private readonly int $volumeId,
+        private readonly int $loanableId,
+        private readonly string $loanableType,
         private readonly string $borrowerName,
         private readonly DateTimeImmutable $loanedAt,
         private readonly ?DateTimeImmutable $returnedAt = null,
         private readonly ?string $notes = null,
-        private readonly ?Volume $volume = null,
+        private readonly Volume|Box|null $loanable = null,
     ) {}
 
-    public function getVolume(): ?Volume
+    public function getLoanable(): Volume|Box|null
     {
-        return $this->volume;
+        return $this->loanable;
     }
 
     public function getId(): ?int
@@ -33,9 +35,14 @@ class Loan
         return $this->userId;
     }
 
-    public function getVolumeId(): int
+    public function getLoanableId(): int
     {
-        return $this->volumeId;
+        return $this->loanableId;
+    }
+
+    public function getLoanableType(): string
+    {
+        return $this->loanableType;
     }
 
     public function getBorrowerName(): string
