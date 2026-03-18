@@ -338,6 +338,27 @@
 }
 
 /* ============================================
+   SKELETON SHIMMER
+   Utilisé par SkeletonCard. Désactivé automatiquement
+   par le bloc prefers-reduced-motion ci-dessous.
+   ============================================ */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted)                                                  25%,
+    color-mix(in oklch, var(--muted) 55%, var(--border))          50%,
+    var(--muted)                                                  75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ============================================
    ANIMATIONS — prefers-reduced-motion
    Les animations Framer Motion sont dans lib/motion.ts.
    Seuls les fallbacks CSS sont ici.

@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**48 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
+**52 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -16,7 +16,7 @@ Phase 2 — Direction    ██████████  5/5  ✅ COMPLÈTE
 Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
-Phase 4 — Composants   █████░░░░░  9/16  ← EN COURS
+Phase 4 — Composants   ████████░░  13/16  ← EN COURS
 Phase 5 — Pages        ░░░░░░░░░░  0/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
@@ -383,10 +383,10 @@ export const getCollection = cache(() =>
 - [x] **AuthForms** — Login · Register · ForgotPassword (style cohérent) ✓
 
 ### Feedback & États
-- [ ] **EmptyState** — Illustration + titre + CTA, déclinable par contexte (collection vide, wishlist vide…)
-- [ ] **SkeletonCard** — Shimmer shimmer, même ratio que VolumeCard
-- [ ] **StatusBadge** — Lu (vert) · Prêté (ambre) · Wishlist (violet) — 4 variantes
-- [ ] **BottomSheet** — Sheet mobile swipe-to-dismiss, handle pill, overlay (voir spec `rapport.md` §6.4)
+- [x] **EmptyState** — Illustration + titre + CTA, déclinable par contexte (collection vide, wishlist vide…) ✓
+- [x] **SkeletonCard** — Shimmer shimmer, même ratio que VolumeCard ✓
+- [x] **StatusBadge** — Lu (vert) · Prêté (ambre) · Wishlist (violet) — 4 variantes ✓
+- [x] **BottomSheet** — Sheet mobile swipe-to-dismiss, handle pill, overlay (voir spec `rapport.md` §6.4) ✓
 
 ### Palette
 - [ ] **PaletteSwitcher** — 4 swatches circulaires (Ember · Crimson · Indigo · Forest) avec ring actif, changement instantané, persistance auto
