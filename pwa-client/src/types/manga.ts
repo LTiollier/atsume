@@ -18,8 +18,8 @@ export interface Box {
     is_empty: boolean;
     is_owned: boolean | null;
     total_volumes?: number | null;
-    possessed_count?: number | null;
     volumes?: Manga[];
+    box_set?: BoxSet | null;
 }
 
 export interface BoxSet {
@@ -30,6 +30,7 @@ export interface BoxSet {
     api_id: string | null;
     cover_url?: string | null;
     boxes: Box[];
+    series?: Series | null;
 }
 
 export interface Edition {
@@ -64,19 +65,21 @@ export interface Manga extends MangaSearchResult {
     is_owned: boolean;
     is_loaned: boolean;
     loaned_to: string | null;
+    box_title?: string | null;
     series: Series | null;
     edition: Edition | null;
 }
 
 export interface Loan {
     id: number;
-    volume_id: number;
+    loanable_id: number;
+    loanable_type: 'volume' | 'box';
     borrower_name: string;
     loaned_at: string;
     returned_at: string | null;
     is_returned: boolean;
     notes: string | null;
-    volume: Manga | null;
+    loanable: Manga | Box | null;
 }
 
 export interface GroupedSeries {

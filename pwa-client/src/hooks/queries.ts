@@ -39,8 +39,8 @@ export function useLoansQuery() {
 export function useReturnLoan() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (volumeId: number) => loanService.markReturned(volumeId),
-        onMutate: async (volumeId) => {
+        mutationFn: ({ id, type }: { id: number, type: 'volume' | 'box' }) => loanService.markReturned(id, type),
+        onMutate: async ({ id, type }) => {
             // Cancel outgoing refetches
             await queryClient.cancelQueries({ queryKey: queryKeys.loans });
             // Snapshot the previous value
@@ -49,7 +49,7 @@ export function useReturnLoan() {
             if (previousLoans) {
                 queryClient.setQueryData<Loan[]>(queryKeys.loans,
                     previousLoans.map(loan =>
-                        loan.volume_id === volumeId
+                        loan.loanable_id === id && loan.loanable_type === type
                             ? { ...loan, is_returned: true, returned_at: new Date().toISOString() }
                             : loan
                     )
@@ -57,7 +57,7 @@ export function useReturnLoan() {
             }
             return { previousLoans };
         },
-        onError: (err, volumeId, context) => {
+        onError: (err, variables, context) => {
             // Rollback on error
             if (context?.previousLoans) {
                 queryClient.setQueryData(queryKeys.loans, context.previousLoans);
@@ -65,7 +65,7 @@ export function useReturnLoan() {
             toast.error("Erreur lors de la validation du rendu");
         },
         onSuccess: () => {
-            toast.success("Manga marqué comme rendu");
+            toast.success("Marqué comme rendu");
         },
         onSettled: () => {
             // Always refetch after error or success to sync with server
@@ -78,29 +78,30 @@ export function useReturnLoan() {
 export function useBulkReturnLoans() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (volumeIds: number[]) => loanService.markManyReturned(volumeIds),
-        onMutate: async (volumeIds) => {
+        mutationFn: (items: { id: number, type: 'volume' | 'box' }[]) => loanService.markManyReturned(items),
+        onMutate: async (items) => {
             await queryClient.cancelQueries({ queryKey: queryKeys.loans });
             const previousLoans = queryClient.getQueryData<Loan[]>(queryKeys.loans);
             if (previousLoans) {
                 queryClient.setQueryData<Loan[]>(queryKeys.loans,
-                    previousLoans.map(loan =>
-                        volumeIds.includes(loan.volume_id)
+                    previousLoans.map(loan => {
+                        const isSelected = items.some(item => item.id === loan.loanable_id && item.type === loan.loanable_type);
+                        return isSelected
                             ? { ...loan, is_returned: true, returned_at: new Date().toISOString() }
-                            : loan
-                    )
+                            : loan;
+                    })
                 );
             }
             return { previousLoans };
         },
-        onError: (err, volumeIds, context) => {
+        onError: (err, variables, context) => {
             if (context?.previousLoans) {
                 queryClient.setQueryData(queryKeys.loans, context.previousLoans);
             }
             toast.error("Erreur lors de la validation du rendu");
         },
         onSuccess: () => {
-            toast.success("Mangas marqués comme rendus");
+            toast.success("Marqués comme rendus");
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.loans });

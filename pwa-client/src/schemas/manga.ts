@@ -18,6 +18,7 @@ export const BoxSchema: z.ZodType<any> = z.lazy(() => z.object({
     is_empty: z.boolean().default(false),
     is_owned: z.boolean().nullable().default(null),
     volumes: z.array(MangaSchema).optional().default([]),
+    box_set: BoxSetSchema.optional().nullable().default(null),
 }));
 
 export const BoxSetSchema = z.object({
@@ -28,6 +29,7 @@ export const BoxSetSchema = z.object({
     api_id: z.string().nullable().default(null),
     cover_url: z.string().optional().nullable().default(null),
     boxes: z.array(BoxSchema).default([]),
+    series: z.lazy(() => SeriesSchema).optional().nullable().default(null),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,19 +77,21 @@ export const MangaSchema: z.ZodType<any> = z.lazy(() => MangaSearchResultSchema.
     is_owned: z.boolean().default(false),
     is_loaned: z.boolean().default(false),
     loaned_to: z.string().nullable().default(null),
+    box_title: z.string().nullable().default(null),
     series: SeriesSchema.nullable().default(null),
     edition: EditionSchema.nullable().default(null),
 }));
 
 export const LoanSchema = z.object({
     id: z.number(),
-    volume_id: z.number(),
+    loanable_id: z.number(),
+    loanable_type: z.enum(['volume', 'box']),
     borrower_name: z.string(),
     loaned_at: z.string(),
     returned_at: z.string().nullable().default(null),
     is_returned: z.boolean().default(false),
     notes: z.string().nullable().default(null),
-    volume: MangaSchema.nullable().default(null),
+    loanable: z.union([MangaSchema, BoxSchema]).nullable().default(null),
 });
 
 /**

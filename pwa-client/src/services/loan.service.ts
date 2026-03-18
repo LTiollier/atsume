@@ -15,11 +15,17 @@ export const loanService = {
             }
         }),
 
-    /** Déclare un prêt pour un volume unique */
-    create: (volumeId: number, borrowerName: string, notes?: string | null) =>
-        api.post('/loans', { volume_id: volumeId, borrower_name: borrowerName, notes: notes ?? null }),
+    /** Déclare un prêt pour un objet unique (volume ou box) */
+    create: (id: number, type: 'volume' | 'box', borrowerName: string, notes?: string | null) =>
+        api.post('/loans', { 
+            loanable_id: id, 
+            loanable_type: type, 
+            borrower_name: borrowerName, 
+            notes: notes ?? null 
+        }),
 
     /** Déclare un prêt groupé pour plusieurs volumes (transactionnel) */
+    /** NOTE: Pour l'instant on garde volume_ids pour la compatibilité backend BulkLoanMangaAction */
     createBulk: (volumeIds: number[], borrowerName: string, notes?: string | null) =>
         api.post<ApiResponse<Loan[]>>('/loans/bulk', {
             volume_ids: volumeIds,
@@ -34,14 +40,17 @@ export const loanService = {
             }
         }),
 
-    /** Marque un volume comme rendu */
-    markReturned: (volumeId: number) =>
-        api.post('/loans/return', { volume_id: volumeId }),
+    /** Marque un objet comme rendu */
+    markReturned: (id: number, type: 'volume' | 'box') =>
+        api.post('/loans/return', { 
+            loanable_id: id, 
+            loanable_type: type 
+        }),
 
-    /** Marque plusieurs volumes comme rendus (transactionnel) */
-    markManyReturned: (volumeIds: number[]) =>
+    /** Marque plusieurs objets comme rendus (transactionnel) */
+    markManyReturned: (items: {id: number, type: 'volume' | 'box'}[]) =>
         api.post<ApiResponse<Loan[]>>('/loans/return/bulk', {
-            volume_ids: volumeIds
+            items: items
         }).then(r => {
             try {
                 return z.array(LoanSchema).parse(r.data.data);

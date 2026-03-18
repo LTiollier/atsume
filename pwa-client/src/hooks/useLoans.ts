@@ -9,8 +9,8 @@ interface UseLoansReturn {
     loans: Loan[];
     isLoading: boolean;
     fetchLoans: () => Promise<void>;
-    handleReturn: (volumeId: number) => Promise<void>;
-    handleBulkReturn: (volumeIds: number[]) => Promise<void>;
+    handleReturn: (id: number, type: 'volume' | 'box') => Promise<void>;
+    handleBulkReturn: (items: {id: number, type: 'volume' | 'box'}[]) => Promise<void>;
 }
 
 export function useLoans(): UseLoansReturn {
@@ -30,10 +30,10 @@ export function useLoans(): UseLoansReturn {
         }
     }, []);
 
-    const handleReturn = useCallback(async (volumeId: number) => {
+    const handleReturn = useCallback(async (id: number, type: 'volume' | 'box') => {
         try {
-            await loanService.markReturned(volumeId);
-            toast.success("Manga marqué comme rendu");
+            await loanService.markReturned(id, type);
+            toast.success("Marqué comme rendu");
             await fetchLoans();
         } catch (error) {
             toast.error("Erreur lors de la validation du rendu");
@@ -41,11 +41,11 @@ export function useLoans(): UseLoansReturn {
         }
     }, [fetchLoans]);
 
-    const handleBulkReturn = useCallback(async (volumeIds: number[]) => {
-        if (volumeIds.length === 0) return;
+    const handleBulkReturn = useCallback(async (items: {id: number, type: 'volume' | 'box'}[]) => {
+        if (items.length === 0) return;
         try {
-            await loanService.markManyReturned(volumeIds);
-            toast.success("Mangas marqués comme rendus");
+            await loanService.markManyReturned(items);
+            toast.success("Marqués comme rendus");
             await fetchLoans();
         } catch (error) {
             toast.error("Erreur lors de la validation du rendu");
