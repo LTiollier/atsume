@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Manga, Series, Edition } from '@/types/manga';
@@ -14,7 +14,6 @@ import { LoanDialog } from '@/components/manga/loan-dialog';
 import { VolumeGrid } from '@/components/collection/VolumeGrid';
 import { ActionToolbar } from '@/components/collection/ActionToolbar';
 import { mangaService } from '@/services/manga.service';
-import { userService } from '@/services/user.service';
 import { loanService } from '@/services/loan.service';
 
 export default function EditionPage() {
@@ -64,33 +63,39 @@ export default function EditionPage() {
     }, [fetchMangas]);
 
     // Data Mapping
-    const { ownedMap, totalTomes, possessedCount } = useMemo(() => {
-        const numberedVolumes = mangas.map(m => ({
-            num: parseInt(m.number || '0'),
-            manga: m
-        })).filter(v => !isNaN(v.num));
-
-        const map = new Map(numberedVolumes.map(v => [v.num, v.manga]));
-        const maxNumber = numberedVolumes.length > 0 ? Math.max(...numberedVolumes.map(v => v.num)) : 0;
-        const total = Math.max(edition?.total_volumes || 0, maxNumber);
+    const { totalTomes, possessedCount } = useMemo(() => {
+        const maxNumber = mangas.length > 0 ? Math.max(...mangas.map(m => parseInt(m.number || '0'))) : 0;
+        // Si le backend donne un total_volumes (ex: 3 pour une édition collector de 3 tomes), on le respecte.
+        // Sinon on se base sur le numéro le plus élevé.
+        const total = edition?.total_volumes || maxNumber;
         const possessed = mangas.filter(m => m.is_owned).length;
-        return { ownedMap: map, totalTomes: total, possessedCount: possessed };
+        return { totalTomes: total, possessedCount: possessed };
     }, [mangas, edition]);
 
     const volumesUI = useMemo(() => {
+        if (mangas.length > 0) {
+            return mangas
+                .map(m => ({
+                    id: m.is_owned ? m.id : undefined,
+                    number: parseInt(m.number || '0'),
+                    isPossessed: !!m.is_owned,
+                    cover_url: m.cover_url || series?.cover_url || null,
+                    manga: m,
+                }))
+                .sort((a, b) => a.number - b.number);
+        }
+
         const ui = [];
         for (let i = 1; i <= totalTomes; i++) {
-            const m = ownedMap.get(i);
             ui.push({
-                id: m?.id,
                 number: i,
-                isPossessed: !!m?.is_owned,
-                cover_url: m?.cover_url || series?.cover_url || null,
-                manga: m || null,
+                isPossessed: false,
+                cover_url: series?.cover_url || null,
+                manga: null,
             });
         }
         return ui;
-    }, [totalTomes, ownedMap, series]);
+    }, [mangas, totalTomes, series]);
 
     // Selection Logic
     const toggleVolume = (vol: { isPossessed: boolean; manga: Manga | null; number: number }, isShift: boolean = false) => {
@@ -138,7 +143,7 @@ export default function EditionPage() {
             toast.success(`${toAdd.length} tome(s) ajouté(s)`);
             setSelectedIds([]);
             await fetchMangas();
-        } catch (error) {
+        } catch {
             toast.error("Erreur lors de l'ajout");
         } finally {
             setIsSaving(false);
