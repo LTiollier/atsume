@@ -1,38 +1,44 @@
 <?php
 
-namespace Tests\Unit\Manga\Application\Actions;
-
 use App\Manga\Application\Actions\GetBoxAction;
 use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
-use Mockery;
 
 test('it gets a box by id', function () {
+    $boxRepository = Mockery::mock(BoxRepositoryInterface::class);
     $box = new Box(
-        id: 1,
-        box_set_id: 1,
-        title: 'Box 1',
-        number: '1',
-        isbn: '1234567890',
-        api_id: 'api_id',
-        release_date: '2023-01-01',
-        cover_url: null,
-        is_empty: false,
+        1,
+        1,
+        'Box 1',
+        '1',
+        '1234567890',
+        'api_id',
+        '2023-01-01',
+        null,
+        false,
+        []
     );
 
-    $repo = Mockery::mock(BoxRepositoryInterface::class);
-    $repo->shouldReceive('findById')->with(1, null)->once()->andReturn($box);
+    $boxRepository->shouldReceive('findById')
+        ->with(1, 1)
+        ->once()
+        ->andReturn($box);
 
-    $action = new GetBoxAction($repo);
+    $action = new GetBoxAction($boxRepository);
+    $result = $action->execute(1, 1);
 
-    expect($action->execute(1))->toBe($box);
+    expect($result)->toBe($box);
 });
 
 test('it returns null if box not found', function () {
-    $repo = Mockery::mock(BoxRepositoryInterface::class);
-    $repo->shouldReceive('findById')->with(1, null)->once()->andReturn(null);
+    $boxRepository = Mockery::mock(BoxRepositoryInterface::class);
+    $boxRepository->shouldReceive('findById')
+        ->with(999, 1)
+        ->once()
+        ->andReturn(null);
 
-    $action = new GetBoxAction($repo);
+    $action = new GetBoxAction($boxRepository);
+    $result = $action->execute(999, 1);
 
-    expect($action->execute(1))->toBeNull();
+    expect($result)->toBeNull();
 });

@@ -1,45 +1,39 @@
 <?php
 
-namespace Tests\Unit\Manga\Application\Actions;
-
 use App\Manga\Application\Actions\RemoveBoxFromCollectionAction;
 use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
-use Mockery;
 
 test('removes box and its volumes from user collection', function () {
-    $boxId = 1;
-    $userId = 1;
+    $boxRepository = Mockery::mock(BoxRepositoryInterface::class);
+    $volumeRepository = Mockery::mock(VolumeRepositoryInterface::class);
 
-    $volume1 = new Volume(10, 1, 'v1', 'isbn1', '1', 'Vol 1', null, null);
-    $volume2 = new Volume(11, 1, 'v2', 'isbn2', '2', 'Vol 2', null, null);
+    $volume1 = Mockery::mock(Volume::class);
+    $volume1->shouldReceive('getId')->andReturn(101);
+    $volume2 = Mockery::mock(Volume::class);
+    $volume2->shouldReceive('getId')->andReturn(102);
 
     $box = new Box(
-        id: $boxId,
-        box_set_id: 1,
-        title: 'Test Box',
-        number: '1',
-        isbn: 'isbn-box',
-        api_id: 'api-box',
-        release_date: null,
-        cover_url: null,
-        is_empty: false,
-        volumes: [$volume1, $volume2]
+        1,
+        1,
+        'Test Box',
+        '1',
+        'isbn-box',
+        'api-box',
+        null,
+        null,
+        false,
+        [$volume1, $volume2]
     );
 
-    $boxRepo = Mockery::mock(BoxRepositoryInterface::class);
-    $boxRepo->shouldReceive('findById')->with($boxId, $userId)->once()->andReturn($box);
-    $boxRepo->shouldReceive('detachFromUser')->with($boxId, $userId)->once();
+    $boxRepository->shouldReceive('findById')->with(1, 1)->andReturn($box);
+    $boxRepository->shouldReceive('detachFromUser')->with(1, 1)->once();
+    $volumeRepository->shouldReceive('detachFromUser')->with(101, 1)->once();
+    $volumeRepository->shouldReceive('detachFromUser')->with(102, 1)->once();
 
-    $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
-    $volumeRepo->shouldReceive('detachFromUser')->with(10, $userId)->once();
-    $volumeRepo->shouldReceive('detachFromUser')->with(11, $userId)->once();
+    $action = new RemoveBoxFromCollectionAction($boxRepository, $volumeRepository);
 
-    $action = new RemoveBoxFromCollectionAction($boxRepo, $volumeRepo);
-
-    $action->execute($boxId, $userId);
-
-    expect(true)->toBeTrue();
+    $action->execute(1, 1);
 });

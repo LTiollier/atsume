@@ -4,24 +4,24 @@ use App\Manga\Domain\Models\Box;
 
 test('box model can be instantiated and returns correct values', function () {
     $box = new Box(
-        id: 1,
-        box_set_id: 10,
-        title: 'Box 1',
-        number: '1',
-        isbn: '1234567890',
-        api_id: 'api-123',
-        release_date: '2023-01-01',
-        cover_url: 'https://example.com/cover.jpg',
-        is_empty: false
+        1,
+        10,
+        'Box 1',
+        '1',
+        '1234567890',
+        'api-123',
+        '2023-01-01',
+        'https://example.com/cover.jpg',
+        false
     );
 
-    expect($box->getId())->toBe(1)
-        ->and($box->getBoxSetId())->toBe(10)
-        ->and($box->getTitle())->toBe('Box 1')
-        ->and($box->getNumber())->toBe('1')
-        ->and($box->getIsbn())->toBe('1234567890')
-        ->and($box->getApiId())->toBe('api-123')
-        ->and($box->getReleaseDate())->toBe('2023-01-01')
-        ->and($box->getCoverUrl())->toBe('https://example.com/cover.jpg')
-        ->and($box->isEmpty())->toBeFalse();
+    expect($box->getId())->toBe(1);
+    expect($box->getBoxSetId())->toBe(10);
+    expect($box->getTitle())->toBe('Box 1');
+    expect($box->getNumber())->toBe('1');
+    expect($box->getIsbn())->toBe('1234567890');
+    expect($box->getApiId())->toBe('api-123');
+    expect($box->getReleaseDate())->toBe('2023-01-01');
+    expect($box->getCoverUrl())->toBe('https://example.com/cover.jpg');
+    expect($box->isEmpty())->toBeFalse();
 });

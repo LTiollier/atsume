@@ -76,7 +76,8 @@ test('can list user mangas with ownership and loan flags', function () {
             'id' => $volume->id,
             'is_owned' => true,
             'is_loaned' => true,
-            'loaned_to' => 'Alice'
+            'loaned_to' => 'Alice',
+            'is_wishlisted' => false,
         ]);
 });
 

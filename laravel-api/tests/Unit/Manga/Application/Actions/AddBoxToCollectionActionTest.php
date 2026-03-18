@@ -1,76 +1,65 @@
 <?php
 
-namespace Tests\Unit\Manga\Application\Actions;
-
 use App\Manga\Application\Actions\AddBoxToCollectionAction;
 use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
-use Mockery;
 
 test('adds box and its volumes to user collection', function () {
-    $boxId = 1;
-    $userId = 1;
+    $boxRepository = Mockery::mock(BoxRepositoryInterface::class);
+    $volumeRepository = Mockery::mock(VolumeRepositoryInterface::class);
 
-    $volume1 = new Volume(10, 1, 'v1', 'isbn1', '1', 'Vol 1', null, null);
-    $volume2 = new Volume(11, 1, 'v2', 'isbn2', '2', 'Vol 2', null, null);
+    $volume1 = Mockery::mock(Volume::class);
+    $volume1->shouldReceive('getId')->andReturn(101);
+    $volume2 = Mockery::mock(Volume::class);
+    $volume2->shouldReceive('getId')->andReturn(102);
 
     $box = new Box(
-        id: $boxId,
-        box_set_id: 1,
-        title: 'Test Box',
-        number: '1',
-        isbn: 'isbn-box',
-        api_id: 'api-box',
-        release_date: null,
-        cover_url: null,
-        is_empty: false,
-        volumes: [$volume1, $volume2]
+        1,
+        1,
+        'Test Box',
+        '1',
+        'isbn-box',
+        'api-box',
+        null,
+        null,
+        false,
+        [$volume1, $volume2]
     );
 
-    $boxRepo = Mockery::mock(BoxRepositoryInterface::class);
-    $boxRepo->shouldReceive('findById')->with($boxId)->once()->andReturn($box);
-    $boxRepo->shouldReceive('attachToUser')->with($boxId, $userId)->once();
+    $boxRepository->shouldReceive('findById')->with(1)->andReturn($box);
+    $boxRepository->shouldReceive('attachToUser')->with(1, 1)->once();
+    $volumeRepository->shouldReceive('attachToUser')->with(101, 1)->once();
+    $volumeRepository->shouldReceive('attachToUser')->with(102, 1)->once();
 
-    $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
-    $volumeRepo->shouldReceive('attachToUser')->with(10, $userId)->once();
-    $volumeRepo->shouldReceive('attachToUser')->with(11, $userId)->once();
+    $action = new AddBoxToCollectionAction($boxRepository, $volumeRepository);
 
-    $action = new AddBoxToCollectionAction($boxRepo, $volumeRepo);
-
-    $action->execute($boxId, $userId);
-
-    expect(true)->toBeTrue();
+    $action->execute(1, 1, true);
 });
 
 test('adds only empty box to user collection', function () {
-    $boxId = 1;
-    $userId = 1;
+    $boxRepository = Mockery::mock(BoxRepositoryInterface::class);
+    $volumeRepository = Mockery::mock(VolumeRepositoryInterface::class);
 
     $box = new Box(
-        id: $boxId,
-        box_set_id: 1,
-        title: 'Empty Box',
-        number: '1',
-        isbn: 'isbn-box',
-        api_id: 'api-box',
-        release_date: null,
-        cover_url: null,
-        is_empty: true,
-        volumes: []
+        1,
+        1,
+        'Empty Box',
+        '1',
+        'isbn-box',
+        'api-box',
+        null,
+        null,
+        true,
+        []
     );
 
-    $boxRepo = Mockery::mock(BoxRepositoryInterface::class);
-    $boxRepo->shouldReceive('findById')->with($boxId)->once()->andReturn($box);
-    $boxRepo->shouldReceive('attachToUser')->with($boxId, $userId)->once();
+    $boxRepository->shouldReceive('findById')->with(1)->andReturn($box);
+    $boxRepository->shouldReceive('attachToUser')->with(1, 1)->once();
+    $volumeRepository->shouldNotReceive('attachToUser');
 
-    $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
-    $volumeRepo->shouldNotReceive('attachToUser');
+    $action = new AddBoxToCollectionAction($boxRepository, $volumeRepository);
 
-    $action = new AddBoxToCollectionAction($boxRepo, $volumeRepo);
-
-    $action->execute($boxId, $userId);
-
-    expect(true)->toBeTrue();
+    $action->execute(1, 1, true);
 });
