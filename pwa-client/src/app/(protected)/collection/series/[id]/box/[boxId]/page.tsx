@@ -127,20 +127,14 @@ export default function BoxPage() {
     };
 
     const handleBatchWishlist = async () => {
-        const toAdd = selectedIds
-            .filter(id => id.startsWith('m-'))
-            .map(id => {
-                const num = parseInt(id.replace('m-', ''));
-                return mangas.find(m => parseInt(m.number || '0') === num)?.api_id;
-            })
-            .filter((id): id is string => !!id);
-        
-        if (toAdd.length === 0) return;
-
+        if (!box?.api_id) {
+            toast.error("Identifiant du coffret manquant.");
+            return;
+        }
         setIsWishlistSaving(true);
         try {
-            await wishlistService.addBulk(toAdd);
-            toast.success(`${toAdd.length} tome(s) ajouté(s) à la wishlist`);
+            await wishlistService.add(box.api_id);
+            toast.success("Coffret ajouté à la wishlist");
             setSelectedIds([]);
         } catch {
             toast.error("Erreur lors de l'ajout à la wishlist");

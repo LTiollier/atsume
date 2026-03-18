@@ -10,8 +10,8 @@ class RemoveVolumeFromWishlistAction
         private readonly WishlistRepositoryInterface $wishlistRepository
     ) {}
 
-    public function execute(int $volumeId, int $userId): void
+    public function execute(int $itemId, string $type, int $userId): void
     {
-        $this->wishlistRepository->removeWishlistFromUser($volumeId, $userId);
+        $this->wishlistRepository->removeWishlistItemFromUser($itemId, $type, $userId);
     }
 }

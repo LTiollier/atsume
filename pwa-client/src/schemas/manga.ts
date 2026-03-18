@@ -98,6 +98,11 @@ export const LoanSchema = z.object({
     loanable: z.union([MangaSchema, BoxSchema]).nullable().default(null),
 });
 
+export const WishlistItemSchema = z.union([
+    EditionSchema.extend({ type: z.literal('edition') }),
+    BoxSchema.extend({ type: z.literal('box') }),
+]);
+
 /**
  * Types inférés via Zod
  */

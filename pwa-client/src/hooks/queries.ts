@@ -123,9 +123,10 @@ export function useWishlist() {
 export function useRemoveFromWishlist() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (mangaId: string) => wishlistService.remove(mangaId),
+        mutationFn: ({ id, type }: { id: number; type: 'edition' | 'box' }) =>
+            wishlistService.remove(id, type),
         onSuccess: () => {
-            toast.success("Manga retiré de la liste de souhaits");
+            toast.success("Retiré de la liste de souhaits");
             queryClient.invalidateQueries({ queryKey: queryKeys.wishlist });
         },
         onError: () => {
@@ -145,11 +146,11 @@ export function useAddToCollection() {
     });
 }
 
-/** Ajoute un manga à la wishlist et invalide le cache */
+/** Ajoute une édition à la wishlist et invalide le cache */
 export function useAddToWishlist() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (apiId: string) => wishlistService.add(apiId),
+        mutationFn: (editionId: number) => wishlistService.addByEditionId(editionId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.wishlist });
         },

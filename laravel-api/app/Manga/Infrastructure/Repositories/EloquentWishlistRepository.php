@@ -2,18 +2,21 @@
 
 namespace App\Manga\Infrastructure\Repositories;
 
-use App\Manga\Domain\Models\Volume;
+use App\Manga\Domain\Models\Box;
+use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
-use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
-use App\Manga\Infrastructure\Mappers\VolumeMapper;
+use App\Manga\Infrastructure\EloquentModels\Box as EloquentBox;
+use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;
+use App\Manga\Infrastructure\Mappers\BoxMapper;
+use App\Manga\Infrastructure\Mappers\EditionMapper;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 
 class EloquentWishlistRepository implements WishlistRepositoryInterface
 {
-    public function addWishlistToUser(int $volumeId, int $userId): void
+    public function addEditionWishlistToUser(int $editionId, int $userId): void
     {
         $user = EloquentUser::findOrFail($userId);
-        $user->wishlistVolumes()->syncWithoutDetaching([$volumeId]);
+        $user->wishlistEditions()->syncWithoutDetaching([$editionId]);
     }
 
     public function addBoxWishlistToUser(int $boxId, int $userId): void
@@ -22,47 +25,44 @@ class EloquentWishlistRepository implements WishlistRepositoryInterface
         $user->wishlistBoxes()->syncWithoutDetaching([$boxId]);
     }
 
-    public function removeWishlistFromUser(int $volumeId, int $userId): void
-    {
-        $user = EloquentUser::findOrFail($userId);
-        $user->wishlistVolumes()->detach($volumeId);
-    }
-
-    public function isWishlistedByUser(int $volumeId, int $userId): bool
+    public function removeWishlistItemFromUser(int $itemId, string $type, int $userId): void
     {
         $user = EloquentUser::findOrFail($userId);
 
-        return $user->wishlistVolumes()->where('wishlistable_id', $volumeId)->exists();
+        if ($type === 'edition') {
+            $user->wishlistEditions()->detach($itemId);
+        } else {
+            $user->wishlistBoxes()->detach($itemId);
+        }
     }
 
     /**
-     * @return Volume[]
+     * @return array<Edition|Box>
      */
     public function findWishlistByUserId(int $userId): array
     {
         $user = EloquentUser::findOrFail($userId);
 
-        /** @var array<int, Volume> $volumes */
-        $volumes = $user->wishlistVolumes()
-            ->with(['edition.series'])
+        /** @var array<Edition> $editions */
+        $editions = $user->wishlistEditions()
+            ->with(['series', 'firstVolume'])
+            ->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
+                $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
+            }])
             ->get()
-            ->map(fn (EloquentVolume $v) => $this->toDomain($v))
-            ->toArray();
+            ->map(fn (EloquentEdition $e) => EditionMapper::toDomain($e, isWishlisted: true))
+            ->all();
 
-        return $volumes;
-    }
+        /** @var array<Box> $boxes */
+        $boxes = $user->wishlistBoxes()
+            ->with('boxSet.series')
+            ->withExists(['users as is_owned' => function ($u) use ($userId) {
+                $u->where('users.id', $userId);
+            }])
+            ->get()
+            ->map(fn (EloquentBox $b) => BoxMapper::toDomain($b, isWishlisted: true))
+            ->all();
 
-    private function toDomain(
-        EloquentVolume $eloquent,
-        ?bool $isOwned = null,
-        ?bool $isLoaned = null,
-        ?string $loanedTo = null,
-    ): Volume {
-        return VolumeMapper::toDomain(
-            $eloquent,
-            isOwned: $isOwned,
-            isLoaned: $isLoaned,
-            loanedTo: $loanedTo,
-        );
+        return array_merge($editions, $boxes);
     }
 }

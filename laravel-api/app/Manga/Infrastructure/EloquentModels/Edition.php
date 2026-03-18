@@ -2,12 +2,14 @@
 
 namespace App\Manga\Infrastructure\EloquentModels;
 
+use App\User\Infrastructure\EloquentModels\User;
 use Database\Factories\EditionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Edition extends Model
 {
@@ -45,5 +47,13 @@ class Edition extends Model
     public function firstVolume(): HasOne
     {
         return $this->hasOne(Volume::class)->orderBy('number');
+    }
+
+    /**
+     * @return MorphToMany<User, $this>
+     */
+    public function wishlistedBy(): MorphToMany
+    {
+        return $this->morphToMany(User::class, 'wishlistable', 'wishlist_items')->withTimestamps();
     }
 }

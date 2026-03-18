@@ -2,20 +2,19 @@
 
 namespace App\Manga\Domain\Repositories;
 
-use App\Manga\Domain\Models\Volume;
+use App\Manga\Domain\Models\Box;
+use App\Manga\Domain\Models\Edition;
 
 interface WishlistRepositoryInterface
 {
-    public function addWishlistToUser(int $volumeId, int $userId): void;
+    public function addEditionWishlistToUser(int $editionId, int $userId): void;
 
     public function addBoxWishlistToUser(int $boxId, int $userId): void;
 
-    public function removeWishlistFromUser(int $volumeId, int $userId): void;
-
-    public function isWishlistedByUser(int $volumeId, int $userId): bool;
+    public function removeWishlistItemFromUser(int $itemId, string $type, int $userId): void;
 
     /**
-     * @return Volume[]
+     * @return array<Edition|Box>
      */
     public function findWishlistByUserId(int $userId): array;
 }

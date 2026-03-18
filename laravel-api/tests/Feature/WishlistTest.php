@@ -16,7 +16,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 uses(RefreshDatabase::class);
 
-test('can add manga to wishlist by api_id', function () {
+test('can add manga to wishlist by api_id (stores edition)', function () {
     $user = User::factory()->create();
     $series = Series::factory()->create();
     $edition = Edition::factory()->create(['series_id' => $series->id]);
@@ -32,15 +32,35 @@ test('can add manga to wishlist by api_id', function () {
     ]);
 
     $response->assertStatus(201);
-    
+
     assertDatabaseHas('wishlist_items', [
         'user_id' => $user->id,
-        'wishlistable_id' => $volume->id,
-        'wishlistable_type' => 'volume'
+        'wishlistable_id' => $edition->id,
+        'wishlistable_type' => 'edition'
     ]);
 });
 
-test('can add manga to wishlist by scan', function () {
+test('can add edition directly to wishlist by edition_id', function () {
+    $user = User::factory()->create();
+    $series = Series::factory()->create();
+    $edition = Edition::factory()->create(['series_id' => $series->id]);
+
+    actingAs($user);
+
+    $response = postJson('/api/wishlist', [
+        'edition_id' => $edition->id,
+    ]);
+
+    $response->assertStatus(201);
+
+    assertDatabaseHas('wishlist_items', [
+        'user_id' => $user->id,
+        'wishlistable_id' => $edition->id,
+        'wishlistable_type' => 'edition'
+    ]);
+});
+
+test('can add manga to wishlist by scan (stores edition)', function () {
     $user = User::factory()->create();
     $series = Series::factory()->create();
     $edition = Edition::factory()->create(['series_id' => $series->id]);
@@ -56,11 +76,11 @@ test('can add manga to wishlist by scan', function () {
     ]);
 
     $response->assertStatus(201);
-    
+
     assertDatabaseHas('wishlist_items', [
         'user_id' => $user->id,
-        'wishlistable_id' => $volume->id,
-        'wishlistable_type' => 'volume'
+        'wishlistable_id' => $edition->id,
+        'wishlistable_type' => 'edition'
     ]);
 });
 
@@ -79,7 +99,6 @@ test('it handles manga not found on wishlist scan', function () {
     $user = User::factory()->create();
     actingAs($user);
 
-    // Assuming our lookup service won't find this random ISBN
     $response = postJson('/api/wishlist/scan', [
         'isbn' => '0000000000000',
     ]);
@@ -91,26 +110,19 @@ test('it extracts volume number on wishlist scan', function () {
     $user = User::factory()->create();
     actingAs($user);
 
-    // The scan-and-add logic should handle volume number extraction from the external API response
-    // For now we just test that the endpoint exists and responds
     $response = postJson('/api/wishlist/scan', [
         'isbn' => '9782012101531',
     ]);
-    
-    // Status might be 404 if lookup fails in test environment, but that's fine for this test
+
     expect(in_array($response->status(), [201, 404]))->toBeTrue();
 });
 
-test('can list wishlist items', function () {
+test('can list wishlist items (editions)', function () {
     $user = User::factory()->create();
     $series = Series::factory()->create(['title' => 'Naruto']);
-    $edition = Edition::factory()->create(['series_id' => $series->id]);
-    $volume = Volume::factory()->create([
-        'edition_id' => $edition->id,
-        'title' => 'Naruto Vol. 1'
-    ]);
+    $edition = Edition::factory()->create(['series_id' => $series->id, 'name' => 'Edition Standard']);
 
-    $user->wishlistVolumes()->attach($volume->id);
+    $user->wishlistEditions()->attach($edition->id);
 
     actingAs($user);
 
@@ -118,26 +130,26 @@ test('can list wishlist items', function () {
 
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.title', 'Naruto Vol. 1');
+        ->assertJsonPath('data.0.type', 'edition')
+        ->assertJsonPath('data.0.name', 'Edition Standard');
 });
 
-test('can remove volume from wishlist', function () {
+test('can remove edition from wishlist', function () {
     $user = User::factory()->create();
     $series = Series::factory()->create();
     $edition = Edition::factory()->create(['series_id' => $series->id]);
-    $volume = Volume::factory()->create(['edition_id' => $edition->id]);
 
-    $user->wishlistVolumes()->attach($volume->id);
+    $user->wishlistEditions()->attach($edition->id);
 
     actingAs($user);
 
-    $response = deleteJson("/api/wishlist/{$volume->id}");
+    $response = deleteJson("/api/wishlist/{$edition->id}", ['type' => 'edition']);
 
     $response->assertStatus(200);
-    
+
     assertDatabaseMissing('wishlist_items', [
         'user_id' => $user->id,
-        'wishlistable_id' => $volume->id,
-        'wishlistable_type' => 'volume'
+        'wishlistable_id' => $edition->id,
+        'wishlistable_type' => 'edition'
     ]);
 });

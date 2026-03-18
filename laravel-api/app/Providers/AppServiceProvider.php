@@ -12,6 +12,7 @@ use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
 use App\Manga\Infrastructure\Console\ScrapeMangaCollecCommand;
 use App\Manga\Infrastructure\EloquentModels\Box;
+use App\Manga\Infrastructure\EloquentModels\Edition;
 use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\Manga\Infrastructure\Policies\SeriesPolicy;
@@ -96,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'volume' => Volume::class,
             'box' => Box::class,
+            'edition' => Edition::class,
         ]);
 
         RateLimiter::for('auth', function (Request $request) {

@@ -9,7 +9,7 @@ use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
 
 class BoxMapper
 {
-    public static function toDomain(EloquentBox $eloquent): Box
+    public static function toDomain(EloquentBox $eloquent, ?bool $isWishlisted = null): Box
     {
         /** @var Volume[] $volumes */
         $volumes = $eloquent->relationLoaded('volumes')
@@ -34,7 +34,7 @@ class BoxMapper
             (bool) $eloquent->is_empty,
             $volumes,
             isset($eloquent->is_owned) ? (bool) $eloquent->is_owned : null,
-            (bool) ($eloquent->is_wishlisted ?? false),
+            $isWishlisted ?? (bool) ($eloquent->is_wishlisted ?? false),
             isset($eloquent->volumes_count) ? (int) $eloquent->volumes_count : null,
             isset($eloquent->possessed_volumes_count) ? (int) $eloquent->possessed_volumes_count : null,
         );

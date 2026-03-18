@@ -90,3 +90,13 @@ export interface GroupedSeries {
     series: Series;
     volumes: Manga[];
 }
+
+export interface WishlistEditionItem extends Edition {
+    type: 'edition';
+}
+
+export interface WishlistBoxItem extends Box {
+    type: 'box';
+}
+
+export type WishlistItem = WishlistEditionItem | WishlistBoxItem;

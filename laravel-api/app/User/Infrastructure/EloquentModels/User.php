@@ -4,6 +4,7 @@ namespace App\User\Infrastructure\EloquentModels;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Manga\Infrastructure\EloquentModels\Box;
+use App\Manga\Infrastructure\EloquentModels\Edition;
 use App\Manga\Infrastructure\EloquentModels\Volume;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -76,11 +77,11 @@ class User extends Authenticatable
     }
 
     /**
-     * @return MorphToMany<Volume, $this>
+     * @return MorphToMany<Edition, $this>
      */
-    public function wishlistVolumes(): MorphToMany
+    public function wishlistEditions(): MorphToMany
     {
-        return $this->morphedByMany(Volume::class, 'wishlistable', 'wishlist_items')->withTimestamps();
+        return $this->morphedByMany(Edition::class, 'wishlistable', 'wishlist_items')->withTimestamps();
     }
 
     /**

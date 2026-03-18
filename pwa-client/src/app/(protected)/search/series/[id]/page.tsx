@@ -42,10 +42,9 @@ export default function SearchSeriesPage() {
         
         return series.editions.map(edition => ({
             edition: edition,
-            volumes: (edition.volumes || []).map(v => ({ 
+            volumes: (edition.volumes || []).map(v => ({
                 ...v,
                 is_owned: !!v.is_owned,
-                is_wishlisted: !!v.is_wishlisted,
                 edition: edition
             })) as Manga[]
         }));
@@ -94,18 +93,10 @@ export default function SearchSeriesPage() {
     };
 
     const handleAddToWishlist = async (edition: Edition) => {
-        const missingVolumes = (edition.volumes || []).filter(v => !v.is_owned);
-        const isCurrentlyWishlisted = missingVolumes.length > 0 && missingVolumes.every(v => v.is_wishlisted);
-
-        if (isCurrentlyWishlisted) {
-            // Remove from wishlist
+        if (edition.is_wishlisted) {
             setIsAddingToWishlist(edition.id);
             try {
-                for (const v of missingVolumes) {
-                    if (v.is_wishlisted) {
-                        await wishlistService.remove(String(v.id));
-                    }
-                }
+                await wishlistService.remove(edition.id, 'edition');
                 toast.success("Retiré de la wishlist");
                 await fetchData();
             } catch (error) {
@@ -117,18 +108,9 @@ export default function SearchSeriesPage() {
             return;
         }
 
-        const apiIds = missingVolumes
-            .map(v => v.api_id)
-            .filter((id): id is string => !!id);
-
-        if (apiIds.length === 0) {
-            toast.info("Tous les tomes sont déjà possédés !");
-            return;
-        }
-
         setIsAddingToWishlist(edition.id);
         try {
-            await wishlistService.addBulk(apiIds);
+            await wishlistService.addByEditionId(edition.id);
             toast.success("Ajouté à la wishlist");
             await fetchData();
         } catch (error) {
@@ -143,19 +125,11 @@ export default function SearchSeriesPage() {
         const isCurrentlyWishlisted = boxSet.boxes.some(b => !b.is_owned && b.is_wishlisted);
 
         if (isCurrentlyWishlisted) {
-            // Remove from wishlist
             setIsAddingToWishlist(boxSet.id);
             try {
                 for (const box of boxSet.boxes) {
                     if (!box.is_owned && box.is_wishlisted) {
-                        const boxData = await mangaService.getBox(box.id);
-                        if (boxData.volumes) {
-                            for (const v of boxData.volumes) {
-                                if (v.is_wishlisted) {
-                                    await wishlistService.remove(String(v.id));
-                                }
-                            }
-                        }
+                        await wishlistService.remove(box.id, 'box');
                     }
                 }
                 toast.success("Retiré de la wishlist");

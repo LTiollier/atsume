@@ -2,7 +2,8 @@
 
 namespace App\Manga\Application\Actions;
 
-use App\Manga\Domain\Models\Volume;
+use App\Manga\Domain\Models\Box;
+use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
 
 class ListWishlistAction
@@ -12,7 +13,7 @@ class ListWishlistAction
     ) {}
 
     /**
-     * @return Volume[]
+     * @return array<Edition|Box>
      */
     public function execute(int $userId): array
     {

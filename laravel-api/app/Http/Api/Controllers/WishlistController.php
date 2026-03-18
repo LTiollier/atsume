@@ -2,10 +2,10 @@
 
 namespace App\Http\Api\Controllers;
 
-use App\Http\Api\Requests\AddMangaRequest;
 use App\Http\Api\Requests\RemoveFromWishlistRequest;
 use App\Http\Api\Requests\ScanMangaRequest;
-use App\Http\Api\Resources\MangaResource;
+use App\Http\Api\Resources\WishlistItemResource;
+use App\Manga\Application\Actions\AddEditionToWishlistAction;
 use App\Manga\Application\Actions\AddScannedMangaToWishlistAction;
 use App\Manga\Application\Actions\AddWishlistItemAction;
 use App\Manga\Application\Actions\ListWishlistAction;
@@ -24,33 +24,42 @@ class WishlistController
         $user = $request->user();
         $wishlist = $action->execute((int) $user->id);
 
-        return MangaResource::collection($wishlist);
+        return WishlistItemResource::collection($wishlist);
     }
 
-    public function store(AddMangaRequest $request, AddWishlistItemAction $action): JsonResponse
+    public function store(Request $request, AddWishlistItemAction $action, AddEditionToWishlistAction $editionAction): JsonResponse
     {
+        $request->validate([
+            'api_id' => ['sometimes', 'string'],
+            'edition_id' => ['sometimes', 'integer'],
+        ]);
+
+        if (! $request->has('api_id') && ! $request->has('edition_id')) {
+            return response()->json(['message' => 'api_id or edition_id is required'], 422);
+        }
+
         /** @var User $user */
         $user = $request->user();
 
-        $dto = new AddWishlistItemDTO(
-            api_id: $request->string('api_id')->toString(),
-            userId: (int) $user->id
-        );
+        if ($request->has('edition_id')) {
+            $item = $editionAction->execute((int) $request->input('edition_id'), (int) $user->id);
+        } else {
+            $dto = new AddWishlistItemDTO(
+                api_id: $request->string('api_id')->toString(),
+                userId: (int) $user->id
+            );
+            $item = $action->execute($dto);
+        }
 
-        $item = $action->execute($dto);
-
-        return response()->json([
-            'message' => 'Item added to wishlist',
-            'data' => $item instanceof \App\Manga\Domain\Models\Volume ? new MangaResource($item) : $item,
-        ], 201);
+        return (new WishlistItemResource($item))->response()->setStatusCode(201);
     }
 
-    public function scan(ScanMangaRequest $request, AddScannedMangaToWishlistAction $action): MangaResource
+    public function scan(ScanMangaRequest $request, AddScannedMangaToWishlistAction $action): JsonResponse
     {
         $dto = $request->toDTO();
-        $volume = $action->execute($dto);
+        $edition = $action->execute($dto);
 
-        return new MangaResource($volume);
+        return (new WishlistItemResource($edition))->response()->setStatusCode(201);
     }
 
     public function destroy(RemoveFromWishlistRequest $request, RemoveVolumeFromWishlistAction $action, int $id): JsonResponse
@@ -58,8 +67,9 @@ class WishlistController
         /** @var User $user */
         $user = $request->user();
 
-        $action->execute($id, (int) $user->id);
+        $type = $request->input('type', 'edition');
+        $action->execute($id, $type, (int) $user->id);
 
-        return response()->json(['message' => 'Volume removed from wishlist'], 200);
+        return response()->json(['message' => 'Item removed from wishlist'], 200);
     }
 }

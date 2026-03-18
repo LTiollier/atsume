@@ -9,7 +9,7 @@ use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
 
 class EditionMapper
 {
-    public static function toDomain(EloquentEdition $eloquent): Edition
+    public static function toDomain(EloquentEdition $eloquent, ?bool $isWishlisted = null): Edition
     {
         /** @var int[] $possessed_numbers */
         $possessed_numbers = $eloquent->relationLoaded('volumes')
@@ -32,12 +32,7 @@ class EditionMapper
             })->all()
             : [];
 
-        // An edition is wishlisted if all missing volumes are wishlisted
-        $is_wishlisted = false;
-        if ($eloquent->relationLoaded('volumes')) {
-            $missingVolumes = $eloquent->volumes->filter(fn ($v) => ! ($v->is_owned ?? false));
-            $is_wishlisted = $missingVolumes->isNotEmpty() && $missingVolumes->every(fn ($v) => (bool) ($v->is_wishlisted ?? false));
-        }
+        $is_wishlisted = $isWishlisted ?? (bool) ($eloquent->is_wishlisted ?? false);
 
         return new Edition(
             id: $eloquent->id,
