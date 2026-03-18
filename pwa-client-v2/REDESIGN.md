@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**41 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
+**45 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -16,7 +16,7 @@ Phase 2 — Direction    ██████████  5/5  ✅ COMPLÈTE
 Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
-Phase 4 — Composants   ██░░░░░░░░  2/16  ← EN COURS
+Phase 4 — Composants   ████░░░░░░  6/16  ← EN COURS
 Phase 5 — Pages        ░░░░░░░░░░  0/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
@@ -372,10 +372,10 @@ export const getCollection = cache(() =>
 - [x] **Shell** — Layout wrapper mobile-first, sidebar desktop (w-64), padding safe-area ✓
 
 ### Cartes & Grilles
-- [ ] **VolumeCard** — Ratio 2:3, status dots (lu/prêté), progress bar, hover élévation (voir spec `rapport.md` §6.2)
-- [ ] **SeriesCard** — Cover + titre + progress bar + "X/Y vol.", 2 colonnes mobile
-- [ ] **BoxCard** — Variante pour les coffrets (icône distincte)
-- [ ] **MangaGrid** — Wrapper grille responsive (2 col mobile → 4-5 desktop)
+- [x] **VolumeCard** — Ratio 2:3, status dots (lu/prêté), progress bar, hover élévation (voir spec `rapport.md` §6.2) ✓
+- [x] **SeriesCard** — Cover + titre + progress bar + "X/Y vol.", 2 colonnes mobile ✓
+- [x] **BoxCard** — Variante pour les coffrets (icône distincte) ✓
+- [x] **MangaGrid** — Wrapper grille responsive (2 col mobile → 4-5 desktop) ✓
 
 ### Formulaires & Inputs
 - [ ] **SearchBar** — Icône loupe intégrée, placeholder, clear button
