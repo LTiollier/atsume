@@ -75,18 +75,14 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
     }
 
     /**
-     * @return Series[]
+     * @return \Illuminate\Pagination\LengthAwarePaginator<Series>
      */
-    public function search(string $query): array
+    public function search(string $query, int $page = 1, int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
     {
-        $eloquentSeries = EloquentSeries::whereRaw('LOWER(title) LIKE ?', ['%'.strtolower($query).'%'])
+        return EloquentSeries::whereRaw('LOWER(title) LIKE ?', ['%'.strtolower($query).'%'])
             ->orWhereRaw('LOWER(authors) LIKE ?', ['%'.strtolower($query).'%'])
-            ->get();
-
-        /** @var array<int, Series> $series */
-        $series = $eloquentSeries->map(fn (EloquentSeries $s) => $this->toDomain($s))->toArray();
-
-        return $series;
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(fn (EloquentSeries $s) => $this->toDomain($s));
     }
 
     private function toDomain(EloquentSeries $eloquent): Series

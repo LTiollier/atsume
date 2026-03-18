@@ -13,8 +13,8 @@ class MangaSearchController
     {
         $dto = $request->toDTO();
 
-        $results = $action->execute($dto);
+        $paginator = $action->execute($dto);
 
-        return MangaSearchResultResource::collection(collect($results));
+        return MangaSearchResultResource::collection($paginator);
     }
 }

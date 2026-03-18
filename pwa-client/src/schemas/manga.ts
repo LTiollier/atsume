@@ -75,6 +75,18 @@ export const MangaSearchResultSchema = z.object({
     isbn: z.string().nullable().default(null),
 });
 
+export const PaginationMetaSchema = z.object({
+    current_page: z.number(),
+    last_page: z.number(),
+    per_page: z.number(),
+    total: z.number(),
+});
+
+export const PaginatedSearchResultSchema = z.object({
+    data: z.array(MangaSearchResultSchema),
+    meta: PaginationMetaSchema,
+});
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MangaSchema: z.ZodType<any> = z.lazy(() => MangaSearchResultSchema.extend({
     id: z.number(),

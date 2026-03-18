@@ -1,6 +1,6 @@
 import api, { ApiResponse } from '@/lib/api';
-import { Manga, MangaSearchResult, Series, Edition, Box, BoxSet } from '@/types/manga';
-import { MangaSchema, MangaSearchResultSchema, SeriesSchema, EditionSchema, BoxSchema, BoxSetSchema } from '@/schemas/manga';
+import { Manga, MangaSearchResult, PaginatedSearchResult, Series, Edition, Box, BoxSet } from '@/types/manga';
+import { MangaSchema, MangaSearchResultSchema, PaginatedSearchResultSchema, SeriesSchema, EditionSchema, BoxSchema, BoxSetSchema } from '@/schemas/manga';
 import { z } from 'zod';
 
 export const mangaService = {
@@ -19,13 +19,13 @@ export const mangaService = {
         }),
 
     /** Recherche des mangas par titre ou ISBN */
-    search: (query: string) =>
-        api.get<ApiResponse<MangaSearchResult[]>>(`/mangas/search?query=${encodeURIComponent(query)}`).then(r => {
+    search: (query: string, page = 1) =>
+        api.get<PaginatedSearchResult>(`/mangas/search?query=${encodeURIComponent(query)}&page=${page}`).then(r => {
             try {
-                return z.array(MangaSearchResultSchema).parse(r.data.data);
+                return PaginatedSearchResultSchema.parse(r.data);
             } catch (error) {
                 console.error("Search result validation failed:", error);
-                return r.data.data as unknown as MangaSearchResult[];
+                return r.data as unknown as PaginatedSearchResult;
             }
         }),
 
