@@ -125,7 +125,7 @@ export function BoxList({
                                 </div>
 
                                 <div className="flex justify-end gap-3 mt-4">
-                                    {!isReadOnly && !isComplete && onAddToWishlist && (
+                                    {!isReadOnly && possessedCount === 0 && onAddToWishlist && (
                                         <Button
                                             variant="ghost"
                                             size="icon"

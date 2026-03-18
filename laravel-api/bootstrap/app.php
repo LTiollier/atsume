@@ -7,6 +7,7 @@ use App\Http\Middleware\ReadBearerTokenFromCookie;
 use App\Manga\Domain\Exceptions\EditionNotFoundException;
 use App\Manga\Domain\Exceptions\MangaNotFoundException;
 use App\Manga\Domain\Exceptions\SeriesNotFoundException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -58,5 +59,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (LoanNotFoundException $e): JsonResponse {
             return response()->json(['message' => $e->getMessage()], 422);
+        });
+
+        // Wishlist policy violations → 403 JSON
+        $exceptions->render(function (AuthorizationException $e): JsonResponse {
+            return response()->json(['message' => $e->getMessage()], 403);
         });
     })->create();

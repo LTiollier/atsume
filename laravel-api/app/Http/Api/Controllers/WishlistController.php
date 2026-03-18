@@ -11,10 +11,14 @@ use App\Manga\Application\Actions\AddWishlistItemAction;
 use App\Manga\Application\Actions\ListWishlistAction;
 use App\Manga\Application\Actions\RemoveVolumeFromWishlistAction;
 use App\Manga\Application\DTOs\AddWishlistItemDTO;
+use App\Manga\Infrastructure\EloquentModels\Box as EloquentBox;
+use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;
+use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
 use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class WishlistController
 {
@@ -42,16 +46,33 @@ class WishlistController
         $user = $request->user();
 
         if ($request->has('edition_id')) {
+            $edition = EloquentEdition::findOrFail((int) $request->input('edition_id'));
+            Gate::authorize('addEdition', $edition);
             $item = $editionAction->execute((int) $request->input('edition_id'), (int) $user->id);
         } else {
-            $dto = new AddWishlistItemDTO(
-                api_id: $request->string('api_id')->toString(),
-                userId: (int) $user->id
-            );
+            $apiId = $request->string('api_id')->toString();
+            $this->authorizeApiIdWishlist($apiId);
+
+            $dto = new AddWishlistItemDTO(api_id: $apiId, userId: (int) $user->id);
             $item = $action->execute($dto);
         }
 
         return (new WishlistItemResource($item))->response()->setStatusCode(201);
+    }
+
+    private function authorizeApiIdWishlist(string $apiId): void
+    {
+        $volume = EloquentVolume::where('api_id', $apiId)->with('edition')->first();
+        if ($volume?->edition) {
+            Gate::authorize('addEdition', $volume->edition);
+
+            return;
+        }
+
+        $box = EloquentBox::where('api_id', $apiId)->first();
+        if ($box) {
+            Gate::authorize('addBox', $box);
+        }
     }
 
     public function scan(ScanMangaRequest $request, AddScannedMangaToWishlistAction $action): JsonResponse

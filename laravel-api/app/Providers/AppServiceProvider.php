@@ -21,6 +21,7 @@ use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\Manga\Infrastructure\Policies\SeriesPolicy;
 use App\Manga\Infrastructure\Policies\VolumePolicy;
+use App\Manga\Infrastructure\Policies\WishlistPolicy;
 use App\Manga\Infrastructure\Repositories\EloquentBoxRepository;
 use App\Manga\Infrastructure\Repositories\EloquentBoxSetRepository;
 use App\Manga\Infrastructure\Repositories\EloquentEditionRepository;
@@ -122,15 +123,10 @@ class AppServiceProvider extends ServiceProvider
             ]);
         }
 
-        Gate::policy(
-            Volume::class,
-            VolumePolicy::class
-        );
-
-        Gate::policy(
-            Series::class,
-            SeriesPolicy::class
-        );
+        Gate::policy(Volume::class, VolumePolicy::class);
+        Gate::policy(Series::class, SeriesPolicy::class);
+        Gate::policy(Edition::class, WishlistPolicy::class);
+        Gate::policy(Box::class, WishlistPolicy::class);
 
         Factory::guessFactoryNamesUsing(function (string $modelName) {
             $className = class_basename($modelName);
