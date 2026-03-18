@@ -19,8 +19,9 @@ test('it can loan multiple mangas in bulk', function () {
         ->twice()
         ->andReturn(true);
 
-    $loanRepo->shouldReceive('findActiveByVolumeIdAndUserId')
+    $loanRepo->shouldReceive('findActiveByLoanableIdAndType')
         ->twice()
+        ->with(Mockery::any(), 'volume', 1)
         ->andReturn(null);
 
     $loanRepo->shouldReceive('save')
@@ -54,8 +55,9 @@ test('it throws exception if one volume is not owned', function () {
         ->with(102, 1)
         ->andReturn(false);
 
-    $loanRepo->shouldReceive('findActiveByVolumeIdAndUserId')
+    $loanRepo->shouldReceive('findActiveByLoanableIdAndType')
         ->once()
+        ->with(101, 'volume', 1)
         ->andReturn(null);
 
     $loanRepo->shouldReceive('save')
@@ -84,8 +86,9 @@ test('it throws exception if one volume is already loaned', function () {
     $activeLoan = Mockery::mock(Loan::class);
     $activeLoan->shouldReceive('getBorrowerName')->andReturn('Someone');
 
-    $loanRepo->shouldReceive('findActiveByVolumeIdAndUserId')
+    $loanRepo->shouldReceive('findActiveByLoanableIdAndType')
         ->once()
+        ->with(101, 'volume', 1)
         ->andReturn($activeLoan);
 
     $action = new BulkLoanMangaAction($loanRepo, $volumeRepo);

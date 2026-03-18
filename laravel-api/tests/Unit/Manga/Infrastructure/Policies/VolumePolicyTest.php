@@ -4,7 +4,7 @@ use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\Manga\Infrastructure\Policies\VolumePolicy;
 use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 test('it allows loaning a volume if the user owns it', function () {
     $policy = new VolumePolicy;
@@ -50,7 +50,7 @@ test('it allows returning a volume if the user owns it and it is loaned', functi
     $usersRelation->shouldReceive('exists')->andReturn(true);
 
     // Loan check
-    $loansRelation = Mockery::mock(HasMany::class);
+    $loansRelation = Mockery::mock(MorphMany::class);
     $volume->shouldReceive('loans')->andReturn($loansRelation);
     $loansRelation->shouldReceive('where')->with('user_id', 1)->andReturnSelf();
     $loansRelation->shouldReceive('whereNull')->with('returned_at')->andReturnSelf();
