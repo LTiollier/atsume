@@ -19,12 +19,12 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class MangaHierarchyController
 {
-    public function showSeries(Request $request, GetSeriesAction $action, int $id): SeriesResource
+    public function showSeries(Request $request, GetSeriesAction $action, int $seriesId): SeriesResource
     {
         /** @var User|null $user */
         $user = $request->user();
 
-        $series = $action->execute($id, $user ? (int) $user->id : null);
+        $series = $action->execute($seriesId, $user ? (int) $user->id : null);
 
         if (! $series) {
             abort(404, 'Series not found');
