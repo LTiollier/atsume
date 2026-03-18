@@ -22,7 +22,7 @@ export default function SearchSeriesPage() {
         try {
             const seriesData = await mangaService.getSeries(seriesId);
             setSeries(seriesData);
-            setVolumes([]); // On ne récupère plus les volumes ici
+            setVolumes([]); 
         } catch (error) {
             console.error('Failed to fetch series data:', error);
             toast.error("Erreur lors de la récupération des détails.");
@@ -40,25 +40,19 @@ export default function SearchSeriesPage() {
         
         return series.editions.map(edition => ({
             edition: edition,
-            // On simule des volumes owned via possessed_count si on veut garder la compatibilité
-            volumes: (edition.possessed_numbers || []).map(num => ({ 
-                id: 0, 
-                number: num.toString(),
-                is_owned: true,
+            volumes: (edition.volumes || []).map(v => ({ 
+                ...v,
+                is_owned: !!v.is_owned,
                 edition: edition
             })) as Manga[]
         }));
     }, [series]);
 
-    const handleAddAll = async (edition: Edition, totalVolumes: number, possessedNumbers: Set<number>) => {
-        if (totalVolumes <= 0) return;
-
-        const missing = [];
-        for (let i = 1; i <= totalVolumes; i++) {
-            if (!possessedNumbers.has(i)) {
-                missing.push(i);
-            }
-        }
+    const handleAddAll = async (edition: Edition) => {
+        const missing = (edition.volumes || [])
+            .filter(v => !v.is_owned)
+            .map(v => parseInt(v.number || '0'))
+            .filter(n => !isNaN(n) && n > 0);
 
         if (missing.length === 0) {
            toast.info("Vous possédez déjà tous les tomes de cette édition !");
@@ -108,7 +102,7 @@ export default function SearchSeriesPage() {
             backLink="/search"
             backLabel="Retour à la recherche"
             isAddingAll={isAddingAll}
-            onAddAll={(edition, total, numbers) => handleAddAll(edition, total, numbers)}
+            onAddAll={(edition) => handleAddAll(edition)}
         />
     );
 }

@@ -202,7 +202,7 @@ export default function BoxPage() {
                             description: `Le tome ${vol.number} a-t-il été récupéré ?`,
                             confirmLabel: "OUI, RÉCUPÉRÉ",
                             onConfirm: async () => {
-                                await loanService.markReturned(vol.manga!.id);
+                                await loanService.markReturned(vol.manga!.id, 'volume');
                                 await fetchData();
                             }
                         });

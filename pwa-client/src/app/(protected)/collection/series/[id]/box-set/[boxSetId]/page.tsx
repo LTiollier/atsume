@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Package, Check, ChevronRight, Loader2, Plus, Trash2 } from 'lucide-react';
-import { BoxSet, Series } from '@/types/manga';
+import { ArrowLeft, Package, Check, Loader2, Plus, Trash2, ArrowLeftRight } from 'lucide-react';
+import { BoxSet, Series, Box } from '@/types/manga';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -12,8 +12,9 @@ import { useOffline } from '@/contexts/OfflineContext';
 import { useAlert } from '@/contexts/AlertContext';
 import { mangaService } from '@/services/manga.service';
 import { motion } from 'framer-motion';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardTitle } from '@/components/ui/card';
 import { MangaCover } from '@/components/ui/manga-cover';
+import { LoanDialog } from '@/components/manga/loan-dialog';
 
 export default function BoxSetPage() {
     const params = useParams();
@@ -26,6 +27,8 @@ export default function BoxSetPage() {
     const [series, setSeries] = useState<Series | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState<number | null>(null);
+    const [loanBox, setLoanBox] = useState<Box | null>(null);
+    const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false);
 
     const fetchData = useCallback(async () => {
         try {
@@ -196,6 +199,22 @@ export default function BoxSetPage() {
                                         </Link>
                                     </Button>
 
+                                    {box.is_owned && (
+                                        <Button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setLoanBox(box);
+                                                setIsLoanDialogOpen(true);
+                                            }}
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-10 px-4 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20"
+                                        >
+                                            <ArrowLeftRight className="h-4 w-4 mr-2" />
+                                            <span className="font-black uppercase tracking-widest text-[10px]">Prêter</span>
+                                        </Button>
+                                    )}
+
                                     {box.is_owned ? (
                                         <Button
                                             onClick={(e) => {
@@ -237,6 +256,16 @@ export default function BoxSetPage() {
                     </motion.div>
                 ))}
             </div>
+
+            <LoanDialog
+                box={loanBox || undefined}
+                open={isLoanDialogOpen}
+                onOpenChange={setIsLoanDialogOpen}
+                onSuccess={() => {
+                    fetchData();
+                    setLoanBox(null);
+                }}
+            />
         </div>
     );
 }

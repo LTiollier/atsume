@@ -15,12 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeftRight, Loader2 } from "lucide-react";
-import { Manga } from "@/types/manga";
+import { Manga, Box } from "@/types/manga";
 import { toast } from "sonner";
 import { loanService } from "@/services/loan.service";
 
 interface LoanDialogProps {
-    mangas: Manga[];
+    mangas?: Manga[];
+    box?: Box;
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSuccess?: () => void;
@@ -37,7 +38,7 @@ const loanSchema = z.object({
 
 type LoanFormValues = z.infer<typeof loanSchema>;
 
-export function LoanDialog({ mangas, open, onOpenChange, onSuccess }: LoanDialogProps) {
+export function LoanDialog({ mangas, box, open, onOpenChange, onSuccess }: LoanDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
@@ -54,14 +55,20 @@ export function LoanDialog({ mangas, open, onOpenChange, onSuccess }: LoanDialog
     });
 
     const onSubmit = async (data: LoanFormValues) => {
-        if (!mangas || mangas.length === 0) return;
-
         try {
             setIsSubmitting(true);
-            const volumeIds = mangas.map(m => m.id);
-            await loanService.createBulk(volumeIds, data.borrowerName, data.notes || null);
+            
+            if (box) {
+                await loanService.create(box.id, 'box', data.borrowerName, data.notes || null);
+                toast.success(`Coffret prêté à ${data.borrowerName}`);
+            } else if (mangas && mangas.length > 0) {
+                const volumeIds = mangas.map(m => m.id);
+                await loanService.createBulk(volumeIds, data.borrowerName, data.notes || null);
+                toast.success(`${mangas.length > 1 ? 'Mangas prêtés' : 'Manga prêté'} à ${data.borrowerName}`);
+            } else {
+                return;
+            }
 
-            toast.success(`${mangas.length > 1 ? 'Mangas prêtés' : 'Manga prêté'} à ${data.borrowerName}`);
             onOpenChange(false);
             reset();
             onSuccess?.();
@@ -72,6 +79,12 @@ export function LoanDialog({ mangas, open, onOpenChange, onSuccess }: LoanDialog
         }
     };
 
+    const description = box 
+        ? <span className="text-slate-200 font-bold">&quot;{box.title}&quot;</span>
+        : (mangas && mangas.length > 1 
+            ? <span className="text-slate-200 font-bold">{mangas.length} tomes</span> 
+            : <span className="text-slate-200 font-bold">&quot;{mangas?.[0]?.title}&quot;</span>);
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-slate-50">
@@ -79,10 +92,10 @@ export function LoanDialog({ mangas, open, onOpenChange, onSuccess }: LoanDialog
                     <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-2xl font-black ">
               <ArrowLeftRight className="h-6 w-6 text-primary" />
-                            PRÊTER CE MANGA
+                            PRÊTER {box ? "CE COFFRET" : "CE MANGA"}
                         </DialogTitle>
             <DialogDescription className="text-slate-400 font-medium">
-              Déclarez à qui vous prêtez {mangas.length > 1 ? <span className="text-slate-200 font-bold">{mangas.length} tomes</span> : <span className="text-slate-200 font-bold">&quot;{mangas[0]?.title}&quot;</span>}.
+              Déclarez à qui vous prêtez {description}.
                         </DialogDescription>
                     </DialogHeader>
 
