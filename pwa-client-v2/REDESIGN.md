@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**73 / 87 tâches complètes** — Dernière mise à jour : 2026-03-19
+**73 / 101 tâches complètes** — Dernière mise à jour : 2026-03-19
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -17,7 +17,9 @@ Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
 Phase 4 — Composants   ██████████  16/16  ✅ COMPLÈTE
-Phase 5 — Pages        █████████░  18/20
+Phase 5 — Pages        ██████████  20/20 ✅ COMPLÈTE
+Phase 5.5 — UI manq.   ░░░░░░░░░░  0/7
+Phase 5.6 — Thème Light ░░░░░░░░░░  0/7
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
 
@@ -427,6 +429,65 @@ export const getCollection = cache(() =>
 ### Profils publics (hors auth)
 - [x] `/user/[username]` — Profil public : stats bio ✓
 - [x] `/user/[username]/collection` — Collection publique read-only ✓
+
+---
+
+## Phase 5.5 — Fonctionnalités UI manquantes
+
+> Identifiées post-Phase 5 : flows manquants découverts à l'usage.
+> Design specs : analyse UX/UI 2026-03-19 — voir commentaires ci-dessous.
+
+### Wishlist — CTA d'ajout (absent de l'UI)
+
+> `useAddToWishlist()` et `wishlistService.addByEditionId()` existent mais aucun bouton n'est affiché.
+> Pattern : toggle heart iconique (♡ → ♥ fill-primary) avec optimistic update + toast.
+> Positionnement : `absolute top-2 right-2`, bouton 32×32, `bg-background/60 backdrop-blur-sm`.
+> Ne pas afficher si `is_owned === true`.
+
+- [ ] **`wishlistService`** — Ajouter `addByBoxSetId(boxSetId: number)` (POST `/wishlist` avec `box_set_id`) si supporté par l'API ; sinon documenter la limitation
+- [ ] **`queries.ts`** — Ajouter `useToggleWishlist()` : hook unifié édition/box-set avec optimistic update (`queryClient.setQueryData`) + invalidation `queryKeys.wishlist` + `queryKeys.series(id)`
+- [ ] **`SeriesDetailClient`** — Ajouter bouton heart sur chaque `EditionCard` et `BoxSetCard` (positionné `absolute top-2 right-2` dans le wrapper relatif de la card) — état driven par `edition.is_wishlisted` / `boxSet.is_wishlisted`
+- [ ] **`SearchClient`** — Ajouter bouton heart sur les résultats de recherche (éditions non possédées) pour wishlist rapide depuis le catalogue
+
+### Statuts visuels — Lu & Prêté dans la bibliothèque
+
+> Problème : `SeriesCard` affiche uniquement une barre possession (owned/total).
+> L'utilisateur ne voit pas combien de tomes il a lus ou prêtés sans aller dans chaque série.
+> Solution : barre segmentée 3 zones + caption contextuel (affiché uniquement si readCount > 0 ou loanedCount > 0).
+
+- [ ] **`SeriesCard`** — Remplacer la barre de progression monochrome par une barre segmentée 3 zones :
+  - Zone 1 `bg-[--color-read]` → tomes lus (`readCount`)
+  - Zone 2 `bg-[--color-loaned]` → tomes prêtés (`loanedCount`)
+  - Zone 3 `bg-primary/25` → possédés non lus (`ownedCount - readCount - loanedCount`)
+  - Zone 4 transparente / `bg-muted` → manquants
+  - Ajouter props `readCount?: number` et `loanedCount?: number` sur `SeriesCard`
+- [ ] **`LibraryTab`** — Calculer `readCount` et `loanedCount` par série depuis `useReadingProgressQuery()` et `useLoansQuery()` et les passer à `SeriesCard`
+- [ ] **`VolumeCard`** — Ajuster le dot lecture : passer à `size-2.5` (10px) + `ring-1 ring-background/80` pour le faire ressortir sur les covers sombres
+
+---
+
+## Phase 5.6 — Thème Light (blanc)
+
+> Ajout d'un second thème de surface en plus des 4 palettes.
+> Architecture : deux classes sur `<html>` — `.theme-void` (dark) ou `.theme-light` (clair) × `.palette-*`.
+> Spec couleurs OKLch : analyse /color-system 2026-03-19.
+> Tokens de surface uniquement — les primaires restent identiques entre les deux thèmes.
+
+### CSS — Tokens
+
+- [ ] **`globals.css`** — Migrer les tokens de surface de `:root` vers `.theme-void` · garder dans `:root` uniquement : `--radius`, `--font-*`, `--destructive*` (tokens vraiment fixes)
+- [ ] **`globals.css`** — Ajouter `.theme-light` avec les tokens de surface inversés (fond `oklch(97% 0.004 80)`, cartes blanc pur, ombres légères `opacity 7-14%`) — contrastes vérifiés WCAG AA ✅
+- [ ] **`globals.css`** — Ajouter les 4 overrides `.theme-light.palette-*` pour `--accent` / `--accent-foreground` (surfaces tintées claires) et glows réduits (opacité 6-12% vs 20-30% en Void)
+
+### Contexte & Persistance
+
+- [ ] **`ThemeContext.tsx`** — Créer `src/contexts/ThemeContext.tsx` : pattern `useSyncExternalStore` hydration-safe (identique à `PaletteContext`), localStorage clé `theme`, valeurs `'void' | 'light'`, applique `.theme-void` / `.theme-light` sur `document.documentElement` sans flash
+- [ ] **`layout.tsx`** — Ajouter `ThemeProvider` dans le layout root (à côté de `PaletteProvider`) · classe initiale `.theme-void` injectée côté serveur pour éviter le FOUC
+
+### Composant & Intégration Settings
+
+- [ ] **`ThemeSwitcher`** — Créer `src/components/ThemeSwitcher.tsx` : deux boutons 40×40px (☽ Void / ☀ Light), ring actif `ring-2 ring-primary`, label en dessous, transition `duration-150`
+- [ ] **`SettingsClient`** — Ajouter `ThemeSwitcher` dans la page Settings au-dessus de `PaletteSwitcher` avec un label de section "Thème" · les deux contrôles sont indépendants (thème × palette = 8 combinaisons)
 
 ---
 
