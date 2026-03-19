@@ -1,14 +1,14 @@
 import { Shell } from '@/components/layout/Shell';
 
 /**
- * Layout protégé — toutes les routes app (dashboard, collection, scan…)
+ * Protected layout — all app routes (dashboard, collection, scan…)
  *
- * AuthGuard : géré au niveau edge par src/middleware.ts
- * → redirect /login si pas de cookie auth_check / laravel_session
- * → 0 flash de contenu, 0 client-side check redondant
+ * AuthGuard: handled at edge by src/middleware.ts
+ * → redirects to /login if auth_check / laravel_session cookie is missing
+ * → no content flash, no redundant client-side check
  *
- * Shell persiste entre les navigations (layout ≠ template) :
- * BottomNav et SidebarNav ne se re-montent pas à chaque changement de page.
+ * Shell persists across navigations (layout ≠ template):
+ * BottomNav and SidebarNav do not remount on each page change.
  */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return <Shell>{children}</Shell>;

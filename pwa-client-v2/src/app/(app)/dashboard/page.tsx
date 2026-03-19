@@ -8,13 +8,13 @@ export const metadata: Metadata = {
 /**
  * Dashboard — Server Component.
  *
- * Le data fetching est côté client (DashboardClient) car le forwarding de
- * cookie session vers le backend n'est pas encore configuré pour les
- * Server Components (cf. note Phase 5 REDESIGN.md — API_URL Docker).
+ * Data fetching is client-side (DashboardClient) because session cookie
+ * forwarding to the backend is not yet configured for Server Components
+ * (see Phase 5 note in REDESIGN.md — API_URL Docker).
  *
- * Architecture cible une fois l'infra prête :
+ * Target architecture once infrastructure is ready:
  *   const [mangas, loans] = await Promise.all([getCollection(), getLoansCached()]);
- *   → passer en initialData à DashboardClient → 0 loading state
+ *   → pass as initialData to DashboardClient → 0 loading state
  */
 export default function DashboardPage() {
   return (

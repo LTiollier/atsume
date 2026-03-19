@@ -55,7 +55,7 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
     });
   }
 
-  // État succès — dérivé du state (rerender-derived-state-no-effect)
+  // Success state — derived from state (rerender-derived-state-no-effect)
   if (done) {
     return (
       <div className="flex flex-col items-center gap-4 py-4 text-center">

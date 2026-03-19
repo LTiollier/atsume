@@ -55,17 +55,17 @@ function getMangaHref(manga: Manga): string {
 export function DashboardClient() {
   const { user } = useAuth();
 
-  // 3 queries parallèles — React Query les lance simultanément (async-parallel)
+  // 3 parallel queries — React Query fires them simultaneously (async-parallel)
   const { data: mangas = [], isLoading: mangasLoading } = useMangas();
   const { data: loans = [], isLoading: loansLoading } = useLoansQuery();
   const { data: readingProgress = [], isLoading: progressLoading } = useReadingProgressQuery();
 
   const statsLoading = mangasLoading || loansLoading || progressLoading;
 
-  // Stats dérivées pendant le render — pas de useEffect (rerender-derived-state-no-effect)
+  // Derived stats during render — no useEffect (rerender-derived-state-no-effect)
   const stats = useMemo(() => {
     const owned = mangas.filter(m => m.is_owned);
-    // Set pour O(1) lookup sur les series uniques (js-set-map-lookups)
+    // Set for O(1) lookup on unique series (js-set-map-lookups)
     const seriesIds = new Set(owned.map(m => m.series?.id).filter((id): id is number => id != null));
     return {
       totalVolumes: owned.length,
@@ -75,7 +75,7 @@ export function DashboardClient() {
     };
   }, [mangas, loans, readingProgress]);
 
-  // Prêts en retard — actifs depuis >= OVERDUE_DAYS
+  // Overdue loans — active for >= OVERDUE_DAYS
   const overdueCount = useMemo(
     () =>
       loans.filter(
@@ -86,7 +86,7 @@ export function DashboardClient() {
     [loans],
   );
 
-  // Derniers ajouts — premiers RECENT_COUNT volumes possédés (API retourne les plus récents en premier)
+  // Recent additions — first RECENT_COUNT owned volumes (API returns newest first)
   const recentMangas = useMemo(
     () => mangas.filter(m => m.is_owned).slice(0, RECENT_COUNT),
     [mangas],
@@ -109,7 +109,7 @@ export function DashboardClient() {
         </h1>
       </motion.div>
 
-      {/* Alerte prêts en retard */}
+      {/* Overdue loans alert */}
       {!loansLoading && overdueCount > 0 && (
         <motion.div variants={sectionVariants} initial="initial" animate="animate">
           <Link
@@ -163,7 +163,7 @@ export function DashboardClient() {
         )}
       </motion.section>
 
-      {/* Derniers ajouts */}
+      {/* Recent additions */}
       {(mangasLoading || recentMangas.length > 0) && (
         <motion.section
           variants={sectionVariants}
@@ -188,8 +188,8 @@ export function DashboardClient() {
           </div>
 
           {/*
-           * -mx-4 + px-4 : le scroll déborde jusqu'aux bords de l'écran
-           * tout en conservant l'indentation du premier item
+           * -mx-4 + px-4: scroll bleeds to screen edges
+           * while keeping the first item indented
            */}
           <div className="overflow-x-auto -mx-4 px-4">
             {mangasLoading ? (

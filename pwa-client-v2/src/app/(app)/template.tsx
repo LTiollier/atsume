@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { pageVariants } from '@/lib/motion';
 
 /**
- * template.tsx re-monte à chaque navigation (contrairement à layout.tsx).
- * → Permet le fade entre les pages (dashboard → collection → search…)
- * → Shell (layout) reste monté en permanence : BottomNav ne clignote pas
+ * template.tsx remounts on every navigation (unlike layout.tsx).
+ * → Enables page fade (dashboard → collection → search…)
+ * → Shell (layout) stays mounted: BottomNav does not flicker
  *
- * Règle animations : transitions de page ✅ — fade 200ms/150ms (pageVariants)
+ * Animation rule: page transitions ✅ — fade 200ms/150ms (pageVariants)
  */
 export default function AppTemplate({ children }: { children: React.ReactNode }) {
   return (
