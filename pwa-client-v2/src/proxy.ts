@@ -35,7 +35,7 @@ const PUBLIC_PREFIXES = [
     '/workbox-',
 ];
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Laisser passer les routes publiques et assets
