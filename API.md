@@ -367,12 +367,11 @@ List all wishlisted editions and box sets.
 ---
 
 ### POST /api/wishlist
-Add an item to wishlist. Accepts either an existing edition ID or an external API ID.
+Add an item to wishlist.
 
-**Body** (one of):
+**Body**:
 ```json
-{ "edition_id": 1 }
-{ "api_id": "string" }
+{ "wishlist_id": 1, "wishlist_type": "edition|box" }
 ```
 **Response 201**: `WishlistItemResource`
 
@@ -381,7 +380,7 @@ Add an item to wishlist. Accepts either an existing edition ID or an external AP
 ### DELETE /api/wishlist/{id}
 Remove an item from wishlist.
 
-**Query/Body**: `type` (required, `edition` or `box`)
+**Body**: `{ "wishlist_type": "edition|box" }`
 **Auth**: Item must belong to user's wishlist
 **Response 200**: `{ "message": "Item removed from wishlist" }`
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Controllers;
 
+use App\Http\Api\Requests\AddToWishlistRequest;
 use App\Http\Api\Requests\RemoveFromWishlistRequest;
 use App\Http\Api\Resources\WishlistItemResource;
 use App\Manga\Application\Actions\AddToWishlistAction;
@@ -26,31 +27,23 @@ class WishlistController
     }
 
     public function store(
-        Request $request,
+        AddToWishlistRequest $request,
         AddToWishlistAction $action,
         WishlistAuthorizationService $authService,
     ): JsonResponse {
-        $request->validate([
-            'api_id' => ['sometimes', 'string'],
-            'edition_id' => ['sometimes', 'integer'],
-        ]);
-
-        if (! $request->has('api_id') && ! $request->has('edition_id')) {
-            return response()->json(['message' => 'api_id or edition_id is required'], 422);
-        }
-
         /** @var User $user */
         $user = $request->user();
 
-        if ($request->has('edition_id')) {
-            $editionId = $request->integer('edition_id');
-            $authService->authorizeAddEdition($editionId);
-            $dto = new AddToWishlistDTO(userId: (int) $user->id, editionId: $editionId);
-        } else {
-            $apiId = $request->string('api_id')->toString();
-            $authService->authorizeAddByApiId($apiId);
-            $dto = new AddToWishlistDTO(userId: (int) $user->id, apiId: $apiId);
-        }
+        $wishlistId = $request->integer('wishlist_id');
+        $wishlistType = $request->string('wishlist_type')->toString();
+
+        $authService->authorizeAdd($wishlistId, $wishlistType);
+
+        $dto = new AddToWishlistDTO(
+            userId: (int) $user->id,
+            wishlistableId: $wishlistId,
+            wishlistableType: $wishlistType,
+        );
 
         $item = $action->execute($dto);
 
@@ -62,7 +55,7 @@ class WishlistController
         /** @var User $user */
         $user = $request->user();
 
-        $type = $request->string('type')->toString() ?: 'edition';
+        $type = $request->string('wishlist_type')->toString();
         $action->execute($id, $type, (int) $user->id);
 
         return response()->json(['message' => 'Item removed from wishlist'], 200);

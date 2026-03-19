@@ -3,11 +3,11 @@
 use App\Http\Api\Controllers\AuthController;
 use App\Http\Api\Controllers\BoxCollectionController;
 use App\Http\Api\Controllers\LoanController;
-use App\Http\Api\Controllers\ReadingProgressController;
 use App\Http\Api\Controllers\MangaCollectionController;
 use App\Http\Api\Controllers\MangaHierarchyController;
 use App\Http\Api\Controllers\MangaSearchController;
 use App\Http\Api\Controllers\PublicProfileController;
+use App\Http\Api\Controllers\ReadingProgressController;
 use App\Http\Api\Controllers\UserSettingsController;
 use App\Http\Api\Controllers\WishlistController;
 use App\Http\Api\Resources\UserResource;

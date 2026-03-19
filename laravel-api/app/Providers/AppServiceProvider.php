@@ -4,8 +4,6 @@ namespace App\Providers;
 
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use App\Borrowing\Infrastructure\Repositories\EloquentLoanRepository;
-use App\ReadingProgress\Domain\Repositories\ReadingProgressRepositoryInterface;
-use App\ReadingProgress\Infrastructure\Repositories\EloquentReadingProgressRepository;
 use App\Manga\Application\Listeners\RemoveBoxFromWishlistOnCollection;
 use App\Manga\Application\Listeners\RemoveEditionFromWishlistOnCollection;
 use App\Manga\Domain\Events\BoxAddedToCollection;
@@ -32,6 +30,8 @@ use App\Manga\Infrastructure\Repositories\EloquentVolumeRepository;
 use App\Manga\Infrastructure\Repositories\EloquentWishlistRepository;
 use App\Manga\Infrastructure\Services\EloquentMangaLookupService;
 use App\Manga\Infrastructure\Services\MangaLookupServiceInterface;
+use App\ReadingProgress\Domain\Repositories\ReadingProgressRepositoryInterface;
+use App\ReadingProgress\Infrastructure\Repositories\EloquentReadingProgressRepository;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use App\User\Infrastructure\Repositories\EloquentUserRepository;
 use Illuminate\Cache\RateLimiting\Limit;

@@ -11,7 +11,7 @@ class RemoveFromWishlistRequest extends FormRequest
     public function authorize(): bool
     {
         $itemId = $this->route('id');
-        $type = $this->input('type', 'edition');
+        $type = $this->input('wishlist_type');
 
         if (! $itemId || ! in_array($type, ['edition', 'box'])) {
             return false;
@@ -33,7 +33,7 @@ class RemoveFromWishlistRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|in:edition,box',
+            'wishlist_type' => 'required|in:edition,box',
         ];
     }
 }

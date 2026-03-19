@@ -28,8 +28,8 @@ class SearchMangaRequest extends FormRequest
     {
         return new SearchMangaDTO(
             query: $this->string('query')->toString(),
-            page: (int) $this->input('page', 1),
-            perPage: (int) $this->input('per_page', 15),
+            page: $this->integer('page', 1),
+            perPage: $this->integer('per_page', 15),
         );
     }
 }

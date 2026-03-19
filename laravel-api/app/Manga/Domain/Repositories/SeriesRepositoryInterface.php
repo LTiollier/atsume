@@ -15,7 +15,7 @@ interface SeriesRepositoryInterface
     public function create(CreateSeriesDTO $dto): Series;
 
     /**
-     * @return LengthAwarePaginator<Series>
+     * @return LengthAwarePaginator<int, Series>
      */
     public function search(string $query, int $page = 1, int $perPage = 15): LengthAwarePaginator;
 }

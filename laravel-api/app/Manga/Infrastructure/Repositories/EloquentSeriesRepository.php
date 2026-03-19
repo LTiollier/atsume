@@ -7,6 +7,7 @@ use App\Manga\Domain\Models\Series;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;
 use App\Manga\Infrastructure\Mappers\SeriesMapper;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EloquentSeriesRepository implements SeriesRepositoryInterface
 {
@@ -75,9 +76,9 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
     }
 
     /**
-     * @return \Illuminate\Pagination\LengthAwarePaginator<Series>
+     * @return LengthAwarePaginator<int, Series>
      */
-    public function search(string $query, int $page = 1, int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function search(string $query, int $page = 1, int $perPage = 15): LengthAwarePaginator
     {
         return EloquentSeries::whereRaw('LOWER(title) LIKE ?', ['%'.strtolower($query).'%'])
             ->orWhereRaw('LOWER(authors) LIKE ?', ['%'.strtolower($query).'%'])

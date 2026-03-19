@@ -32,8 +32,8 @@ class AuthController
         return response()->json([
             'user' => new UserResource($result['user']),
         ], 201)
-        ->withCookie($this->makeTokenCookie($result['token']))
-        ->withCookie($this->makeCheckCookie());
+            ->withCookie($this->makeTokenCookie($result['token']))
+            ->withCookie($this->makeCheckCookie());
     }
 
     public function login(LoginRequest $request, LoginAction $action): JsonResponse
@@ -46,8 +46,8 @@ class AuthController
             return response()->json([
                 'user' => new UserResource($result['user']),
             ])
-            ->withCookie($this->makeTokenCookie($result['token']))
-            ->withCookie($this->makeCheckCookie());
+                ->withCookie($this->makeTokenCookie($result['token']))
+                ->withCookie($this->makeCheckCookie());
         } catch (InvalidCredentialsException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -72,8 +72,8 @@ class AuthController
         return response()->json([
             'message' => 'Successfully logged out.',
         ])
-        ->withCookie(Cookie::forget('auth_token'))
-        ->withCookie(Cookie::forget('auth_check'));
+            ->withCookie(Cookie::forget('auth_token'))
+            ->withCookie(Cookie::forget('auth_check'));
     }
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
@@ -138,8 +138,8 @@ class AuthController
      */
     private function makeCheckCookie(): SymfonyCookie
     {
-        /** @var int $expiration */
-        $expiration = (int) config('sanctum.expiration', 60 * 24 * 7);
+        $sanctumExpiration = config('sanctum.expiration');
+        $expiration = is_int($sanctumExpiration) ? $sanctumExpiration : 60 * 24 * 7;
 
         /** @var string|null $domain */
         $domain = config('session.domain');
