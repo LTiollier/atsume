@@ -272,3 +272,25 @@ export function useUpdateSettings() {
             userService.updateSettings(payload),
     });
 }
+
+// ─── Public profiles ──────────────────────────────────────────────────────────
+
+export function usePublicProfileQuery(username: string) {
+    return useQuery({
+        queryKey: queryKeys.publicProfile(username),
+        queryFn: () => userService.getPublicProfile(username),
+        enabled: !!username,
+        staleTime: 5 * 60 * 1000,
+        retry: 1,
+    });
+}
+
+export function usePublicCollectionQuery(username: string) {
+    return useQuery({
+        queryKey: queryKeys.publicCollection(username),
+        queryFn: () => userService.getPublicCollection(username),
+        enabled: !!username,
+        staleTime: 5 * 60 * 1000,
+        retry: 1,
+    });
+}

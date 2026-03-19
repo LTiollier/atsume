@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**72 / 87 tâches complètes** — Dernière mise à jour : 2026-03-19
+**73 / 87 tâches complètes** — Dernière mise à jour : 2026-03-19
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -17,7 +17,7 @@ Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
 Phase 4 — Composants   ██████████  16/16  ✅ COMPLÈTE
-Phase 5 — Pages        █████████░  17/20
+Phase 5 — Pages        █████████░  18/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
 
@@ -425,7 +425,7 @@ export const getCollection = cache(() =>
 - [x] `/settings` — Username + visibilité profil + **PaletteSwitcher** (4 swatches : Ember · Crimson · Indigo · Forest) ✓
 
 ### Profils publics (hors auth)
-- [ ] `/user/[username]` — Profil public : stats bio
+- [x] `/user/[username]` — Profil public : stats bio ✓
 - [ ] `/user/[username]/collection` — Collection publique read-only
 
 ---
