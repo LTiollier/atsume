@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**59 / 87 tâches complètes** — Dernière mise à jour : 2026-03-18
+**60 / 87 tâches complètes** — Dernière mise à jour : 2026-03-19
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -17,7 +17,7 @@ Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
 Phase 4 — Composants   ██████████  16/16  ✅ COMPLÈTE
-Phase 5 — Pages        ██░░░░░░░░  4/20
+Phase 5 — Pages        ██░░░░░░░░  5/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
 
@@ -409,7 +409,7 @@ export const getCollection = cache(() =>
 - [x] `/reset-password` — New password + confirm ✓
 
 ### App (layout protégé)
-- [ ] `layout.tsx` (protected) — Shell + BottomNav + AuthGuard + transitions de page
+- [x] `layout.tsx` (protected) — Shell + BottomNav + AuthGuard + transitions de page ✓
 - [ ] `/dashboard` — Stats 2×2 · Derniers ajouts · Alerte prêts en retard
 - [ ] `/collection` — Hub avec sous-tabs : Bibliothèque · Prêts · Wishlist · Lu
 - [ ] `/collection` → Bibliothèque — Grille séries + recherche/filtre
