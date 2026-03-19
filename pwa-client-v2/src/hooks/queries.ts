@@ -13,6 +13,7 @@ export const queryKeys = {
     loans: ["loans"] as const,
     wishlist: ["wishlist"] as const,
     readingProgress: ["readingProgress"] as const,
+    series: (id: number) => ["series", id] as const,
     publicCollection: (username: string) => ["publicCollection", username] as const,
     publicProfile: (username: string) => ["publicProfile", username] as const,
 };
@@ -37,6 +38,14 @@ export function useMangas(initialData?: Manga[]) {
         queryKey: queryKeys.mangas,
         queryFn: mangaService.getCollection,
         initialData,
+    });
+}
+
+export function useSeriesQuery(id: number) {
+    return useQuery({
+        queryKey: queryKeys.series(id),
+        queryFn: () => mangaService.getSeries(id),
+        enabled: id > 0,
     });
 }
 

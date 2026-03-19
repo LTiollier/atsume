@@ -7,7 +7,7 @@
 
 ## Progression globale
 
-**65 / 87 tâches complètes** — Dernière mise à jour : 2026-03-19
+**66 / 87 tâches complètes** — Dernière mise à jour : 2026-03-19
 
 ```
 Phase 0 — Décisions    ██████████  5/5  ✅ COMPLÈTE
@@ -17,7 +17,7 @@ Phase 3 — Design sys.  ██████████  9/9  ✅ COMPLÈTE
 Phase 3.5 — Bootstrap  ██████████  8/8  ✅ COMPLÈTE
 Phase 3.6 — Env local  ██████████  5/5  ✅ COMPLÈTE
 Phase 4 — Composants   ██████████  16/16  ✅ COMPLÈTE
-Phase 5 — Pages        █████░░░░░  10/20
+Phase 5 — Pages        ██████░░░░  11/20
 Phase 6 — Polish       ░░░░░░░░░░  0/12
 ```
 
@@ -413,7 +413,7 @@ export const getCollection = cache(() =>
 - [x] `/dashboard` — Stats 2×2 · Derniers ajouts · Alerte prêts en retard ✓
 - [x] `/collection` — Hub avec sous-tabs : Bibliothèque · Prêts · Wishlist · Lu ✓
 - [x] `/collection` → Bibliothèque — Grille séries + recherche/filtre ✓
-- [ ] `/series/[id]` — Détail série : liste des éditions + box-sets
+- [x] `/series/[id]` — Détail série : liste des éditions + box-sets ✓
 - [ ] `/series/[id]/edition/[editionId]` — Grille volumes avec statuts + actions
 - [ ] `/series/[id]/box-set/[boxSetId]` — Détail box-set
 - [ ] `/series/[id]/box/[boxId]` — Détail boîte individuelle
