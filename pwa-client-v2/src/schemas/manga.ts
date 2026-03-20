@@ -86,6 +86,40 @@ export const PaginatedSearchResultSchema = z.object({
     meta: PaginationMetaSchema,
 });
 
+export const SearchEditionSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    publisher: z.string().nullable().default(null),
+    total_volumes: z.number().nullable().default(null),
+    possessed_count: z.number().nullable().default(null),
+    cover_url: z.string().nullable().default(null),
+    is_wishlisted: z.boolean().default(false),
+});
+
+export const SearchBoxSetSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    publisher: z.string().nullable().default(null),
+    cover_url: z.string().nullable().default(null),
+    total_boxes: z.number().default(0),
+    possessed_count: z.number().default(0),
+});
+
+export const SeriesSearchResultSchema = z.object({
+    id: z.number().nullable().default(null),
+    api_id: z.string().nullable().default(null),
+    title: z.string(),
+    authors: z.array(z.string()).nullable().default([]),
+    cover_url: z.string().nullable().default(null),
+    editions: z.array(SearchEditionSchema).default([]),
+    box_sets: z.array(SearchBoxSetSchema).default([]),
+});
+
+export const PaginatedSeriesSearchResultSchema = z.object({
+    data: z.array(SeriesSearchResultSchema),
+    meta: PaginationMetaSchema,
+});
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MangaSchema: z.ZodType<any> = z.lazy(() => MangaSearchResultSchema.extend({
     id: z.number(),

@@ -2,11 +2,11 @@ import { cache } from 'react';
 import api, { ApiResponse } from '@/lib/api';
 import { isHttpError } from '@/lib/error';
 import {
-    Manga, MangaSearchResult, PaginatedSearchResult,
-    Series, Edition, Box, BoxSet,
+    Manga, MangaSearchResult, Series, Edition, Box, BoxSet,
+    PaginatedSeriesSearchResult,
 } from '@/types/manga';
 import {
-    MangaSchema, MangaSearchResultSchema, PaginatedSearchResultSchema,
+    MangaSchema, MangaSearchResultSchema, PaginatedSeriesSearchResultSchema,
     SeriesSchema, EditionSchema, BoxSchema, BoxSetSchema,
 } from '@/schemas/manga';
 import { z } from 'zod';
@@ -38,13 +38,13 @@ export const mangaService = {
             .then(r => z.array(MangaSchema).parse(r.data.data)),
 
     search: (query: string, page = 1) =>
-        api.get<PaginatedSearchResult>(
+        api.get<PaginatedSeriesSearchResult>(
             `/mangas/search?query=${encodeURIComponent(query)}&page=${page}`
         ).then(r => {
             try {
-                return PaginatedSearchResultSchema.parse(r.data);
+                return PaginatedSeriesSearchResultSchema.parse(r.data);
             } catch {
-                return r.data as unknown as PaginatedSearchResult;
+                return r.data as unknown as PaginatedSeriesSearchResult;
             }
         }),
 

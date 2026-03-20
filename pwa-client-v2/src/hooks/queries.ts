@@ -191,6 +191,22 @@ export function useCreateLoan() {
     });
 }
 
+export function useBulkCreateLoan() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ volumeIds, borrowerName }: { volumeIds: number[]; borrowerName: string }) =>
+            loanService.createBulk(volumeIds, borrowerName),
+        onSuccess: (_, { volumeIds }) => {
+            toast.success(`${volumeIds.length} volume${volumeIds.length > 1 ? 's' : ''} prêté${volumeIds.length > 1 ? 's' : ''}`);
+            queryClient.invalidateQueries({ queryKey: queryKeys.loans });
+            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+        },
+        onError: () => {
+            toast.error('Erreur lors du prêt');
+        },
+    });
+}
+
 // ─── Reading Progress ─────────────────────────────────────────────────────────
 
 export function useReadingProgressQuery() {
@@ -248,6 +264,27 @@ export function useAddToCollection() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (apiId: string) => mangaService.addToCollection(apiId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+        },
+    });
+}
+
+export function useAddBulkToCollection() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ editionId, numbers }: { editionId: number; numbers: number[] }) =>
+            mangaService.addBulk(editionId, numbers),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+        },
+    });
+}
+
+export function useAddBoxToCollection() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (boxId: number) => mangaService.addBoxToCollection(boxId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
         },

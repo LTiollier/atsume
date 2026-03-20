@@ -76,6 +76,40 @@ export interface PaginatedSearchResult {
     meta: PaginationMeta;
 }
 
+export interface SearchEdition {
+    id: number;
+    name: string;
+    publisher: string | null;
+    total_volumes: number | null;
+    possessed_count: number | null;
+    cover_url: string | null;
+    is_wishlisted: boolean;
+}
+
+export interface SearchBoxSet {
+    id: number;
+    title: string;
+    publisher: string | null;
+    cover_url: string | null;
+    total_boxes: number;
+    possessed_count: number;
+}
+
+export interface SeriesSearchResult {
+    id: number | null;
+    api_id: string | null;
+    title: string;
+    authors: string[] | null;
+    cover_url: string | null;
+    editions: SearchEdition[];
+    box_sets: SearchBoxSet[];
+}
+
+export interface PaginatedSeriesSearchResult {
+    data: SeriesSearchResult[];
+    meta: PaginationMeta;
+}
+
 export interface Manga extends MangaSearchResult {
     id: number;
     number: string | null;

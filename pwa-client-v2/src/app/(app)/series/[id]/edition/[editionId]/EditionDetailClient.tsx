@@ -1,29 +1,25 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { ChevronLeft, Package, BookMarked, BookUp, PlusCircle } from 'lucide-react';
+import { ChevronLeft, Package, BookMarked, BookUp, CheckCircle, Loader2 } from 'lucide-react';
 
 import {
   useEditionQuery,
   useReadingProgressQuery,
   useLoansQuery,
   useBulkToggleReadingProgress,
-  useReturnLoan,
-  useCreateLoan,
-  useAddToCollection,
+  useBulkCreateLoan,
   queryKeys,
 } from '@/hooks/queries';
-import type { Loan } from '@/types/manga';
+import type { Loan, Manga } from '@/types/manga';
 import { BottomSheet } from '@/components/feedback/BottomSheet';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { sectionVariants } from '@/lib/motion';
-import type { Manga } from '@/types/manga';
 
 // ─── Skeletons hoisted at module level (rendering-hoist-jsx) ─────────────────
 
@@ -50,7 +46,6 @@ const gridSkeleton = (
   </div>
 );
 
-// Hoisted decorators reused in VolumeActionCard (rendering-hoist-jsx)
 const bottomGradient = (
   <div
     aria-hidden
@@ -65,22 +60,84 @@ const coverFallback = (
   </div>
 );
 
-// ─── VolumeActionCard — defined outside parent (rerender-no-inline-components) ─
+// ─── CollectionSelectBar — portal, deux actions (rerender-no-inline-components) ─
+
+interface CollectionSelectBarProps {
+  count: number;
+  onMarkRead: () => void;
+  onLoan: () => void;
+  markPending: boolean;
+}
+
+function CollectionSelectBar({ count, onMarkRead, onLoan, markPending }: CollectionSelectBarProps) {
+  if (typeof document === 'undefined' || count === 0) return null;
+  return createPortal(
+    <div
+      className="fixed bottom-0 left-0 right-0 z-40 lg:left-64 px-4 pt-3"
+      style={{
+        paddingBottom: 'calc(64px + env(safe-area-inset-bottom) + 12px)',
+        background: 'var(--background)',
+        borderTop: '1px solid var(--border)',
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <p className="flex-1 text-xs font-semibold" style={{ color: 'var(--muted-foreground)' }}>
+          {count} sélectionné{count > 1 ? 's' : ''}
+        </p>
+        <button
+          type="button"
+          onClick={onMarkRead}
+          disabled={markPending}
+          className="flex items-center gap-1.5 h-10 px-4 text-sm font-semibold transition-opacity disabled:opacity-40 hover:opacity-90"
+          style={{
+            background: 'color-mix(in oklch, var(--primary) 12%, var(--card))',
+            color: 'var(--primary)',
+            border: '1px solid color-mix(in oklch, var(--primary) 30%, transparent)',
+            borderRadius: 'var(--radius)',
+          }}
+        >
+          {markPending
+            ? <Loader2 size={13} className="animate-spin" aria-hidden />
+            : <BookMarked size={13} aria-hidden />}
+          Marquer
+        </button>
+        <button
+          type="button"
+          onClick={onLoan}
+          className="flex items-center gap-1.5 h-10 px-4 text-sm font-semibold transition-opacity hover:opacity-90"
+          style={{
+            background: 'var(--primary)',
+            color: 'var(--primary-foreground)',
+            borderRadius: 'var(--radius)',
+          }}
+        >
+          <BookUp size={13} aria-hidden />
+          Prêter
+        </button>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ─── VolumeActionCard — toujours en mode sélection (rerender-no-inline-components) ─
 
 interface VolumeActionCardProps {
   manga: Manga;
   isRead: boolean;
   isLoaned: boolean;
-  onSelect: (manga: Manga) => void;
+  isSelected: boolean;
+  onToggle: (manga: Manga) => void;
 }
 
-function VolumeActionCard({ manga, isRead, isLoaned, onSelect }: VolumeActionCardProps) {
+function VolumeActionCard({ manga, isRead, isLoaned, isSelected, onToggle }: VolumeActionCardProps) {
   return (
     <button
       type="button"
       className="manga-card block w-full"
-      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-      onClick={() => onSelect(manga)}
+      style={{ background: 'none', border: 'none', padding: 0, cursor: manga.is_owned ? 'pointer' : 'default' }}
+      onClick={() => { if (manga.is_owned) onToggle(manga); }}
+      aria-pressed={manga.is_owned ? isSelected : undefined}
       aria-label={`${manga.title}${manga.number ? ` — tome ${manga.number}` : ''}${isLoaned ? ' — prêté' : ''}`}
     >
       {manga.cover_url ? (
@@ -97,7 +154,7 @@ function VolumeActionCard({ manga, isRead, isLoaned, onSelect }: VolumeActionCar
 
       {bottomGradient}
 
-      {/* Overlay non-possédé — priorité 1 */}
+      {/* Non-owned overlay */}
       {!manga.is_owned && (
         <div
           aria-hidden
@@ -106,8 +163,8 @@ function VolumeActionCard({ manga, isRead, isLoaned, onSelect }: VolumeActionCar
         />
       )}
 
-      {/* Overlay prêté — priorité 2 (ambre 15%, même technique que non-possédé) */}
-      {isLoaned && (
+      {/* Loaned overlay — masqué si sélectionné */}
+      {isLoaned && !isSelected && (
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none"
@@ -115,8 +172,19 @@ function VolumeActionCard({ manga, isRead, isLoaned, onSelect }: VolumeActionCar
         />
       )}
 
-      {/* Dot Lu — top-left 10px avec ring (cohérent avec VolumeCard) */}
-      {isRead && (
+      {/* Selected overlay */}
+      {isSelected && (
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none flex items-center justify-center"
+          style={{ background: 'color-mix(in oklch, var(--primary) 35%, transparent)' }}
+        >
+          <CheckCircle size={20} style={{ color: 'white' }} />
+        </div>
+      )}
+
+      {/* Dot Lu — masqué si sélectionné */}
+      {isRead && !isSelected && (
         <span
           className="absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full shrink-0"
           style={{
@@ -127,8 +195,8 @@ function VolumeActionCard({ manga, isRead, isLoaned, onSelect }: VolumeActionCar
         />
       )}
 
-      {/* Dot Prêté — top-right 10px, symétrique du dot Lu */}
-      {isLoaned && (
+      {/* Dot Prêté — masqué si sélectionné */}
+      {isLoaned && !isSelected && (
         <span
           className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full shrink-0"
           style={{
@@ -139,7 +207,7 @@ function VolumeActionCard({ manga, isRead, isLoaned, onSelect }: VolumeActionCar
         />
       )}
 
-      {/* Volume number label */}
+      {/* Volume number */}
       {manga.number && (
         <div className="absolute bottom-0 left-0 right-0 px-1.5 pb-1.5">
           <span
@@ -161,7 +229,7 @@ interface EditionDetailClientProps {
   editionId: number;
 }
 
-export function EditionDetailClient({ seriesId, editionId }: EditionDetailClientProps) {
+export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionDetailClientProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -172,43 +240,33 @@ export function EditionDetailClient({ seriesId, editionId }: EditionDetailClient
 
   // Mutations
   const { mutate: bulkToggle, isPending: togglePending } = useBulkToggleReadingProgress();
-  const returnLoan = useReturnLoan();
-  const createLoan = useCreateLoan();
-  const addToCollection = useAddToCollection();
+  const bulkCreateLoan = useBulkCreateLoan();
 
-  // Bottom sheet state
-  const [selectedVolume, setSelectedVolume] = useState<Manga | null>(null);
-  const [isLoanStep, setIsLoanStep] = useState(false);
+  // Multiselect state
+  const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(() => new Set());
+
+  // Loan sheet state
+  const [isLoanOpen, setIsLoanOpen] = useState(false);
   const [borrowerName, setBorrowerName] = useState('');
 
-  // Preserve last known volume during bottom sheet exit animation
-  // (rerender-use-ref-transient-values — ref keeps content visible while sheet slides out)
-  const lastVolumeRef = useRef<Manga | null>(null);
-  if (selectedVolume !== null) lastVolumeRef.current = selectedVolume;
-  const displayVolume = selectedVolume ?? lastVolumeRef.current;
-
-  // Derived during render — no useEffect (rerender-derived-state-no-effect)
+  // Derived during render (rerender-derived-state-no-effect)
   const volumes: Manga[] = edition?.volumes ?? [];
 
-  // Set pour O(1) lookup lecture (js-set-map-lookups)
+  // O(1) lookup sets (js-set-map-lookups)
   const readSet = useMemo(
     () => new Set(readingProgress.map(p => p.volume_id)),
     [readingProgress],
   );
 
-  // Set + Map pour O(1) lookup prêts actifs — cross-référence car is_loaned peut être absent de l'API édition
   const activeVolumeLoans = useMemo(
     () => loans.filter((l): l is Loan & { loanable_type: 'volume' } =>
       !l.is_returned && l.loanable_type === 'volume'
     ),
     [loans],
   );
+
   const loanedSet = useMemo(
     () => new Set(activeVolumeLoans.map(l => l.loanable_id)),
-    [activeVolumeLoans],
-  );
-  const activeLoanMap = useMemo(
-    () => new Map(activeVolumeLoans.map(l => [l.loanable_id, l])),
     [activeVolumeLoans],
   );
 
@@ -223,62 +281,62 @@ export function EditionDetailClient({ seriesId, editionId }: EditionDetailClient
       ? Math.round((possessedCount / totalVolumes) * 100)
       : null;
 
-  // Statuts dérivés du volume sélectionné — pas d'useEffect (rerender-derived-state-no-effect)
-  const isSelectedRead = displayVolume ? readSet.has(displayVolume.id) : false;
-  const isSelectedLoaned = displayVolume ? loanedSet.has(displayVolume.id) : false;
-  const selectedActiveLoan = displayVolume ? activeLoanMap.get(displayVolume.id) : undefined;
-
-  // ── Sheet title — updates on loan step change
-  const sheetTitle = isLoanStep
-    ? 'Prêter ce volume'
-    : displayVolume
-    ? `Tome ${displayVolume.number ?? '?'}`
-    : undefined;
-
-  function handleCloseSheet() {
-    setSelectedVolume(null);
-    setIsLoanStep(false);
-    setBorrowerName('');
-  }
-
   function invalidateEdition() {
     queryClient.invalidateQueries({ queryKey: queryKeys.edition(editionId) });
   }
 
-  function handleBulkReadToggle() {
+  function handleToggle(manga: Manga) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(manga.id)) next.delete(manga.id); else next.add(manga.id);
+      return next;
+    });
+  }
+
+  function handleSelectAll() {
+    setSelectedIds(new Set(ownedVolumes.map(v => v.id)));
+  }
+
+  // Tout marquer — agit sur TOUS les volumes possédés
+  function handleBulkReadToggleAll() {
     const targetIds = allRead
       ? ownedVolumes.map(v => v.id)
       : ownedVolumes.filter(v => !readSet.has(v.id)).map(v => v.id);
     if (targetIds.length > 0) bulkToggle(targetIds);
   }
 
-  function handleToggleRead() {
-    if (!displayVolume) return;
-    bulkToggle([displayVolume.id]);
-    handleCloseSheet();
+  // Tout prêter — présélectionne les non prêtés et ouvre le sheet
+  function handleBulkLoanAll() {
+    setSelectedIds(new Set(ownedVolumes.filter(v => !loanedSet.has(v.id)).map(v => v.id)));
+    setIsLoanOpen(true);
   }
 
-  function handleReturnLoan() {
-    if (!displayVolume) return;
-    returnLoan.mutate(
-      { id: displayVolume.id, type: 'volume' },
-      { onSuccess: () => { invalidateEdition(); handleCloseSheet(); } },
+  // Marquer — toggle sur la sélection courante
+  function handleMarkSelected() {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    bulkToggle(ids);
+    setSelectedIds(new Set());
+  }
+
+  function handleCloseLoanSheet() {
+    setIsLoanOpen(false);
+    setBorrowerName('');
+  }
+
+  function handleConfirmLoan() {
+    if (!borrowerName.trim() || selectedIds.size === 0) return;
+    const volumeIds = [...selectedIds];
+    bulkCreateLoan.mutate(
+      { volumeIds, borrowerName: borrowerName.trim() },
+      {
+        onSuccess: () => {
+          handleCloseLoanSheet();
+          setSelectedIds(new Set());
+          invalidateEdition();
+        },
+      },
     );
-  }
-
-  function handleCreateLoan() {
-    if (!displayVolume || !borrowerName.trim()) return;
-    createLoan.mutate(
-      { id: displayVolume.id, type: 'volume', borrowerName: borrowerName.trim() },
-      { onSuccess: () => { invalidateEdition(); handleCloseSheet(); } },
-    );
-  }
-
-  function handleAddToCollection() {
-    if (!displayVolume?.api_id) return;
-    addToCollection.mutate(displayVolume.api_id, {
-      onSuccess: () => { invalidateEdition(); handleCloseSheet(); },
-    });
   }
 
   return (
@@ -319,27 +377,18 @@ export function EditionDetailClient({ seriesId, editionId }: EditionDetailClient
           initial="initial"
           animate="animate"
         >
-          {/* Cover */}
           <div
             className="shrink-0 w-20 relative overflow-hidden rounded-[calc(var(--radius)*2)]"
             style={{ aspectRatio: '2/3', background: 'var(--muted)' }}
           >
             {edition.cover_url ? (
-              <Image
-                src={edition.cover_url}
-                alt={edition.name}
-                fill
-                sizes="80px"
-                className="object-cover"
-              />
+              <Image src={edition.cover_url} alt={edition.name} fill sizes="80px" className="object-cover" />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Package size={24} aria-hidden style={{ color: 'var(--muted-foreground)' }} />
               </div>
             )}
           </div>
-
-          {/* Info */}
           <div className="flex flex-col justify-center gap-1.5 min-w-0 flex-1">
             <h1
               className="text-xl font-bold leading-tight"
@@ -391,181 +440,120 @@ export function EditionDetailClient({ seriesId, editionId }: EditionDetailClient
               className="text-xs font-semibold uppercase"
               style={{ color: 'var(--muted-foreground)', letterSpacing: '0.08em' }}
             >
-              Volumes ({volumes.length})
+              {selectedIds.size > 0
+                ? `${selectedIds.size} sélectionné${selectedIds.size > 1 ? 's' : ''}`
+                : `Volumes (${volumes.length})`}
             </h2>
             {ownedVolumes.length > 0 && (
-              <button
-                type="button"
-                onClick={handleBulkReadToggle}
-                disabled={togglePending}
-                className="flex items-center gap-1.5 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
-                style={{ color: 'var(--primary)' }}
-              >
-                <BookMarked size={13} aria-hidden />
-                {allRead ? 'Tout démarquer' : 'Tout marquer'}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleSelectAll}
+                  className="text-xs font-medium transition-opacity hover:opacity-70"
+                  style={{ color: 'var(--muted-foreground)' }}
+                >
+                  Tout sélectionner
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkReadToggleAll}
+                  disabled={togglePending}
+                  className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
+                  style={{ color: 'var(--primary)' }}
+                >
+                  <BookMarked size={11} aria-hidden />
+                  {allRead ? 'Tout démarquer' : 'Tout marquer'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkLoanAll}
+                  className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
+                  style={{ color: 'var(--primary)' }}
+                >
+                  <BookUp size={11} aria-hidden />
+                  Tout prêter
+                </button>
+              </div>
             )}
           </div>
 
-          <div className="manga-grid">
+          <div className={`manga-grid ${selectedIds.size > 0 ? 'pb-28' : ''}`}>
             {volumes.map(manga => (
               <VolumeActionCard
                 key={manga.id}
                 manga={manga}
                 isRead={readSet.has(manga.id)}
                 isLoaned={loanedSet.has(manga.id)}
-                onSelect={setSelectedVolume}
+                isSelected={selectedIds.has(manga.id)}
+                onToggle={handleToggle}
               />
             ))}
           </div>
         </motion.section>
       )}
 
-      {/* Per-volume action bottom sheet */}
-      <BottomSheet open={!!selectedVolume} onClose={handleCloseSheet} title={sheetTitle}>
-        {displayVolume && !isLoanStep && (
-          <div className="flex flex-col gap-1 pt-2">
-            {/* Volume subtitle */}
-            <p className="text-sm mb-2 leading-snug" style={{ color: 'var(--muted-foreground)' }}>
-              {displayVolume.title}
-            </p>
+      {/* Barre de confirmation (portal) — visible quand sélection > 0 */}
+      <CollectionSelectBar
+        count={selectedIds.size}
+        onMarkRead={handleMarkSelected}
+        onLoan={() => setIsLoanOpen(true)}
+        markPending={togglePending}
+      />
 
-            {/* Bloc "Prêté à" — affiché en tête si le volume est prêté */}
-            {isSelectedLoaned && selectedActiveLoan && (
-              <div
-                className="flex items-center gap-3 px-3 py-2.5 rounded mb-2"
-                style={{
-                  background: 'color-mix(in oklch, var(--color-loaned) 10%, var(--card))',
-                  border: '1px solid color-mix(in oklch, var(--color-loaned) 25%, transparent)',
-                }}
-              >
-                <BookUp size={16} style={{ color: 'var(--color-loaned)' }} aria-hidden />
-                <div className="flex flex-col gap-0.5">
-                  <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Prêté à</p>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
-                    {selectedActiveLoan.borrower_name}
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                    Depuis {formatDistanceToNow(new Date(selectedActiveLoan.loaned_at), { locale: fr })}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {displayVolume.is_owned ? (
-              <>
-                {/* Toggle read */}
-                <button
-                  type="button"
-                  onClick={handleToggleRead}
-                  disabled={togglePending}
-                  className="flex items-center gap-3 w-full text-sm font-medium py-3 border-b transition-opacity disabled:opacity-50 hover:opacity-80"
-                  style={{ color: 'var(--foreground)', borderColor: 'var(--border)' }}
-                >
-                  <BookMarked size={18} aria-hidden style={{ color: 'var(--primary)' }} />
-                  {isSelectedRead ? 'Marquer comme non lu' : 'Marquer comme lu'}
-                </button>
-
-                {/* Return ou prêter — basé sur loanedSet (cross-référence fiable) */}
-                {isSelectedLoaned ? (
-                  <motion.button
-                    type="button"
-                    onClick={handleReturnLoan}
-                    disabled={returnLoan.isPending}
-                    whileTap={{ scale: 0.96, opacity: 0.7 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center gap-3 w-full text-sm font-medium py-3 transition-opacity disabled:opacity-50 hover:opacity-80"
-                    style={{ color: 'var(--color-loaned)' }}
-                  >
-                    <BookUp size={18} aria-hidden />
-                    {returnLoan.isPending ? 'Traitement…' : 'Marquer comme retourné'}
-                  </motion.button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setIsLoanStep(true)}
-                    className="flex items-center gap-3 w-full text-sm font-medium py-3 transition-opacity hover:opacity-80"
-                    style={{ color: 'var(--foreground)' }}
-                  >
-                    <BookUp size={18} aria-hidden style={{ color: 'var(--muted-foreground)' }} />
-                    Prêter ce volume
-                  </button>
-                )}
-              </>
-            ) : (
-              /* Non-owned volume */
-              <>
-                <p className="text-sm py-2" style={{ color: 'var(--muted-foreground)' }}>
-                  Vous ne possédez pas ce volume.
-                </p>
-                {displayVolume.api_id && (
-                  <button
-                    type="button"
-                    onClick={handleAddToCollection}
-                    disabled={addToCollection.isPending}
-                    className="flex items-center gap-3 w-full text-sm font-medium py-3 transition-opacity disabled:opacity-50 hover:opacity-80"
-                    style={{ color: 'var(--primary)' }}
-                  >
-                    <PlusCircle size={18} aria-hidden />
-                    {addToCollection.isPending ? 'Ajout…' : 'Ajouter à la collection'}
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Loan form step */}
-        {displayVolume && isLoanStep && (
-          <div className="flex flex-col gap-4 pt-2">
-            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-              À qui prêtez-vous ce volume ?
-            </p>
-            <input
-              type="text"
-              value={borrowerName}
-              onChange={e => setBorrowerName(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleCreateLoan(); }}
-              placeholder="Nom de l'emprunteur"
-              autoFocus
-              className="w-full h-11 px-3 text-sm outline-none"
+      {/* Loan bottom sheet */}
+      <BottomSheet
+        open={isLoanOpen}
+        onClose={handleCloseLoanSheet}
+        title={`Prêter ${selectedIds.size} volume${selectedIds.size > 1 ? 's' : ''}`}
+      >
+        <div className="flex flex-col gap-4 pt-2">
+          <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            À qui prêtez-vous {selectedIds.size > 1 ? 'ces volumes' : 'ce volume'} ?
+          </p>
+          <input
+            type="text"
+            value={borrowerName}
+            onChange={e => setBorrowerName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleConfirmLoan(); }}
+            placeholder="Nom de l'emprunteur"
+            autoFocus
+            className="w-full h-11 px-3 text-sm outline-none"
+            style={{
+              background: 'var(--input)',
+              border: '1px solid var(--border)',
+              color: 'var(--foreground)',
+              borderRadius: 'var(--radius)',
+            }}
+          />
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleCloseLoanSheet}
+              className="flex-1 h-10 text-sm font-medium transition-opacity hover:opacity-80"
               style={{
-                background: 'var(--input)',
-                border: '1px solid var(--border)',
+                background: 'var(--secondary)',
                 color: 'var(--foreground)',
                 borderRadius: 'var(--radius)',
+                border: '1px solid var(--border)',
               }}
-            />
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setIsLoanStep(false)}
-                className="flex-1 h-10 text-sm font-medium transition-opacity hover:opacity-80"
-                style={{
-                  background: 'var(--secondary)',
-                  color: 'var(--foreground)',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                Annuler
-              </button>
-              <button
-                type="button"
-                onClick={handleCreateLoan}
-                disabled={!borrowerName.trim() || createLoan.isPending}
-                className="flex-1 h-10 text-sm font-semibold transition-opacity disabled:opacity-50 hover:opacity-80"
-                style={{
-                  background: 'var(--primary)',
-                  color: 'var(--primary-foreground)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                {createLoan.isPending ? 'Enregistrement…' : 'Confirmer'}
-              </button>
-            </div>
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmLoan}
+              disabled={!borrowerName.trim() || bulkCreateLoan.isPending}
+              className="flex-1 h-10 text-sm font-semibold transition-opacity disabled:opacity-50 hover:opacity-80"
+              style={{
+                background: 'var(--primary)',
+                color: 'var(--primary-foreground)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              {bulkCreateLoan.isPending ? 'Enregistrement…' : 'Confirmer'}
+            </button>
           </div>
-        )}
+        </div>
       </BottomSheet>
     </div>
   );
