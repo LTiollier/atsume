@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import api, { ApiResponse } from '@/lib/api';
+import { isHttpError } from '@/lib/error';
 import {
     Manga, MangaSearchResult, PaginatedSearchResult,
     Series, Edition, Box, BoxSet,
@@ -46,6 +47,18 @@ export const mangaService = {
                 return r.data as unknown as PaginatedSearchResult;
             }
         }),
+
+    searchByIsbn: async (isbn: string): Promise<MangaSearchResult | null> => {
+        try {
+            const r = await api.get<ApiResponse<MangaSearchResult>>(
+                `/mangas/search/isbn?isbn=${encodeURIComponent(isbn)}`
+            );
+            return MangaSearchResultSchema.parse(r.data.data);
+        } catch (err) {
+            if (isHttpError(err, 404)) return null;
+            throw err;
+        }
+    },
 
     addToCollection: (apiId: string) =>
         api.post('/mangas', { api_id: apiId }),

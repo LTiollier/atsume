@@ -154,17 +154,16 @@ export function ScanClient() {
     toast.success(`Code scanné`);
 
     try {
-      const result = await mangaService.search(isbn);
-      const first = result.data[0] ?? null;
+      const result = await mangaService.searchByIsbn(isbn);
       setItems(prev =>
         prev.map(item =>
           item.isbn === isbn
             ? {
                 ...item,
                 isLoading: false,
-                title: first?.title,
-                cover_url: first?.cover_url ?? null,
-                isError: !first,
+                title: result?.title,
+                cover_url: result?.cover_url ?? null,
+                isError: !result,
               }
             : item,
         ),
