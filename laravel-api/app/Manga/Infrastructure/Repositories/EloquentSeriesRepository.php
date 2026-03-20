@@ -78,10 +78,30 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
     /**
      * @return LengthAwarePaginator<int, Series>
      */
-    public function search(string $query, int $page = 1, int $perPage = 15): LengthAwarePaginator
+    public function search(string $query, int $page = 1, int $perPage = 15, ?int $userId = null): LengthAwarePaginator
     {
-        return EloquentSeries::whereRaw('LOWER(title) LIKE ?', ['%'.strtolower($query).'%'])
-            ->orWhereRaw('LOWER(authors) LIKE ?', ['%'.strtolower($query).'%'])
+        $baseQuery = EloquentSeries::whereRaw('LOWER(title) LIKE ?', ['%'.strtolower($query).'%'])
+            ->orWhereRaw('LOWER(authors) LIKE ?', ['%'.strtolower($query).'%']);
+
+        if ($userId !== null) {
+            $baseQuery->with([
+                'editions' => function ($q) use ($userId) {
+                    $q->withCount(['volumes as possessed_volumes_count' => fn ($v) => $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))]);
+                    $q->with('firstVolume');
+                },
+                'boxSets' => function ($q) use ($userId) {
+                    $q->with('firstBox');
+                    $q->with(['boxes' => fn ($q) => $q->withExists(['users as is_owned' => fn ($u) => $u->where('users.id', $userId)])]);
+                },
+            ]);
+        } else {
+            $baseQuery->with([
+                'editions' => fn ($q) => $q->with('firstVolume'),
+                'boxSets' => fn ($q) => $q->with('firstBox'),
+            ]);
+        }
+
+        return $baseQuery
             ->paginate($perPage, ['*'], 'page', $page)
             ->through(fn (EloquentSeries $s) => $this->toDomain($s));
     }

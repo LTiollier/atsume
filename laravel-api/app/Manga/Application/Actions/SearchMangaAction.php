@@ -18,6 +18,6 @@ class SearchMangaAction
      */
     public function execute(SearchMangaDTO $dto): LengthAwarePaginator
     {
-        return $this->seriesRepository->search($dto->query, $dto->page, $dto->perPage);
+        return $this->seriesRepository->search($dto->query, $dto->page, $dto->perPage, $dto->userId);
     }
 }

@@ -2,11 +2,13 @@
 
 namespace App\Manga\Domain\Models;
 
+use App\Manga\Domain\Models\BoxSet;
+
 class Series
 {
     /**
      * @param  Edition[]  $editions
-     * @param  array<int, mixed>  $boxSets
+     * @param  BoxSet[]  $boxSets
      */
     public function __construct(
         private readonly int $id,
@@ -27,7 +29,7 @@ class Series
     }
 
     /**
-     * @return array<int, mixed>
+     * @return BoxSet[]
      */
     public function getBoxSets(): array
     {

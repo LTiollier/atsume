@@ -30,6 +30,7 @@ class SearchMangaRequest extends FormRequest
             query: $this->string('query')->toString(),
             page: $this->integer('page', 1),
             perPage: $this->integer('per_page', 15),
+            userId: $this->user()?->id,
         );
     }
 }

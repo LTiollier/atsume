@@ -17,5 +17,5 @@ interface SeriesRepositoryInterface
     /**
      * @return LengthAwarePaginator<int, Series>
      */
-    public function search(string $query, int $page = 1, int $perPage = 15): LengthAwarePaginator;
+    public function search(string $query, int $page = 1, int $perPage = 15, ?int $userId = null): LengthAwarePaginator;
 }

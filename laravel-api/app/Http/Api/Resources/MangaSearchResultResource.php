@@ -2,6 +2,9 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Manga\Domain\Models\Box;
+use App\Manga\Domain\Models\BoxSet;
+use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Models\Series;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,11 +24,24 @@ class MangaSearchResultResource extends JsonResource
             'api_id' => $this->resource->getApiId(),
             'title' => $this->resource->getTitle(),
             'authors' => $this->resource->getAuthors() ? explode(', ', $this->resource->getAuthors()) : [],
-            'description' => null,
-            'published_date' => null,
-            'page_count' => null,
             'cover_url' => $this->resource->getCoverUrl(),
-            'isbn' => null,
+            'editions' => array_map(fn (Edition $e) => [
+                'id' => $e->getId(),
+                'name' => $e->getName(),
+                'publisher' => $e->getPublisher(),
+                'total_volumes' => $e->getTotalVolumes(),
+                'possessed_count' => $e->getPossessedCount(),
+                'cover_url' => $e->getCoverUrl(),
+                'is_wishlisted' => $e->isWishlisted(),
+            ], $this->resource->getEditions()),
+            'box_sets' => array_map(fn (BoxSet $bs) => [
+                'id' => $bs->getId(),
+                'title' => $bs->getTitle(),
+                'publisher' => $bs->getPublisher(),
+                'cover_url' => $bs->getCoverUrl(),
+                'total_boxes' => count($bs->getBoxes()),
+                'possessed_count' => count(array_filter($bs->getBoxes(), fn (Box $b) => (bool) $b->isOwned())),
+            ], $this->resource->getBoxSets()),
         ];
     }
 }
