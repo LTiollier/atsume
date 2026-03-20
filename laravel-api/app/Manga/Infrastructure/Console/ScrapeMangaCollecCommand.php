@@ -19,11 +19,16 @@ use Illuminate\Support\Facades\DB;
 
 class ScrapeMangaCollecCommand extends Command
 {
-    protected $signature = 'app:scrape-mangacollec {--limit= : The number of series to scrape (default: all)} {--rps=3 : Requests per second}';
+    protected $signature = 'app:scrape-mangacollec {--limit= : The number of series to scrape (default: all)} {--rps=3 : Requests per second} {--reset : Clear progress file and start from scratch}';
 
     protected $description = 'Scrape manga data from MangaCollec API';
 
     private ?float $lastRequestTime = null;
+
+    private string $progressFile = '';
+
+    /** @var array<string, array<string, string>> */
+    private array $progress = ['series' => []];
 
     public function __construct(
         private readonly MangaCollecScraperService $scraperService,
@@ -38,7 +43,18 @@ class ScrapeMangaCollecCommand extends Command
 
     public function handle(): int
     {
+        ini_set('memory_limit', '512M');
+
         $this->info('Starting MangaCollec Scraper...');
+
+        $this->progressFile = storage_path('app/scrape-progress.json');
+
+        if ($this->option('reset')) {
+            @unlink($this->progressFile);
+            $this->info('Progress file cleared.');
+        }
+
+        $this->loadProgress();
 
         $this->throttle();
         if (! $this->scraperService->login()) {
@@ -64,6 +80,13 @@ class ScrapeMangaCollecCommand extends Command
             $seriesUuid = $seriesData['id'] ?? '';
             /** @var string $title */
             $title = $seriesData['title'] ?? '';
+
+            if ($this->isSeriesComplete($seriesUuid)) {
+                $this->line("Skipping (already imported): {$title}");
+
+                continue;
+            }
+
             $this->info("Scraping series: {$title} ({$seriesUuid})");
 
             $this->throttle();
@@ -75,7 +98,7 @@ class ScrapeMangaCollecCommand extends Command
                 continue;
             }
 
-            DB::transaction(function () use ($detail, $seriesUuid) {
+            DB::transaction(function () use ($detail, $seriesUuid): void {
                 // 1. Handle Series
                 $series = $this->seriesRepository->findByApiId($seriesUuid);
 
@@ -310,6 +333,10 @@ class ScrapeMangaCollecCommand extends Command
                 }
             });
 
+            unset($detail);
+            gc_collect_cycles();
+
+            $this->markSeriesComplete($seriesUuid);
             /** @var string $finishTitle */
             $finishTitle = $seriesData['title'] ?? '';
             $this->info("Finished series: {$finishTitle}");
@@ -319,6 +346,26 @@ class ScrapeMangaCollecCommand extends Command
         $this->info('Scraping completed!');
 
         return 0;
+    }
+
+    private function loadProgress(): void
+    {
+        if (file_exists($this->progressFile)) {
+            /** @var mixed $decoded */
+            $decoded = json_decode((string) file_get_contents($this->progressFile), true);
+            $this->progress = is_array($decoded) ? $decoded : ['series' => []]; // @phpstan-ignore-line
+        }
+    }
+
+    private function isSeriesComplete(string $uuid): bool
+    {
+        return ($this->progress['series'][$uuid] ?? '') === 'ok';
+    }
+
+    private function markSeriesComplete(string $uuid): void
+    {
+        $this->progress['series'][$uuid] = 'ok';
+        file_put_contents($this->progressFile, json_encode($this->progress, JSON_PRETTY_PRINT));
     }
 
     private function throttle(): void
