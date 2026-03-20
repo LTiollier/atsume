@@ -74,6 +74,10 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
 
   // Non-owned selection — add to collection (rerender-lazy-state-init)
   const [selectedNonOwnedNumbers, setSelectedNonOwnedNumbers] = useState<ReadonlySet<number>>(() => new Set());
+
+  // Derived mode booleans — prevent cross-mode clicks (rerender-derived-state)
+  const isAddMode = selectedNonOwnedNumbers.size > 0;
+  const isOwnedSelectMode = selectedIds.size > 0;
   const { isLoanOpen, borrowerName, setBorrowerName, openLoanSheet, closeLoanSheet } = useLoanSheet();
 
   // Progress for header
@@ -276,7 +280,7 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
             </div>
           </div>
 
-          <div className={`manga-grid ${selectedIds.size > 0 || selectedNonOwnedNumbers.size > 0 ? 'pb-28' : ''}`}>
+          <div className={`manga-grid ${isOwnedSelectMode || isAddMode ? 'pb-28' : ''}`}>
             {volumes.map(manga => (
               <VolumeActionCard
                 key={manga.id}
@@ -285,8 +289,9 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
                 isLoaned={loanedSet.has(manga.id)}
                 isSelected={selectedIds.has(manga.id)}
                 onToggle={handleToggle}
+                disabled={isAddMode}
                 isAddSelected={selectedNonOwnedNumbers.has(parseVolumeNumber(manga) ?? -1)}
-                onAddToggle={handleNonOwnedToggle}
+                onAddToggle={isOwnedSelectMode ? undefined : handleNonOwnedToggle}
               />
             ))}
           </div>
@@ -299,6 +304,7 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
         label={`Ajouter ${selectedNonOwnedNumbers.size} tome${selectedNonOwnedNumbers.size > 1 ? 's' : ''}`}
         onConfirm={handleAddSelected}
       />
+
 
       <CollectionActionBar
         count={selectedIds.size}

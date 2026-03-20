@@ -34,6 +34,8 @@ export interface BoxItemCardProps {
   wishlistPending?: boolean;
   isAddSelected?: boolean;
   onAddToggle?: (box: Box) => void;
+  /** Disable owned-item toggle (e.g. when add-to-collection mode is active) */
+  disabled?: boolean;
 }
 
 /**
@@ -56,14 +58,16 @@ export function BoxItemCard({
   wishlistPending = false,
   isAddSelected = false,
   onAddToggle,
+  disabled = false,
 }: BoxItemCardProps) {
   const isOwned = box.is_owned ?? false;
-  const isClickable = isOwned || !!onAddToggle;
+  // Owned clickable unless disabled (add-mode active); non-owned clickable when onAddToggle provided (rerender-derived-state)
+  const isClickable = (isOwned && !disabled) || (!isOwned && !!onAddToggle);
   const metaLine = getBoxMetaLine(box);
 
   function handleClick() {
-    if (isOwned) onToggle(box);
-    else if (onAddToggle) onAddToggle(box);
+    if (isOwned && !disabled) onToggle(box);
+    else if (!isOwned && onAddToggle) onAddToggle(box);
   }
 
   return (

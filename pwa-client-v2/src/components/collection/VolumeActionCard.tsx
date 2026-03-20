@@ -28,6 +28,8 @@ export interface VolumeActionCardProps {
   onToggle: (manga: Manga) => void;
   isAddSelected?: boolean;
   onAddToggle?: (manga: Manga) => void;
+  /** Disable owned-item toggle (e.g. when add-to-collection mode is active) */
+  disabled?: boolean;
 }
 
 // Defined outside any parent component (rerender-no-inline-components)
@@ -39,13 +41,15 @@ export function VolumeActionCard({
   onToggle,
   isAddSelected = false,
   onAddToggle,
+  disabled = false,
 }: VolumeActionCardProps) {
   const isOwned = manga.is_owned;
-  const isClickable = isOwned || !!onAddToggle;
+  // Owned clickable unless disabled (add-mode active); non-owned clickable when onAddToggle provided (rerender-derived-state)
+  const isClickable = (isOwned && !disabled) || (!isOwned && !!onAddToggle);
 
   function handleClick() {
-    if (isOwned) onToggle(manga);
-    else if (onAddToggle) onAddToggle(manga);
+    if (isOwned && !disabled) onToggle(manga);
+    else if (!isOwned && onAddToggle) onAddToggle(manga);
   }
 
   return (

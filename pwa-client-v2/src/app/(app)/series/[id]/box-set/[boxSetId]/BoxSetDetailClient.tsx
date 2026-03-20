@@ -67,6 +67,10 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
   // Non-owned selection — add to collection (rerender-lazy-state-init)
   const [selectedNonOwnedBoxIds, setSelectedNonOwnedBoxIds] = useState<ReadonlySet<number>>(() => new Set());
 
+  // Derived mode booleans — prevent cross-mode clicks (rerender-derived-state)
+  const isAddMode = selectedNonOwnedBoxIds.size > 0;
+  const isOwnedSelectMode = selectedIds.size > 0;
+
   // ── Add non-owned boxes to collection ────────────────────────────────────────
 
   function handleNonOwnedBoxToggle(box: Box) {
@@ -224,7 +228,7 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
             </div>
           </div>
 
-          <MangaGrid variant="series" className={selectedIds.size > 0 || selectedNonOwnedBoxIds.size > 0 ? 'pb-28' : undefined}>
+          <MangaGrid variant="series" className={isOwnedSelectMode || isAddMode ? 'pb-28' : undefined}>
             {boxes.map(box => (
               <BoxItemCard
                 key={box.id}
@@ -232,6 +236,7 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
                 isLoaned={loanedSet.has(box.id)}
                 isSelected={selectedIds.has(box.id)}
                 onToggle={handleToggle}
+                disabled={isAddMode}
                 isWishlisted={box.is_wishlisted ?? false}
                 onToggleWishlist={() => toggleWishlist.mutate({
                   id: box.id,
@@ -241,7 +246,7 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
                 })}
                 wishlistPending={toggleWishlist.isPending}
                 isAddSelected={selectedNonOwnedBoxIds.has(box.id)}
-                onAddToggle={handleNonOwnedBoxToggle}
+                onAddToggle={isOwnedSelectMode ? undefined : handleNonOwnedBoxToggle}
               />
             ))}
           </MangaGrid>
