@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Package } from 'lucide-react';
 
 import { useWishlist, useRemoveFromWishlist } from '@/hooks/queries';
@@ -49,20 +50,31 @@ function getItemPublisher(item: WishlistItem): string | null {
   return item.type === 'edition' ? (item as WishlistEditionItem).publisher : null;
 }
 
-// ─── WishlistRow — defined outside parent component (rerender-no-inline-components) ─
+function getItemHref(item: WishlistItem): string | null {
+  if (item.type === 'edition') {
+    const edition = item as WishlistEditionItem;
+    const seriesId = edition.series_id ?? edition.series?.id;
+    if (!seriesId) return null;
+    return `/series/${seriesId}/edition/${edition.id}`;
+  }
+  const box = item as WishlistBoxItem;
+  const seriesId = box.series_id ?? box.box_set?.series_id;
+  const boxSetId = box.box_set_id ?? box.box_set?.id;
+  if (!seriesId || !boxSetId) return null;
+  return `/series/${seriesId}/box-set/${boxSetId}`;
+}
 
-function WishlistRow({ item }: { item: WishlistItem }) {
-  const { mutate, isPending } = useRemoveFromWishlist();
+// ─── WishlistRowContent — defined outside parent (rerender-no-inline-components) ─
 
-  const title = getItemTitle(item);
-  const publisher = getItemPublisher(item);
-  const cover = item.cover_url ?? null;
+interface WishlistRowContentProps {
+  title: string;
+  publisher: string | null;
+  cover: string | null;
+}
 
+function WishlistRowContent({ title, publisher, cover }: WishlistRowContentProps) {
   return (
-    <div
-      className="flex items-center gap-3 p-4 border-b last:border-b-0"
-      style={{ borderColor: 'var(--border)' }}
-    >
+    <>
       {/* Cover thumbnail */}
       <div
         className="shrink-0 w-10 relative overflow-hidden"
@@ -91,13 +103,41 @@ function WishlistRow({ item }: { item: WishlistItem }) {
         </p>
         <div className="flex items-center gap-2 flex-wrap">
           <StatusBadge variant="wishlist" />
-          {publisher && (
+          {publisher ? (
             <span className="text-xs truncate" style={{ color: 'var(--muted-foreground)' }}>
               {publisher}
             </span>
-          )}
+          ) : null}
         </div>
       </div>
+    </>
+  );
+}
+
+// ─── WishlistRow — defined outside parent component (rerender-no-inline-components) ─
+
+function WishlistRow({ item }: { item: WishlistItem }) {
+  const { mutate, isPending } = useRemoveFromWishlist();
+
+  const title = getItemTitle(item);
+  const publisher = getItemPublisher(item);
+  const cover = item.cover_url ?? null;
+  const href = getItemHref(item);
+
+  return (
+    <div
+      className="flex items-center gap-3 p-4 border-b last:border-b-0"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      {href ? (
+        <Link href={href} className="flex items-center gap-3 flex-1 min-w-0">
+          <WishlistRowContent title={title} publisher={publisher} cover={cover} />
+        </Link>
+      ) : (
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <WishlistRowContent title={title} publisher={publisher} cover={cover} />
+        </div>
+      )}
 
       {/* Remove button */}
       <button
