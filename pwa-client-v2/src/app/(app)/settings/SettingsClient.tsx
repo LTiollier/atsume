@@ -15,6 +15,7 @@ import { useTheme, type Theme } from '@/contexts/ThemeContext';
 import { usePalette, type Palette } from '@/contexts/PaletteContext';
 import { sectionVariants } from '@/lib/motion';
 import { getApiErrorMessage, getValidationErrors } from '@/lib/error';
+import { LogOut } from 'lucide-react';
 
 // ─── Zod schema — mirrored from API rules ─────────────────────────────────────
 
@@ -85,7 +86,7 @@ function ToggleSwitch({ checked, onToggle, id, disabled }: ToggleSwitchProps) {
 // ─── SettingsClient ───────────────────────────────────────────────────────────
 
 export function SettingsClient() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const { mutate: saveSettings, isPending } = useUpdateSettings();
   const { theme } = useTheme();
   const { palette } = usePalette();
@@ -361,6 +362,43 @@ export function SettingsClient() {
             </div>
           </div>
         </form>
+      </motion.section>
+
+      {/* ── Section Compte ── */}
+      <motion.section
+        variants={sectionVariants}
+        initial="initial"
+        animate="animate"
+        aria-label="Compte"
+      >
+        <div className="mb-5">
+          <h2
+            className="text-xs font-semibold uppercase mb-1"
+            style={{ color: 'var(--muted-foreground)', letterSpacing: '0.08em' }}
+          >
+            Compte
+          </h2>
+          {user?.email && (
+            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+              {user.email}
+            </p>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => { logout(); window.location.href = '/login'; }}
+          className="w-full h-11 flex items-center justify-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+          style={{
+            background: 'color-mix(in oklch, var(--destructive) 10%, transparent)',
+            color: 'var(--destructive)',
+            border: '1px solid color-mix(in oklch, var(--destructive) 25%, transparent)',
+            borderRadius: 'var(--radius)',
+          }}
+        >
+          <LogOut size={16} aria-hidden />
+          Se déconnecter
+        </button>
       </motion.section>
     </div>
   );
