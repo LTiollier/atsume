@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 
 class ScrapeMangaCollecCommand extends Command
 {
-    protected $signature = 'app:scrape-mangacollec {--limit=2 : The number of series to scrape} {--rps=2 : Requests per second}';
+    protected $signature = 'app:scrape-mangacollec {--limit= : The number of series to scrape (default: all)} {--rps=3 : Requests per second}';
 
     protected $description = 'Scrape manga data from MangaCollec API';
 
@@ -50,12 +50,13 @@ class ScrapeMangaCollecCommand extends Command
         $this->throttle();
         /** @var array<int, array<string, mixed>> $seriesList */
         $seriesList = $this->scraperService->getSeriesList();
-        $limit = (int) $this->option('limit');
+        $limitOption = $this->option('limit');
+        $limit = $limitOption !== null ? (int) $limitOption : null;
         $count = 0;
 
         foreach ($seriesList as $seriesData) {
             /** @var array<string, mixed> $seriesData */
-            if ($count >= $limit) {
+            if ($limit !== null && $count >= $limit) {
                 break;
             }
 
