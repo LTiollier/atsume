@@ -27,7 +27,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401 && typeof window !== 'undefined') {
+        const url = error.config?.url ?? '';
+        if (error.response?.status === 401 && typeof window !== 'undefined' && !url.includes('/auth/')) {
             tokenStorage.clear();
             window.location.href = '/login';
         }
