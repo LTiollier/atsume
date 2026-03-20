@@ -20,6 +20,8 @@ interface VolumeRepositoryInterface
 
     public function findByIsbn(string $isbn): ?Volume;
 
+    public function findByIsbnWithRelations(string $isbn): ?Volume;
+
     public function attachToUser(int $volumeId, int $userId): void;
 
     public function detachFromUser(int $volumeId, int $userId): void;

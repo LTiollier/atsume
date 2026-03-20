@@ -70,6 +70,29 @@ Search mangas via external API.
 
 ---
 
+### GET /api/mangas/search/isbn
+Search a single manga by ISBN (barcode scan). Looks up the volume in the local catalog.
+
+**Query params**: `isbn` (required, string)
+**Response 200**: `VolumeSearchResultResource`
+```json
+{
+  "id": 1,
+  "api_id": "string",
+  "title": "string",
+  "authors": ["string"],
+  "description": null,
+  "published_date": "string|null",
+  "page_count": null,
+  "cover_url": "string|null",
+  "isbn": "string"
+}
+```
+**Response 404**: ISBN not found in local catalog
+**Response 422**: `isbn` param missing
+
+---
+
 ### GET /api/users/{username}
 Get a public user profile.
 

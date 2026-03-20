@@ -29,6 +29,7 @@ Route::get('/reset-password/{token}', function () {
 // Public catalog & profiles (unauthenticated)
 Route::middleware('throttle:api')->group(function () {
     Route::get('/mangas/search', [MangaSearchController::class, 'search']);
+    Route::get('/mangas/search/isbn', [MangaSearchController::class, 'searchByIsbn']);
 
     Route::prefix('/users/{username}')->group(function () {
         Route::get('/', [PublicProfileController::class, 'showProfile']);

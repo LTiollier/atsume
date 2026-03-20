@@ -79,6 +79,15 @@ class EloquentVolumeRepository implements VolumeRepositoryInterface
         return $eloquent ? $this->toDomain($eloquent) : null;
     }
 
+    public function findByIsbnWithRelations(string $isbn): ?Volume
+    {
+        $eloquent = EloquentVolume::where('isbn', $isbn)
+            ->with(['edition.series'])
+            ->first();
+
+        return $eloquent ? $this->toDomain($eloquent) : null;
+    }
+
     public function attachToUser(int $volumeId, int $userId): void
     {
         $user = EloquentUser::findOrFail($userId);
