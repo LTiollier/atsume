@@ -1,4 +1,5 @@
-import api, { initCsrf } from '@/lib/api';
+import api from '@/lib/api';
+import { tokenStorage } from '@/lib/tokenStorage';
 import { User } from '@/types/auth';
 import { AuthResponseSchema } from '@/schemas/auth';
 
@@ -21,18 +22,18 @@ interface RegisterPayload {
 export const authService = {
     /** Authentifie l'utilisateur avec email et mot de passe */
     login: async (payload: LoginPayload): Promise<AuthResponse> => {
-        await initCsrf();
-        return api.post<AuthResponse>('/auth/login', payload).then(r => {
-            return AuthResponseSchema.parse(r.data);
-        });
+        const response = await api.post('/auth/login', payload);
+        const validated = AuthResponseSchema.parse(response.data);
+        tokenStorage.setToken(validated.token);
+        return { user: validated.user };
     },
 
     /** Crée un nouveau compte utilisateur */
     register: async (payload: RegisterPayload): Promise<AuthResponse> => {
-        await initCsrf();
-        return api.post<AuthResponse>('/auth/register', payload).then(r => {
-            return AuthResponseSchema.parse(r.data);
-        });
+        const response = await api.post('/auth/register', payload);
+        const validated = AuthResponseSchema.parse(response.data);
+        tokenStorage.setToken(validated.token);
+        return { user: validated.user };
     },
 
     /** Révoque le token Sanctum côté serveur */

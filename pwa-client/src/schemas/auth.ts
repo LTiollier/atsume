@@ -16,6 +16,7 @@ export const UserSchema = z.object({
  */
 export const AuthResponseSchema = z.object({
     user: UserSchema,
+    token: z.string(),
 });
 
 export type ValidatedUser = z.infer<typeof UserSchema>;

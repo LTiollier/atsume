@@ -59,7 +59,6 @@ export default function RegisterPage() {
     try {
       const { user } = await authService.register(data);
 
-      // Update auth state (le cookie httpOnly auth_token est posé par le serveur)
       login(user);
 
       // Redirect to callbackUrl or home

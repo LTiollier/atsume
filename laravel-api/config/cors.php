@@ -19,10 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    // ⚠️  Ne jamais utiliser '*' avec supports_credentials: true (rejeté par les navigateurs)
-    // Doit lister explicitement les origines autorisées
-    // Doit lister explicitement les origines autorisées pour supports_credentials: true
-    'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000')),
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:3001',
+    ],
 
     'allowed_origins_patterns' => [],
 
@@ -32,7 +33,6 @@ return [
 
     'max_age' => 0,
 
-    // Requis pour que les cookies de session Sanctum SPA soient transmis cross-origin
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 
 ];
