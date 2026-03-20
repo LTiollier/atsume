@@ -52,6 +52,7 @@ class AuthController
 
     public function logout(Request $request, LogoutAction $action): JsonResponse
     {
+        /** @var \App\User\Infrastructure\EloquentModels\User $eloquentUser */
         $eloquentUser = $request->user();
 
         $domainUser = new User(

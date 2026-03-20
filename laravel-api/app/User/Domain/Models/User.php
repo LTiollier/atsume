@@ -16,13 +16,19 @@ class User
 
     private bool $isPublic;
 
+    private string $theme;
+
+    private string $palette;
+
     public function __construct(
         string $name,
         string $email,
         string $password,
         ?int $id = null,
         ?string $username = null,
-        bool $isPublic = false
+        bool $isPublic = false,
+        string $theme = 'void',
+        string $palette = 'ember'
     ) {
         $this->name = $name;
         $this->email = $email;
@@ -30,6 +36,8 @@ class User
         $this->id = $id;
         $this->username = $username;
         $this->isPublic = $isPublic;
+        $this->theme = $theme;
+        $this->palette = $palette;
     }
 
     public function getId(): ?int
@@ -60,5 +68,15 @@ class User
     public function isPublic(): bool
     {
         return $this->isPublic;
+    }
+
+    public function getTheme(): string
+    {
+        return $this->theme;
+    }
+
+    public function getPalette(): string
+    {
+        return $this->palette;
     }
 }

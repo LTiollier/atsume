@@ -27,7 +27,9 @@ class UpdateUserSettingsAction
             password: $user->getPassword(),
             id: $user->getId(),
             username: $dto->username,
-            isPublic: $dto->isPublic
+            isPublic: $dto->isPublic,
+            theme: $dto->theme,
+            palette: $dto->palette
         );
 
         return $this->userRepository->update($updatedUser);

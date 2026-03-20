@@ -8,5 +8,7 @@ class UpdateUserSettingsDTO
         public readonly int $userId,
         public readonly ?string $username,
         public readonly bool $isPublic,
+        public readonly string $theme,
+        public readonly string $palette,
     ) {}
 }

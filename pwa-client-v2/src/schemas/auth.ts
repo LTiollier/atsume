@@ -6,6 +6,8 @@ export const UserSchema = z.object({
     email: z.string().email(),
     username: z.string().nullable(),
     is_public: z.boolean(),
+    theme: z.string(),
+    palette: z.string(),
 });
 
 export const AuthResponseSchema = z.object({

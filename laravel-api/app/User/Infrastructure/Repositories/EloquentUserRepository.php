@@ -16,6 +16,8 @@ class EloquentUserRepository implements UserRepositoryInterface
             'is_public' => $user->isPublic(),
             'email' => $user->getEmail(),
             'password' => $user->getPassword(),
+            'theme' => $user->getTheme(),
+            'palette' => $user->getPalette(),
         ]);
 
         return new User(
@@ -24,7 +26,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             password: $eloquentUser->password,
             id: $eloquentUser->id,
             username: $eloquentUser->username,
-            isPublic: $eloquentUser->is_public
+            isPublic: $eloquentUser->is_public,
+            theme: $eloquentUser->theme,
+            palette: $eloquentUser->palette
         );
     }
 
@@ -42,7 +46,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             password: $eloquentUser->password,
             id: $eloquentUser->id,
             username: $eloquentUser->username,
-            isPublic: $eloquentUser->is_public
+            isPublic: $eloquentUser->is_public,
+            theme: $eloquentUser->theme,
+            palette: $eloquentUser->palette
         );
     }
 
@@ -60,7 +66,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             password: $eloquentUser->password,
             id: $eloquentUser->id,
             username: $eloquentUser->username,
-            isPublic: $eloquentUser->is_public
+            isPublic: $eloquentUser->is_public,
+            theme: $eloquentUser->theme,
+            palette: $eloquentUser->palette
         );
     }
 
@@ -78,7 +86,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             password: $eloquentUser->password,
             id: $eloquentUser->id,
             username: $eloquentUser->username,
-            isPublic: $eloquentUser->is_public
+            isPublic: $eloquentUser->is_public,
+            theme: $eloquentUser->theme,
+            palette: $eloquentUser->palette
         );
     }
 
@@ -91,6 +101,8 @@ class EloquentUserRepository implements UserRepositoryInterface
             'is_public' => $user->isPublic(),
             'email' => $user->getEmail(),
             'password' => $user->getPassword(),
+            'theme' => $user->getTheme(),
+            'palette' => $user->getPalette(),
         ]);
 
         return new User(
@@ -99,7 +111,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             password: $eloquentUser->password,
             id: $eloquentUser->id,
             username: $eloquentUser->username,
-            isPublic: $eloquentUser->is_public
+            isPublic: $eloquentUser->is_public,
+            theme: $eloquentUser->theme,
+            palette: $eloquentUser->palette
         );
     }
 

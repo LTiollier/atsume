@@ -5,6 +5,8 @@ import { User } from '@/types/auth';
 import { tokenStorage } from '@/lib/tokenStorage';
 import { useHasHydrated } from '@/hooks/useHasHydrated';
 import { authService } from '@/services/auth.service';
+import { seedThemeFromUser } from '@/contexts/ThemeContext';
+import { seedPaletteFromUser } from '@/contexts/PaletteContext';
 
 interface AuthContextType {
     user: User | null;
@@ -26,6 +28,10 @@ const getUserSnapshot = (): User | null => {
     if (!initialized) {
         cachedUser = tokenStorage.getUser<User>();
         initialized = true;
+        if (cachedUser) {
+            seedThemeFromUser(cachedUser.theme);
+            seedPaletteFromUser(cachedUser.palette);
+        }
     }
     return cachedUser;
 };
@@ -53,6 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = useCallback((newUser: User) => {
         tokenStorage.setUser(newUser);
+        seedThemeFromUser(newUser.theme);
+        seedPaletteFromUser(newUser.palette);
         emitUserChange();
     }, []);
 
@@ -67,6 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const updateUser = useCallback((updatedUser: User) => {
         tokenStorage.setUser(updatedUser);
+        seedThemeFromUser(updatedUser.theme);
+        seedPaletteFromUser(updatedUser.palette);
         emitUserChange();
     }, []);
 

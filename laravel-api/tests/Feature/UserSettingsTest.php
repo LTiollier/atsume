@@ -11,6 +11,8 @@ it('updates user settings successfully', function () {
     $response = $this->actingAs($user)->putJson('/api/user/settings', [
         'username' => 'new_username',
         'is_public' => true,
+        'theme' => 'void',
+        'palette' => 'ember',
     ]);
 
     $response->assertOk()
@@ -18,6 +20,8 @@ it('updates user settings successfully', function () {
             'data' => [
                 'username' => 'new_username',
                 'is_public' => true,
+                'theme' => 'void',
+                'palette' => 'ember',
             ],
         ]);
 
@@ -25,6 +29,8 @@ it('updates user settings successfully', function () {
         'id' => $user->id,
         'username' => 'new_username',
         'is_public' => true,
+        'theme' => 'void',
+        'palette' => 'ember',
     ]);
 });
 
@@ -40,6 +46,8 @@ it('prevents duplicate usernames', function () {
     $response = $this->actingAs($user)->putJson('/api/user/settings', [
         'username' => 'taken_username',
         'is_public' => true,
+        'theme' => 'void',
+        'palette' => 'ember',
     ]);
 
     $response->assertUnprocessable()
@@ -55,6 +63,8 @@ it('allows updating settings without changing username', function () {
     $response = $this->actingAs($user)->putJson('/api/user/settings', [
         'username' => 'my_username',
         'is_public' => true,
+        'theme' => 'void',
+        'palette' => 'ember',
     ]);
 
     $response->assertOk();
@@ -63,4 +73,60 @@ it('allows updating settings without changing username', function () {
         'username' => 'my_username',
         'is_public' => true,
     ]);
+});
+
+it('persists theme and palette choices', function () {
+    $user = User::factory()->create([
+        'theme' => 'void',
+        'palette' => 'ember',
+    ]);
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings', [
+        'username' => $user->username,
+        'is_public' => false,
+        'theme' => 'light',
+        'palette' => 'indigo',
+    ]);
+
+    $response->assertOk()
+        ->assertJson([
+            'data' => [
+                'theme' => 'light',
+                'palette' => 'indigo',
+            ],
+        ]);
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'theme' => 'light',
+        'palette' => 'indigo',
+    ]);
+});
+
+it('rejects invalid theme', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings', [
+        'username' => $user->username,
+        'is_public' => false,
+        'theme' => 'dark',
+        'palette' => 'ember',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['theme']);
+});
+
+it('rejects invalid palette', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings', [
+        'username' => $user->username,
+        'is_public' => false,
+        'theme' => 'void',
+        'palette' => 'pink',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['palette']);
 });

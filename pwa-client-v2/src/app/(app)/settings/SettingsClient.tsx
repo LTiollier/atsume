@@ -11,6 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUpdateSettings } from '@/hooks/queries';
 import { PaletteSwitcher } from '@/components/palette/PaletteSwitcher';
 import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
+import { useTheme, type Theme } from '@/contexts/ThemeContext';
+import { usePalette, type Palette } from '@/contexts/PaletteContext';
 import { sectionVariants } from '@/lib/motion';
 import { getApiErrorMessage, getValidationErrors } from '@/lib/error';
 
@@ -85,6 +87,8 @@ function ToggleSwitch({ checked, onToggle, id, disabled }: ToggleSwitchProps) {
 export function SettingsClient() {
   const { user, updateUser } = useAuth();
   const { mutate: saveSettings, isPending } = useUpdateSettings();
+  const { theme } = useTheme();
+  const { palette } = usePalette();
 
   const {
     register,
@@ -106,9 +110,41 @@ export function SettingsClient() {
 
   const canSave = isDirty && !isPending && !(isPublic && !usernameValue.trim());
 
+  // Auto-save helpers — silent on success, toast only on error
+  // (rerender-defer-reads: reads form values only inside callback, not on render)
+  function handleThemeChange(newTheme: Theme) {
+    saveSettings(
+      {
+        username: usernameValue.trim() || null,
+        is_public: isPublic,
+        theme: newTheme,
+        palette,
+      },
+      {
+        onSuccess: (updatedUser) => updateUser(updatedUser),
+        onError: (err) => toast.error(getApiErrorMessage(err, 'Erreur lors de la mise à jour')),
+      },
+    );
+  }
+
+  function handlePaletteChange(newPalette: Palette) {
+    saveSettings(
+      {
+        username: usernameValue.trim() || null,
+        is_public: isPublic,
+        theme,
+        palette: newPalette,
+      },
+      {
+        onSuccess: (updatedUser) => updateUser(updatedUser),
+        onError: (err) => toast.error(getApiErrorMessage(err, 'Erreur lors de la mise à jour')),
+      },
+    );
+  }
+
   function onSubmit(data: SettingsFormValues) {
     saveSettings(
-      { username: data.username.trim() || null, is_public: data.is_public },
+      { username: data.username.trim() || null, is_public: data.is_public, theme, palette },
       {
         onSuccess: (updatedUser) => {
           updateUser(updatedUser);
@@ -158,7 +194,7 @@ export function SettingsClient() {
             >
               Thème
             </p>
-            <ThemeSwitcher showLabels />
+            <ThemeSwitcher showLabels onSelect={handleThemeChange} />
           </div>
 
           {/* ── Palette ── */}
@@ -169,7 +205,7 @@ export function SettingsClient() {
             >
               Palette
             </p>
-            <PaletteSwitcher showLabels />
+            <PaletteSwitcher showLabels onSelect={handlePaletteChange} />
           </div>
         </div>
       </motion.section>

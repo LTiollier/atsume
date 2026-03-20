@@ -19,6 +19,8 @@ interface PaletteSwitcherProps {
   /** Afficher le nom de la palette sous chaque swatch */
   showLabels?: boolean;
   className?: string;
+  /** Called after the palette is applied — use to persist to the backend */
+  onSelect?: (palette: Palette) => void;
 }
 
 /**
@@ -34,7 +36,7 @@ interface PaletteSwitcherProps {
  * pendant le render — pas de state local.
  * Pattern `rerender-move-effect-to-event` : `setPalette` appelé dans le handler.
  */
-export function PaletteSwitcher({ showLabels = false, className }: PaletteSwitcherProps) {
+export function PaletteSwitcher({ showLabels = false, className, onSelect }: PaletteSwitcherProps) {
   // usePalette() ne re-rend que quand `palette` change — setPalette est stable (useCallback)
   const { palette, setPalette } = usePalette();
 
@@ -56,7 +58,7 @@ export function PaletteSwitcher({ showLabels = false, className }: PaletteSwitch
               aria-label={label}
               variants={tapVariants}
               whileTap="tap"
-              onClick={() => setPalette(key)}
+              onClick={() => { setPalette(key); onSelect?.(key); }}
               className="w-8 h-8 rounded-full transition-shadow duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
               style={{
                 background: color,

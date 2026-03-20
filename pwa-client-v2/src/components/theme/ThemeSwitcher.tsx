@@ -35,6 +35,8 @@ interface ThemeSwitcherProps {
   /** Afficher le nom du thème sous chaque bouton */
   showLabels?: boolean;
   className?: string;
+  /** Called after the theme is applied — use to persist to the backend */
+  onSelect?: (theme: Theme) => void;
 }
 
 /**
@@ -46,7 +48,7 @@ interface ThemeSwitcherProps {
  * - Ring actif : box-shadow double couche (gap --background + --primary)
  *   cohérent avec PaletteSwitcher.
  */
-export function ThemeSwitcher({ showLabels = false, className }: ThemeSwitcherProps) {
+export function ThemeSwitcher({ showLabels = false, className, onSelect }: ThemeSwitcherProps) {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -67,7 +69,7 @@ export function ThemeSwitcher({ showLabels = false, className }: ThemeSwitcherPr
               aria-label={label}
               variants={tapVariants}
               whileTap="tap"
-              onClick={() => setTheme(key)}
+              onClick={() => { setTheme(key); onSelect?.(key); }}
               className="w-10 h-10 rounded-[calc(var(--radius)*2)] flex items-center justify-center transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] focus-visible:ring-[var(--ring)]"
               style={{
                 background: bg,

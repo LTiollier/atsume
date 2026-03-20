@@ -34,6 +34,8 @@ class User extends Authenticatable
         'is_public',
         'email',
         'password',
+        'theme',
+        'palette',
     ];
 
     /**

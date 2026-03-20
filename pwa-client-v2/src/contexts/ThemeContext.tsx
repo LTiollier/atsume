@@ -83,6 +83,17 @@ function _store_set(theme: Theme): void {
   _listeners.forEach((l) => l());
 }
 
+/**
+ * Seed the theme from the authenticated user's server-side preference.
+ * Call this after login or on app init when the User object is available.
+ * Takes priority over localStorage — writes back to localStorage for consistency.
+ */
+export function seedThemeFromUser(theme: string): void {
+  if ((THEMES as readonly string[]).includes(theme)) {
+    _store_set(theme as Theme);
+  }
+}
+
 /* Initialisation côté client — lecture localStorage + application de la classe */
 if (typeof window !== 'undefined') {
   try {

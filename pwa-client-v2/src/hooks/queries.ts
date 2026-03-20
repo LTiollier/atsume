@@ -372,7 +372,7 @@ export function useAddToWishlistByApiId() {
 
 export function useUpdateSettings() {
     return useMutation({
-        mutationFn: (payload: { username: string | null; is_public: boolean }) =>
+        mutationFn: (payload: { username: string | null; is_public: boolean; theme: string; palette: string }) =>
             userService.updateSettings(payload),
     });
 }

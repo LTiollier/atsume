@@ -4,4 +4,6 @@ export interface User {
     email: string;
     username: string | null;
     is_public: boolean;
+    theme: string;
+    palette: string;
 }

@@ -5,6 +5,8 @@ import { Manga, Series, Edition } from '@/types/manga';
 interface UpdateSettingsPayload {
     username: string | null;
     is_public: boolean;
+    theme: string;
+    palette: string;
 }
 
 interface PublicProfile {

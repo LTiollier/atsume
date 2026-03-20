@@ -88,6 +88,17 @@ function _store_set(palette: Palette): void {
   _listeners.forEach((l) => l());
 }
 
+/**
+ * Seed the palette from the authenticated user's server-side preference.
+ * Call this after login or on app init when the User object is available.
+ * Takes priority over localStorage — writes back to localStorage for consistency.
+ */
+export function seedPaletteFromUser(palette: string): void {
+  if ((PALETTES as readonly string[]).includes(palette)) {
+    _store_set(palette as Palette);
+  }
+}
+
 /* Initialisation côté client — lecture localStorage + application de la classe */
 if (typeof window !== 'undefined') {
   try {

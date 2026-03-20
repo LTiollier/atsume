@@ -24,6 +24,8 @@ class UpdateUserSettingsRequest extends FormRequest
         return [
             'username' => ['nullable', 'string', 'max:50', 'alpha_dash', 'unique:users,username,'.$user->id],
             'is_public' => ['required', 'boolean'],
+            'theme' => ['required', 'string', 'in:void,light'],
+            'palette' => ['required', 'string', 'in:ember,crimson,indigo,forest'],
         ];
     }
 
@@ -37,7 +39,9 @@ class UpdateUserSettingsRequest extends FormRequest
         return new UpdateUserSettingsDTO(
             userId: $user->id,
             username: is_string($username) ? $username : null,
-            isPublic: $this->boolean('is_public')
+            isPublic: $this->boolean('is_public'),
+            theme: $this->string('theme'),
+            palette: $this->string('palette')
         );
     }
 }

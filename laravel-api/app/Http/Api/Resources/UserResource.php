@@ -22,6 +22,8 @@ class UserResource extends JsonResource
             'username' => $this->resource->getUsername(),
             'email' => $this->resource->getEmail(),
             'is_public' => $this->resource->isPublic(),
+            'theme' => $this->resource->getTheme(),
+            'palette' => $this->resource->getPalette(),
         ];
     }
 }
