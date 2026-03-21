@@ -7,6 +7,7 @@ import { Package } from 'lucide-react';
 import { useWishlist, useRemoveFromWishlist } from '@/hooks/queries';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { StatusBadge } from '@/components/feedback/StatusBadge';
+import { CollectionStatBar } from '@/components/collection/CollectionStatBar';
 import type { WishlistItem, WishlistEditionItem, WishlistBoxItem } from '@/types/manga';
 
 // ─── Skeletons hoisted at module level (rendering-hoist-jsx) ─────────────────
@@ -165,16 +166,22 @@ export function WishlistTab() {
   const { data: items = [], isLoading } = useWishlist();
 
   if (isLoading) return wishlistSkeletons;
-  if (items.length === 0) return <EmptyState context="wishlist" action={{ label: 'Rechercher', href: '/search' }} />;
 
   return (
-    <div
-      className="rounded-[calc(var(--radius)*2)] overflow-hidden"
-      style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
-    >
-      {items.map(item => (
-        <WishlistRow key={`${item.type}-${item.id}`} item={item} />
-      ))}
+    <div className="flex flex-col gap-0">
+      <CollectionStatBar items={[{ value: items.length, label: 'En wishlist' }]} />
+      {items.length === 0 ? (
+        <EmptyState context="wishlist" action={{ label: 'Rechercher', href: '/search' }} />
+      ) : (
+        <div
+          className="rounded-[calc(var(--radius)*2)] overflow-hidden"
+          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+        >
+          {items.map(item => (
+            <WishlistRow key={`${item.type}-${item.id}`} item={item} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

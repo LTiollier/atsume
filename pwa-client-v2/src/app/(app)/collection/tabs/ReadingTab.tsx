@@ -7,6 +7,7 @@ import { Package } from 'lucide-react';
 import { useMangas, useReadingProgressQuery, useBulkToggleReadingProgress } from '@/hooks/queries';
 import { useGroupedCollection } from '@/hooks/useGroupedCollection';
 import { EmptyState } from '@/components/feedback/EmptyState';
+import { CollectionStatBar } from '@/components/collection/CollectionStatBar';
 import type { Manga, Series } from '@/types/manga';
 
 // ─── Skeletons hoisted at module level (rendering-hoist-jsx) ─────────────────
@@ -170,29 +171,58 @@ export function ReadingTab() {
 
   const grouped = useGroupedCollection(ownedMangas);
 
+  // Series where readCount === total published volumes (mirrors SeriesProgressRow logic)
+  // Uses edition.total_volumes, not owned count — (rerender-derived-state-no-effect)
+  const completedSeriesCount = useMemo(
+    () =>
+      grouped
+        .filter(gs => gs.series.id > 0)
+        .filter(({ volumes }) => {
+          if (volumes.length === 0) return false;
+          // Sum total_volumes across unique editions (same as SeriesProgressRow)
+          const seen = new Set<number>();
+          let total = 0;
+          for (const v of volumes) {
+            if (v.edition?.id != null && !seen.has(v.edition.id)) {
+              seen.add(v.edition.id);
+              if (v.edition.total_volumes != null) total += v.edition.total_volumes;
+            }
+          }
+          if (total === 0) total = volumes.length;
+          const readCount = volumes.filter(v => readSet.has(v.id)).length;
+          return total > 0 && readCount === total;
+        })
+        .length,
+    [grouped, readSet],
+  );
+
   if (isLoading) return progressSkeletons;
 
-  if (grouped.filter(gs => gs.series.id > 0).length === 0) {
-    return (
-      <EmptyState
-        context="reading"
-        action={{ label: 'Voir la collection', href: '/collection?tab=library' }}
-      />
-    );
-  }
-
   return (
-    <div>
-      {grouped
-        .filter(gs => gs.series.id > 0)
-        .map(({ series, volumes }) => (
-          <SeriesProgressRow
-            key={series.id}
-            series={series}
-            volumes={volumes}
-            readSet={readSet}
-          />
-        ))}
+    <div className="flex flex-col">
+      <CollectionStatBar items={[
+        { value: readingProgress.length, label: 'Volumes lus' },
+        { value: completedSeriesCount, label: 'Séries finies' },
+      ]} />
+      {grouped.filter(gs => gs.series.id > 0).length === 0 ? (
+        <EmptyState
+          context="reading"
+          action={{ label: 'Voir la collection', href: '/collection?tab=library' }}
+        />
+      ) : (
+        <div>
+          {grouped
+            .filter(gs => gs.series.id > 0)
+            .map(({ series, volumes }) => (
+              <SeriesProgressRow
+                key={series.id}
+                series={series}
+                volumes={volumes}
+                readSet={readSet}
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 }

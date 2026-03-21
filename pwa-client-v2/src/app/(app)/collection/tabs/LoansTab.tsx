@@ -5,7 +5,8 @@ import { differenceInDays, format } from 'date-fns';
 
 import { useLoansQuery, useReturnLoan, useBulkReturnLoans } from '@/hooks/queries';
 import { EmptyState } from '@/components/feedback/EmptyState';
-import type { Loan } from '@/types/manga';
+import { CollectionStatBar } from '@/components/collection/CollectionStatBar';
+import type { Loan, Manga, Box } from '@/types/manga';
 
 const OVERDUE_DAYS = 30;
 
@@ -128,11 +129,32 @@ export function LoansTab() {
     [loans],
   );
 
+  // Unique series touched by active loans — Set for O(1) dedup (js-set-map-lookups)
+  const loanedSeriesCount = useMemo(() => {
+    const seriesIds = new Set<number>();
+    for (const loan of activeLoans) {
+      if (loan.loanable_type === 'volume') {
+        const sid = (loan.loanable as Manga | null)?.series?.id;
+        if (sid != null) seriesIds.add(sid);
+      } else {
+        const sid = (loan.loanable as Box | null)?.series_id;
+        if (sid != null) seriesIds.add(sid);
+      }
+    }
+    return seriesIds.size;
+  }, [activeLoans]);
+
   if (isLoading) return loanSkeletons;
-  if (loans.length === 0) return <EmptyState context="loans" />;
 
   return (
     <div className="flex flex-col gap-6">
+      <CollectionStatBar items={[
+        { value: activeLoans.length, label: 'Prêts en cours' },
+        { value: loanedSeriesCount, label: 'Séries concernées' },
+      ]} />
+
+      {loans.length === 0 ? <EmptyState context="loans" /> : (
+      <>
       {/* Active loans */}
       <section>
         <div className="flex items-center justify-between mb-3">
@@ -193,6 +215,8 @@ export function LoansTab() {
             ))}
           </div>
         </section>
+      )}
+      </>
       )}
     </div>
   );

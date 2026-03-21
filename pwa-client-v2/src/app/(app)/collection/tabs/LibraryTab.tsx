@@ -8,6 +8,7 @@ import { SeriesCard } from '@/components/cards/SeriesCard';
 import { SearchBar } from '@/components/forms/SearchBar';
 import { SkeletonCard } from '@/components/feedback/SkeletonCard';
 import { EmptyState } from '@/components/feedback/EmptyState';
+import { CollectionStatBar, collectionStatBarSkeleton } from '@/components/collection/CollectionStatBar';
 
 export function LibraryTab() {
   const { data: mangas = [], isLoading } = useMangas();
@@ -17,6 +18,12 @@ export function LibraryTab() {
 
   // Memoized owned filter — avoids recreating the array on every keystroke (rerender-memo)
   const ownedMangas = useMemo(() => mangas.filter(m => m.is_owned), [mangas]);
+
+  // Series count — Set for O(1) dedup (js-set-map-lookups)
+  const seriesCount = useMemo(
+    () => new Set(ownedMangas.map(m => m.series?.id).filter((id): id is number => id != null)).size,
+    [ownedMangas],
+  );
 
   // O(1) lookups for read and loaned volume IDs (js-set-map-lookups)
   const readVolumeIds = useMemo(
@@ -39,6 +46,12 @@ export function LibraryTab() {
 
   return (
     <div className="flex flex-col gap-4">
+      {isLoading ? collectionStatBarSkeleton : (
+        <CollectionStatBar items={[
+          { value: ownedMangas.length, label: 'Volumes' },
+          { value: seriesCount, label: 'Séries' },
+        ]} />
+      )}
       <SearchBar
         placeholder="Rechercher une série…"
         onChange={setSearch}
