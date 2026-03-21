@@ -5286,5 +5286,22 @@ class MangaDataSeeder extends Seeder
         }, $volumesToAttach);
 
         DB::table('user_volumes')->insert($userVolumes);
+
+        // Reset sequences for PostgreSQL
+        if (DB::getDriverName() === 'pgsql') {
+            $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'");
+            foreach ($tables as $table) {
+                $tableName = $table->table_name;
+                try {
+                    $seqName = DB::selectOne("SELECT pg_get_serial_sequence(?, 'id') as seq", [$tableName])->seq;
+                    if ($seqName) {
+                        $maxId = DB::table($tableName)->max('id') ?: 0;
+                        DB::statement("SELECT setval(?, ?, true)", [$seqName, $maxId]);
+                    }
+                } catch (\Exception $e) {
+                    // Skip tables where we can't get sequence or max id
+                }
+            }
+        }
     }
 }
