@@ -16,6 +16,7 @@ import { useTheme, type Theme } from '@/contexts/ThemeContext';
 import { usePalette, type Palette } from '@/contexts/PaletteContext';
 import { sectionVariants } from '@/lib/motion';
 import { getApiErrorMessage, getValidationErrors } from '@/lib/error';
+import { MangaCollecImportCard } from '@/components/settings/MangaCollecImportCard';
 import { LogOut } from 'lucide-react';
 
 // ─── Zod schema — mirrored from API rules ─────────────────────────────────────
@@ -363,6 +364,28 @@ export function SettingsClient() {
             </div>
           </div>
         </form>
+      </motion.section>
+
+      {/* ── Section Import / Export ── */}
+      <motion.section
+        variants={sectionVariants}
+        initial="initial"
+        animate="animate"
+        aria-label="Import / Export"
+      >
+        <div className="mb-5">
+          <h2
+            className="text-xs font-semibold uppercase mb-1"
+            style={{ color: 'var(--muted-foreground)', letterSpacing: '0.08em' }}
+          >
+            Import / Export
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            Importez ou exportez votre collection depuis d&apos;autres services.
+          </p>
+        </div>
+
+        <MangaCollecImportCard />
       </motion.section>
 
       {/* ── Section Compte ── */}

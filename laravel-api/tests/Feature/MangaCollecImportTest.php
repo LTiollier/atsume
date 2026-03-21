@@ -101,8 +101,10 @@ test('successfully imports existing local volumes and tries importing missing on
 
     $response->assertStatus(200)
         ->assertJson([
-            'imported' => 1,
-            'failed' => 1, // Since our mock of import() above doesn't actually create the missing volume
+            'data' => [
+                'imported' => 1,
+                'failed' => 1, // Since our mock of import() above doesn't actually create the missing volume
+            ],
         ]);
 
     // Verify the existing volume was attached

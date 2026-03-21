@@ -501,6 +501,19 @@ export function useUpdateSettings() {
     });
 }
 
+export function useImportMangaCollec() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (url: string) => userService.importMangaCollec(url),
+        onSuccess: (result) => {
+            let msg = `${result.imported} tome(s) importé(s)`;
+            if (result.failed > 0) msg += ` (${result.failed} non trouvés)`;
+            toast.success(msg);
+            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+        },
+    });
+}
+
 // ─── Public profiles ──────────────────────────────────────────────────────────
 
 export function usePublicProfileQuery(username: string) {

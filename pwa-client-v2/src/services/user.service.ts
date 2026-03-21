@@ -19,6 +19,9 @@ export const userService = {
     updateSettings: (payload: UpdateSettingsPayload) =>
         api.put<ApiResponse<User>>('/user/settings', payload).then(r => r.data.data),
 
+    importMangaCollec: (url: string) =>
+        api.post<ApiResponse<{ imported: number; failed: number }>>('/user/settings/import/mangacollec', { url }).then(r => r.data.data),
+
     getPublicProfile: (username: string) =>
         api.get<ApiResponse<PublicProfile>>(`/users/${username}`).then(r => r.data.data),
 
