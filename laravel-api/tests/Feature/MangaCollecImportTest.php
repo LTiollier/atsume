@@ -51,12 +51,12 @@ test('successfully imports existing local volumes and tries importing missing on
     $user = User::factory()->create();
     actingAs($user);
 
-    // Create a local volume that matches the first imported volume by ISBN
+    // Create a local volume that matches the first imported volume by api_id
     $series = Series::factory()->create();
     $edition = Edition::factory()->create(['series_id' => $series->id]);
     $volume1 = Volume::factory()->create([
         'edition_id' => $edition->id,
-        'isbn' => '9782344071120', // volume 1 (existing)
+        'api_id' => 'de103e3c-79f6-4018-82eb-ad2a156f1742',
     ]);
 
     $this->mock(MangaCollecScraperService::class, function (MockInterface $mock) {
@@ -64,20 +64,15 @@ test('successfully imports existing local volumes and tries importing missing on
             ->with('xutech')
             ->once()
             ->andReturn([
-                'volumes' => [
-                    [
-                        'id' => 'de103e3c-79f6-4018-82eb-ad2a156f1742',
-                        'isbn' => '9782344071120',
-                        'edition_id' => 'ed-1',
-                    ],
-                    [
-                        'id' => 'missing-vol-id',
-                        'isbn' => '978-missing',
-                        'edition_id' => 'ed-test-missing',
-                    ],
+                'possessions' => [
+                    ['volume_id' => 'de103e3c-79f6-4018-82eb-ad2a156f1742'],
+                    ['volume_id' => 'missing-vol-id'],
+                ],
+                'box_possessions' => [
+                    ['box_id' => 'missing-box-id'],
                 ],
                 'editions' => [
-                    ['id' => 'ed-test-missing', 'series_id' => 'missing-series-id'],
+                    ['series_id' => 'missing-series-id'],
                 ],
             ]);
 
@@ -103,7 +98,7 @@ test('successfully imports existing local volumes and tries importing missing on
         ->assertJson([
             'data' => [
                 'imported' => 1,
-                'failed' => 1, // Since our mock of import() above doesn't actually create the missing volume
+                'failed' => 2, // Since our mock doesn't actually create the missing volume and box
             ],
         ]);
 

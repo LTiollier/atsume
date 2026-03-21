@@ -121,6 +121,23 @@ class EloquentVolumeRepository implements VolumeRepositoryInterface
         }
     }
 
+    /**
+     * @param  array<int, string>  $apiIds
+     * @return array{attached: int, found: int}
+     */
+    public function attachByApiIdsToUser(array $apiIds, int $userId): array
+    {
+        $localIds = EloquentVolume::whereIn('api_id', $apiIds)->pluck('id')->toArray();
+        $user = EloquentUser::findOrFail($userId);
+
+        $sync = $user->volumes()->syncWithoutDetaching($localIds);
+
+        return [
+            'attached' => count($sync['attached']),
+            'found' => count($localIds),
+        ];
+    }
+
     public function isOwnedByUser(int $volumeId, int $userId): bool
     {
         $user = EloquentUser::findOrFail($userId);

@@ -116,6 +116,23 @@ class EloquentBoxRepository implements BoxRepositoryInterface
         $user->boxes()->detach($boxId);
     }
 
+    /**
+     * @param  array<int, string>  $apiIds
+     * @return array{attached: int, found: int}
+     */
+    public function attachByApiIdsToUser(array $apiIds, int $userId): array
+    {
+        $localIds = EloquentBox::whereIn('api_id', $apiIds)->pluck('id')->toArray();
+        $user = EloquentUser::findOrFail($userId);
+
+        $sync = $user->boxes()->syncWithoutDetaching($localIds);
+
+        return [
+            'attached' => count($sync['attached']),
+            'found' => count($localIds),
+        ];
+    }
+
     public function isOwnedByUser(int $boxId, int $userId): bool
     {
         $user = EloquentUser::findOrFail($userId);

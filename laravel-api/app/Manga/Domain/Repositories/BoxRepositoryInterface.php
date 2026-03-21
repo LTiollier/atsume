@@ -29,5 +29,11 @@ interface BoxRepositoryInterface
 
     public function detachFromUser(int $boxId, int $userId): void;
 
+    /**
+     * @param  array<int, string>  $apiIds
+     * @return array{attached: int, found: int}
+     */
+    public function attachByApiIdsToUser(array $apiIds, int $userId): array;
+
     public function isOwnedByUser(int $boxId, int $userId): bool;
 }

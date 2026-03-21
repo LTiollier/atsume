@@ -4,6 +4,7 @@ namespace App\Manga\Application\Actions;
 
 use App\Manga\Application\DTOs\ImportMangaCollecDTO;
 use App\Manga\Domain\Exceptions\MangaCollecProfilePrivateException;
+use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\Manga\Infrastructure\Services\MangaCollecScraperService;
 use App\Manga\Infrastructure\Services\MangaCollecSeriesImportService;
@@ -17,6 +18,7 @@ class ImportFromMangaCollecAction
         private readonly MangaCollecScraperService $scraperService,
         private readonly MangaCollecSeriesImportService $importService,
         private readonly VolumeRepositoryInterface $volumeRepository,
+        private readonly BoxRepositoryInterface $boxRepository,
     ) {}
 
     /**
@@ -30,90 +32,65 @@ class ImportFromMangaCollecAction
             throw new MangaCollecProfilePrivateException('Unable to fetch collection. The profile might be private or invalid.');
         }
 
-        /** @var array<int, array<string, mixed>> $volumes */
-        $volumes = is_array($collection['volumes'] ?? null) ? $collection['volumes'] : [];
         /** @var array<int, array<string, mixed>> $editions */
         $editions = is_array($collection['editions'] ?? null) ? $collection['editions'] : [];
+        /** @var array<int, array<string, mixed>> $possessions */
+        $possessions = is_array($collection['possessions'] ?? null) ? $collection['possessions'] : [];
+        /** @var array<int, array<string, mixed>> $boxPossessions */
+        $boxPossessions = is_array($collection['box_possessions'] ?? null) ? $collection['box_possessions'] : [];
 
-        // Build dictionaries to map edition -> series
-        /** @var array<string, string> $editionToSeries */
-        $editionToSeries = [];
-        foreach ($editions as $edition) {
-            /** @var string|null $editionId */
-            $editionId = $edition['id'] ?? null;
-            /** @var string|null $seriesBaseId */
-            $seriesBaseId = $edition['series_id'] ?? null;
-            if (is_string($editionId) && is_string($seriesBaseId)) {
-                $editionToSeries[$editionId] = $seriesBaseId;
+        // 1. Import Series (from editions)
+        $importedSeriesIds = [];
+        foreach ($editions as $editionData) {
+            /** @var string|null $seriesId */
+            $seriesId = $editionData['series_id'] ?? null;
+            if (is_string($seriesId) && $seriesId !== '' && ! in_array($seriesId, $importedSeriesIds, true)) {
+                $importedSeriesIds[] = $seriesId;
+                try {
+                    $detail = $this->scraperService->getSeriesDetail($seriesId);
+                    if ($detail !== null) {
+                        $this->importService->import($seriesId, $detail);
+                    }
+                } catch (Exception $e) {
+                    Log::error("Failed to import series {$seriesId}", ['error' => $e->getMessage()]);
+                }
             }
         }
 
-        $importedSeriesIds = []; // Keep track of series we already requested to import in this run
-        $importedCount = 0;
-        $failedCount = 0;
-
-        foreach ($volumes as $volData) {
-            /** @var string|null $isbn */
-            $isbn = $volData['isbn'] ?? null;
-            /** @var string|null $apiId */
-            $apiId = $volData['id'] ?? null;
-            /** @var string|null $editionId */
-            $editionId = $volData['edition_id'] ?? null;
-
-            if (! is_string($isbn) && ! is_string($apiId)) {
-                $failedCount++;
-
-                continue;
-            }
-
-            $volume = null;
-            if (is_string($isbn) && $isbn !== '') {
-                $volume = $this->volumeRepository->findByIsbn($isbn);
-            }
-            if (! $volume && is_string($apiId) && $apiId !== '') {
-                $volume = $this->volumeRepository->findByApiId($apiId);
-            }
-
-            // If the volume is missing in our local DB, let's try to fetch its series and import it
-            if (! $volume && is_string($editionId) && isset($editionToSeries[$editionId])) {
-                $seriesId = $editionToSeries[$editionId];
-
-                if (! in_array($seriesId, $importedSeriesIds, true)) {
-                    $importedSeriesIds[] = $seriesId;
-                    try {
-                        $detail = $this->scraperService->getSeriesDetail($seriesId);
-                        if ($detail) {
-                            $this->importService->import($seriesId, $detail);
-                        }
-                    } catch (Exception $e) {
-                        Log::error("Failed to import missing series {$seriesId}", ['error' => $e->getMessage()]);
-                    }
-                }
-
-                // Try finding the volume again after importing the series
-                if (is_string($isbn) && $isbn !== '') {
-                    $volume = $this->volumeRepository->findByIsbn($isbn);
-                }
-                if (! $volume && is_string($apiId) && $apiId !== '') {
-                    $volume = $this->volumeRepository->findByApiId($apiId);
-                }
-            }
-
-            if ($volume) {
-                DB::transaction(function () use ($volume, $dto) {
-                    if (! $this->volumeRepository->isOwnedByUser($volume->getId(), $dto->userId)) {
-                        $this->volumeRepository->attachToUser($volume->getId(), $dto->userId);
-                    }
-                });
-                $importedCount++;
-            } else {
-                $failedCount++;
+        // 2. Map and Attach Volumes
+        $volumeApiIds = [];
+        foreach ($possessions as $volData) {
+            /** @var string|null $volApiId */
+            $volApiId = $volData['volume_id'] ?? null;
+            if (is_string($volApiId) && $volApiId !== '') {
+                $volumeApiIds[] = $volApiId;
             }
         }
 
-        return [
-            'imported' => $importedCount,
-            'failed' => $failedCount,
-        ];
+        // 3. Map and Attach Boxes
+        $boxApiIds = [];
+        foreach ($boxPossessions as $boxData) {
+            /** @var string|null $boxApiId */
+            $boxApiId = $boxData['box_id'] ?? null;
+            if (is_string($boxApiId) && $boxApiId !== '') {
+                $boxApiIds[] = $boxApiId;
+            }
+        }
+
+        // Attach inside transaction mapping to API IDs
+        return DB::transaction(function () use ($volumeApiIds, $boxApiIds, $dto) {
+            $volumeSync = $this->volumeRepository->attachByApiIdsToUser($volumeApiIds, $dto->userId);
+            $boxSync = $this->boxRepository->attachByApiIdsToUser($boxApiIds, $dto->userId);
+
+            $totalRequested = count($volumeApiIds) + count($boxApiIds);
+            $totalFound = $volumeSync['found'] + $boxSync['found'];
+            $newlyAttached = $volumeSync['attached'] + $boxSync['attached'];
+            $failed = $totalRequested - $totalFound;
+
+            return [
+                'imported' => $newlyAttached,
+                'failed' => $failed,
+            ];
+        });
     }
 }
