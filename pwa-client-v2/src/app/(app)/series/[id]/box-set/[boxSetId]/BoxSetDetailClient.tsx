@@ -25,7 +25,9 @@ import { AddToCollectionBar } from '@/components/collection/AddToCollectionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { BoxItemCard } from '@/components/collection/BoxItemCard';
 import { MangaGrid } from '@/components/cards/MangaGrid';
+import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { sectionVariants } from '@/lib/motion';
 import type { Box, Loan } from '@/types/manga';
 
@@ -70,6 +72,9 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
   // Derived mode booleans — prevent cross-mode clicks (rerender-derived-state)
   const isAddMode = selectedNonOwnedBoxIds.size > 0;
   const isOwnedSelectMode = selectedIds.size > 0;
+
+  // Dialog management
+  const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
 
   // ── Add non-owned boxes to collection ────────────────────────────────────────
 
@@ -202,7 +207,12 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
                   </button>
                   <button
                     type="button"
-                    onClick={handleBulkLoanAll}
+                    onClick={() => confirm({
+                      title: 'Tout prêter ?',
+                      description: `Voulez-vous prêter tous les coffrets disponibles (${ownedBoxes.filter(v => !loanedSet.has(v.id)).length}) de ce lot ?`,
+                      onConfirm: handleBulkLoanAll,
+                      confirmLabel: 'Prêter tout',
+                    })}
                     className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
                     style={{ color: 'var(--primary)' }}
                   >
@@ -214,7 +224,12 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
               {nonOwnedBoxes.length > 0 && (
                 <button
                   type="button"
-                  onClick={handleAddAllBoxes}
+                  onClick={() => confirm({
+                    title: 'Ajouter tout ?',
+                    description: `Voulez-vous ajouter les ${nonOwnedBoxes.length} coffrets manquants à votre collection ?`,
+                    onConfirm: handleAddAllBoxes,
+                    confirmLabel: 'Ajouter tout',
+                  })}
                   disabled={addBox.isPending}
                   className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
                   style={{ color: 'var(--primary)' }}
@@ -276,6 +291,13 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
         onBorrowerNameChange={setBorrowerName}
         onConfirm={handleConfirmLoan}
         isPending={bulkCreateBoxLoan.isPending}
+      />
+
+      <ConfirmationDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        {...config!}
+        onConfirm={handleConfirm}
       />
     </div>
   );

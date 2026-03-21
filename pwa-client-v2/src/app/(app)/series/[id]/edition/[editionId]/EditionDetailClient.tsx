@@ -25,7 +25,9 @@ import { CollectionActionBar } from '@/components/collection/CollectionActionBar
 import { AddToCollectionBar } from '@/components/collection/AddToCollectionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { VolumeActionCard } from '@/components/collection/VolumeActionCard';
+import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { sectionVariants } from '@/lib/motion';
 import type { Loan, Manga } from '@/types/manga';
 
@@ -80,6 +82,9 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
   const isOwnedSelectMode = selectedIds.size > 0;
   const { isLoanOpen, borrowerName, setBorrowerName, openLoanSheet, closeLoanSheet } = useLoanSheet();
 
+  // Dialog management
+  const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
+
   // Progress for header
   const possessedCount = edition?.possessed_count ?? ownedVolumes.length;
   const totalVolumes = edition?.total_volumes ?? null;
@@ -116,7 +121,9 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
         toast.success(`${numbers.length} tome${numbers.length > 1 ? 's' : ''} ajouté${numbers.length > 1 ? 's' : ''}`);
         invalidateEdition();
       },
-      onError: err => toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout")),
+      onError: err => {
+        toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
+      },
     });
   }
 
@@ -244,7 +251,14 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
                   </button>
                   <button
                     type="button"
-                    onClick={handleBulkReadToggleAll}
+                    onClick={() => confirm({
+                      title: allRead ? 'Tout démarquer ?' : 'Tout marquer comme lu ?',
+                      description: allRead 
+                        ? `Voulez-vous marquer les ${ownedVolumes.length} tomes de cette édition comme non lus ?`
+                        : `Voulez-vous marquer les ${ownedVolumes.length} tomes de cette édition comme lus ?`,
+                      onConfirm: handleBulkReadToggleAll,
+                      confirmLabel: allRead ? 'Démarquer tout' : 'Marquer tout',
+                    })}
                     disabled={togglePending}
                     className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
                     style={{ color: 'var(--primary)' }}
@@ -254,7 +268,12 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
                   </button>
                   <button
                     type="button"
-                    onClick={handleBulkLoanAll}
+                    onClick={() => confirm({
+                      title: 'Tout prêter ?',
+                      description: `Voulez-vous prêter tous les tomes disponibles (${ownedVolumes.filter(v => !loanedSet.has(v.id)).length}) de cette édition ?`,
+                      onConfirm: handleBulkLoanAll,
+                      confirmLabel: 'Prêter tout',
+                    })}
                     className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
                     style={{ color: 'var(--primary)' }}
                   >
@@ -266,7 +285,12 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
               {nonOwnedVolumes.length > 0 && (
                 <button
                   type="button"
-                  onClick={handleAddAll}
+                  onClick={() => confirm({
+                    title: 'Ajouter tout ?',
+                    description: `Voulez-vous ajouter les ${nonOwnedVolumes.length} tomes manquants à votre collection ?`,
+                    onConfirm: handleAddAll,
+                    confirmLabel: 'Ajouter tout',
+                  })}
                   disabled={addBulk.isPending}
                   className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
                   style={{ color: 'var(--primary)' }}
@@ -322,6 +346,13 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
         onBorrowerNameChange={setBorrowerName}
         onConfirm={handleConfirmLoan}
         isPending={bulkCreateLoan.isPending}
+      />
+
+      <ConfirmationDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        {...config!}
+        onConfirm={handleConfirm}
       />
     </div>
   );

@@ -25,7 +25,9 @@ import { CollectionActionBar } from '@/components/collection/CollectionActionBar
 import { AddToCollectionBar } from '@/components/collection/AddToCollectionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { VolumeActionCard } from '@/components/collection/VolumeActionCard';
+import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { sectionVariants } from '@/lib/motion';
 import type { Loan, Manga } from '@/types/manga';
 
@@ -80,6 +82,9 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
   const isOwnedSelectMode = selectedIds.size > 0;
   const { isLoanOpen, borrowerName, setBorrowerName, openLoanSheet, closeLoanSheet } = useLoanSheet();
 
+  // Dialog management
+  const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
+
   // Progress for header
   const ownedCount = ownedVolumes.length;
   const totalVolumes = box?.total_volumes ?? (volumes.length > 0 ? volumes.length : null);
@@ -132,7 +137,9 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
     )).then(() => {
       toast.success(`${total} tome${total > 1 ? 's' : ''} ajouté${total > 1 ? 's' : ''}`);
       queryClient.invalidateQueries({ queryKey: queryKeys.box(boxId) });
-    }).catch(err => toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout")));
+    }).catch(err => {
+      toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
+    });
   }
 
   function handleAddSelected() {
@@ -156,18 +163,18 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
     }).catch(err => toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout")));
   }
 
+  // Tout prêter — pre-selects non-loaned owned volumes then opens sheet
+  function handleBulkLoanAll() {
+    selectMany(ownedVolumes.filter(v => !loanedSet.has(v.id)));
+    openLoanSheet();
+  }
+
   // Tout marquer — acts on ALL owned volumes
   function handleBulkReadToggle() {
     const targetIds = allRead
       ? ownedVolumes.map(v => v.id)
       : ownedVolumes.filter(v => !readSet.has(v.id)).map(v => v.id);
     if (targetIds.length > 0) bulkToggle(targetIds);
-  }
-
-  // Tout prêter — pre-selects non-loaned owned volumes then opens sheet
-  function handleBulkLoanAll() {
-    selectMany(ownedVolumes.filter(v => !loanedSet.has(v.id)));
-    openLoanSheet();
   }
 
   // Marquer — toggle on current selection
@@ -266,7 +273,14 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={handleBulkReadToggle}
+                    onClick={() => confirm({
+                      title: allRead ? 'Tout démarquer ?' : 'Tout marquer comme lu ?',
+                      description: allRead 
+                        ? `Voulez-vous marquer les ${ownedVolumes.length} tomes de cette boîte comme non lus ?`
+                        : `Voulez-vous marquer les ${ownedVolumes.length} tomes de cette boîte comme lus ?`,
+                      onConfirm: handleBulkReadToggle,
+                      confirmLabel: allRead ? 'Démarquer tout' : 'Marquer tout',
+                    })}
                     disabled={togglePending}
                     className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
                     style={{ color: 'var(--primary)' }}
@@ -276,7 +290,12 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={handleBulkLoanAll}
+                    onClick={() => confirm({
+                      title: 'Tout prêter ?',
+                      description: `Voulez-vous prêter tous les tomes disponibles (${ownedVolumes.filter(v => !loanedSet.has(v.id)).length}) de cette boîte ?`,
+                      onConfirm: handleBulkLoanAll,
+                      confirmLabel: 'Prêter tout',
+                    })}
                     className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
                     style={{ color: 'var(--primary)' }}
                   >
@@ -288,7 +307,12 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
               {nonOwnedVolumes.length > 0 && (
                 <button
                   type="button"
-                  onClick={handleAddAll}
+                  onClick={() => confirm({
+                    title: 'Ajouter tout ?',
+                    description: `Voulez-vous ajouter les ${nonOwnedVolumes.length} tomes manquants à votre collection ?`,
+                    onConfirm: handleAddAll,
+                    confirmLabel: 'Ajouter tout',
+                  })}
                   disabled={addBulk.isPending}
                   className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
                   style={{ color: 'var(--primary)' }}
@@ -343,6 +367,13 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
         onBorrowerNameChange={setBorrowerName}
         onConfirm={handleConfirmLoan}
         isPending={bulkCreateLoan.isPending}
+      />
+
+      <ConfirmationDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        {...config!}
+        onConfirm={handleConfirm}
       />
     </div>
   );

@@ -33,6 +33,8 @@ import { MangaGrid } from '@/components/cards/MangaGrid';
 import { useAuth } from '@/contexts/AuthContext';
 import { sectionVariants } from '@/lib/motion';
 import { getApiErrorMessage } from '@/lib/error';
+import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import type { Manga, Box, SeriesSearchResult, SearchEdition, SearchBoxSet, PaginatedSeriesSearchResult } from '@/types/manga';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -746,6 +748,9 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
   const { data: fullEdition, isLoading } = useEditionQuery(edition.id);
   const addBulk = useAddBulkToCollection();
 
+  // Dialog management
+  const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
+
   const [selectedNumbers, setSelectedNumbers] = useState<ReadonlySet<number>>(() => new Set());
 
   const volumes: Manga[] = fullEdition?.volumes ?? [];
@@ -791,7 +796,9 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
         toast.success(`${numbers.length} tome${numbers.length > 1 ? 's' : ''} ajouté${numbers.length > 1 ? 's' : ''}`);
         invalidate();
       },
-      onError: err => toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout")),
+      onError: err => {
+        toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
+      },
     });
   }
 
@@ -901,7 +908,12 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
                 </button>
                 <button
                   type="button"
-                  onClick={handleAddAll}
+                  onClick={() => confirm({
+                    title: 'Ajouter tout ?',
+                    description: `Voulez-vous ajouter les ${nonOwnedVolumes.length} tomes manquants à votre collection ?`,
+                    onConfirm: handleAddAll,
+                    confirmLabel: 'Ajouter tout',
+                  })}
                   disabled={addBulk.isPending}
                   className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
                   style={{ color: 'var(--primary)' }}
@@ -937,6 +949,13 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
           onConfirm={handleAddSelected}
         />
       )}
+
+      <ConfirmationDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        {...config!}
+        onConfirm={handleConfirm}
+      />
     </motion.div>
   );
 }
@@ -950,8 +969,12 @@ interface SearchBoxSetDetailViewProps {
 }
 
 function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDetailViewProps) {
+  const queryClient = useQueryClient();
   const { data: fullBoxSet, isLoading } = useBoxSetQuery(boxSet.id);
   const addBox = useAddBoxToCollection();
+
+  // Dialog management
+  const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
 
   const [selectedBoxIds, setSelectedBoxIds] = useState<ReadonlySet<number>>(() => new Set());
 
@@ -972,6 +995,10 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
     setSelectedBoxIds(new Set(nonOwnedBoxes.map(b => b.id)));
   }
 
+  function invalidate() {
+    queryClient.invalidateQueries({ queryKey: queryKeys.boxSet(boxSet.id) });
+  }
+
   async function handleAddAll() {
     if (nonOwnedBoxes.length === 0) return;
     try {
@@ -979,6 +1006,7 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
       toast.success(
         `${nonOwnedBoxes.length} coffret${nonOwnedBoxes.length > 1 ? 's' : ''} ajouté${nonOwnedBoxes.length > 1 ? 's' : ''}`,
       );
+      invalidate();
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
     }
@@ -993,6 +1021,7 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
         `${ids.length} coffret${ids.length > 1 ? 's' : ''} ajouté${ids.length > 1 ? 's' : ''}`,
       );
       setSelectedBoxIds(new Set());
+      invalidate();
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
     }
@@ -1100,7 +1129,12 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
                 </button>
                 <button
                   type="button"
-                  onClick={handleAddAll}
+                  onClick={() => confirm({
+                    title: 'Ajouter tout ?',
+                    description: `Voulez-vous ajouter les ${nonOwnedBoxes.length} boîtes manquantes à votre collection ?`,
+                    onConfirm: handleAddAll,
+                    confirmLabel: 'Ajouter tout',
+                  })}
                   disabled={addBox.isPending}
                   className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
                   style={{ color: 'var(--primary)' }}
@@ -1136,6 +1170,13 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
           onConfirm={handleAddSelected}
         />
       )}
+
+      <ConfirmationDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        {...config!}
+        onConfirm={handleConfirm}
+      />
     </motion.div>
   );
 }

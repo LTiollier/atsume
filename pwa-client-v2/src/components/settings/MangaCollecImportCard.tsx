@@ -3,12 +3,17 @@ import { Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useImportMangaCollec } from '@/hooks/queries';
 import { getApiErrorMessage, getValidationErrors } from '@/lib/error';
+import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 
 export function MangaCollecImportCard() {
     const [url, setUrl] = useState('');
     const { mutateAsync: importCollection } = useImportMangaCollec();
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
+
+    // Dialog management
+    const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
 
     const handleImport = () => {
         if (!url.trim()) return;
@@ -87,7 +92,13 @@ export function MangaCollecImportCard() {
             <div className="px-5 py-4 flex justify-end">
                 <button
                     type="button"
-                    onClick={handleImport}
+                    onClick={() => confirm({
+                        title: "Démarrer l'import ?",
+                        description: "Cette action va importer votre collection depuis MangaCollec. Les tomes déjà possédés seront ignorés, mais cela peut prendre quelques instants.",
+                        onConfirm: handleImport,
+                        confirmLabel: "Lancer l'import",
+                        variant: 'primary',
+                    })}
                     disabled={isPending || !url.trim()}
                     className="h-9 px-5 text-sm font-semibold flex items-center gap-2 transition-opacity disabled:opacity-40 hover:opacity-90"
                     style={{
@@ -100,6 +111,13 @@ export function MangaCollecImportCard() {
                     {isPending ? 'Importation en cours...' : 'Importer'}
                 </button>
             </div>
+
+            <ConfirmationDialog
+                open={isOpen}
+                onOpenChange={setIsOpen}
+                {...config!}
+                onConfirm={handleConfirm}
+            />
         </div>
     );
 }
