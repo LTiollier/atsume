@@ -366,22 +366,22 @@ export function SettingsClient() {
         </form>
       </motion.section>
 
-      {/* ── Section Import / Export ── */}
+      {/* ── Section Import ── */}
       <motion.section
         variants={sectionVariants}
         initial="initial"
         animate="animate"
-        aria-label="Import / Export"
+        aria-label="Import"
       >
         <div className="mb-5">
           <h2
             className="text-xs font-semibold uppercase mb-1"
             style={{ color: 'var(--muted-foreground)', letterSpacing: '0.08em' }}
           >
-            Import / Export
+            Importation
           </h2>
           <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            Importez ou exportez votre collection depuis d&apos;autres services.
+            Importez votre collection depuis MangaCollec.
           </p>
         </div>
 
