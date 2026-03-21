@@ -97,7 +97,7 @@ test('import updates volume cover_url when it arrives on re-import', function ()
     expect($volume->cover_url)->toBe('https://cdn.example.com/cover1.jpg');
 });
 
-test('import skips volume with duplicate ISBN and logs warning', function () {
+test('import allows duplicate ISBN in different editions', function () {
     $service = app(MangaCollecSeriesImportService::class);
 
     // First series owns the ISBN
@@ -125,7 +125,8 @@ test('import skips volume with duplicate ISBN and logs warning', function () {
 
     $service->import($uuid2, $detail2);
 
-    expect(EloquentVolume::where('api_id', 'vol-uuid-clash')->exists())->toBeFalse();
+    expect(EloquentVolume::where('api_id', 'vol-uuid-clash')->exists())->toBeTrue();
+    expect(EloquentVolume::where('isbn', '9781234567890')->count())->toBe(2);
 });
 
 test('import sets series cover_url from first volume when not already set', function () {

@@ -17,6 +17,7 @@ use App\Manga\Infrastructure\EloquentModels\BoxSet as EloquentBoxSet;
 use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;
 use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;
 use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
+use Closure;
 use Illuminate\Support\Facades\DB;
 
 class MangaCollecSeriesImportService
@@ -33,9 +34,9 @@ class MangaCollecSeriesImportService
      * Import (create or update) a full series and all its related data.
      *
      * @param  array<string, mixed>  $detail
-     * @param  \Closure(string): void|null  $log  Optional debug logger (receives a message string)
+     * @param  Closure(string): void|null  $log  Optional debug logger (receives a message string)
      */
-    public function import(string $seriesUuid, array $detail, ?\Closure $log = null): void
+    public function import(string $seriesUuid, array $detail, ?Closure $log = null): void
     {
         $debug = fn (string $msg) => $log ? ($log)($msg) : null;
 
@@ -73,6 +74,7 @@ class MangaCollecSeriesImportService
                 $seriesModel->update([
                     'authors' => $authors,
                     'title' => $seriesTitle,
+                    'api_id' => $seriesUuid,
                 ]);
             }
 
@@ -138,22 +140,33 @@ class MangaCollecSeriesImportService
                 }
 
                 $existingVolume = $this->volumeRepository->findByApiId($volumeUuid);
+
+                $mappedEditionId = $editionsMap[$editionIdRaw] ?? null;
+                if (! $mappedEditionId) {
+                    $mappedEditionId = reset($editionsMap) ?: null;
+                }
+
+                // Fallback: match by edition + number if api_id lookup yielded nothing
+                if (! $existingVolume && $mappedEditionId && $volumeNumber !== '') {
+                    $existingVolume = $this->volumeRepository->findByEditionAndNumber($mappedEditionId, $volumeNumber);
+                }
+
+                // Final Fallback: match by edition + isbn if still nothing (but we have a valid isbn)
+                if (! $existingVolume && $mappedEditionId && $isbn !== null) {
+                    $existingVolume = $this->volumeRepository->findByEditionAndIsbn($mappedEditionId, $isbn);
+                }
+
                 if ($existingVolume) {
                     EloquentVolume::find($existingVolume->getId())?->update([
                         'title' => $volumeTitle,
                         'isbn' => $isbn,
                         'published_date' => $publishedDate,
                         'cover_url' => $coverUrl,
+                        'api_id' => $volumeUuid,
                     ]);
                     $debug(sprintf('[volumes] UPDATED #%s "%s" (api_id: %s)', $volumeNumber, $volumeTitle, $volumeUuid));
 
                     continue;
-                }
-
-                $mappedEditionId = $editionsMap[$editionIdRaw] ?? null;
-                if (! $mappedEditionId) {
-                    $debug(sprintf('[volumes] FALLBACK #%s – edition_id "%s" not in map, using first edition', $volumeNumber, $editionIdRaw));
-                    $mappedEditionId = reset($editionsMap) ?: null;
                 }
 
                 if (! $mappedEditionId) {
@@ -172,6 +185,11 @@ class MangaCollecSeriesImportService
                     coverUrl: $coverUrl
                 ));
                 $debug(sprintf('[volumes] CREATED #%s "%s" → edition local id %d', $volumeNumber, $volumeTitle, $mappedEditionId));
+
+                // Optional: clear memory if volume list is huge
+                if (count($volumesRaw) > 100) {
+                    gc_collect_cycles();
+                }
             }
 
             // Update series cover if we found one and it is not yet set
@@ -202,6 +220,7 @@ class MangaCollecSeriesImportService
                     EloquentBoxSet::find($boxSet->getId())?->update([
                         'title' => $beTitle,
                         'publisher' => $bePublisherName,
+                        'api_id' => $beUuid,
                     ]);
                 }
                 $boxSetsMap[$beUuid] = $boxSet->getId();
@@ -222,6 +241,20 @@ class MangaCollecSeriesImportService
                 $boxIsEmpty = str_contains(strtolower($boxTitle), 'vide');
 
                 $existingBox = $this->boxRepository->findByApiId($boxUuid);
+
+                $boxEditionId = is_string($boxData['box_edition_id'] ?? null) ? $boxData['box_edition_id'] : '';
+                $mappedBoxSetId = $boxSetsMap[$boxEditionId] ?? null;
+
+                // Fallback: match by boxSet + number if api_id lookup yielded nothing
+                if (! $existingBox && $mappedBoxSetId && $boxNumber !== '') {
+                    $existingBox = $this->boxRepository->findByBoxSetAndNumber($mappedBoxSetId, $boxNumber);
+                }
+
+                // Final Fallback: match by boxSet + isbn if still nothing
+                if (! $existingBox && $mappedBoxSetId && $boxIsbn !== null) {
+                    $existingBox = $this->boxRepository->findByBoxSetAndIsbn($mappedBoxSetId, $boxIsbn);
+                }
+
                 if ($existingBox) {
                     EloquentBox::find($existingBox->getId())?->update([
                         'title' => $boxTitle,
@@ -229,14 +262,13 @@ class MangaCollecSeriesImportService
                         'release_date' => $boxReleaseDate,
                         'cover_url' => $boxCoverUrl,
                         'is_empty' => $boxIsEmpty,
+                        'api_id' => $boxUuid,
                     ]);
                     $boxesMap[$boxUuid] = $existingBox->getId();
 
                     continue;
                 }
 
-                $boxEditionId = is_string($boxData['box_edition_id'] ?? null) ? $boxData['box_edition_id'] : '';
-                $mappedBoxSetId = $boxSetsMap[$boxEditionId] ?? null;
                 if (! $mappedBoxSetId) {
                     continue;
                 }

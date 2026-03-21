@@ -11,6 +11,10 @@ interface BoxRepositoryInterface
 
     public function findByApiId(string $apiId): ?Box;
 
+    public function findByBoxSetAndNumber(int $boxSetId, string $number): ?Box;
+
+    public function findByBoxSetAndIsbn(int $boxSetId, string $isbn): ?Box;
+
     /** @return Box[] */
     public function findByBoxSetId(int $boxSetId): array;
 

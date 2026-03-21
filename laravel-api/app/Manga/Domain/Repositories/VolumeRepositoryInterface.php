@@ -13,6 +13,8 @@ interface VolumeRepositoryInterface
 
     public function findByEditionAndNumber(int $editionId, string $number): ?Volume;
 
+    public function findByEditionAndIsbn(int $editionId, string $isbn): ?Volume;
+
     /**
      * @return Volume[]
      */

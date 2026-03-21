@@ -28,7 +28,7 @@ class ScrapeMangaCollecCommand extends Command
 
     public function handle(): int
     {
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '1024M');
 
         $this->info('Starting MangaCollec Scraper...');
 

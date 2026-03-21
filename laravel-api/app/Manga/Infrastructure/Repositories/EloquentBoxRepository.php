@@ -49,6 +49,20 @@ class EloquentBoxRepository implements BoxRepositoryInterface
         return $eloquent ? $this->toDomain($eloquent) : null;
     }
 
+    public function findByBoxSetAndNumber(int $boxSetId, string $number): ?Box
+    {
+        $eloquent = EloquentBox::where('box_set_id', $boxSetId)->where('number', $number)->first();
+
+        return $eloquent ? $this->toDomain($eloquent) : null;
+    }
+
+    public function findByBoxSetAndIsbn(int $boxSetId, string $isbn): ?Box
+    {
+        $eloquent = EloquentBox::where('box_set_id', $boxSetId)->where('isbn', $isbn)->first();
+
+        return $eloquent ? $this->toDomain($eloquent) : null;
+    }
+
     /** @return Box[] */
     public function findByBoxSetId(int $boxSetId): array
     {
