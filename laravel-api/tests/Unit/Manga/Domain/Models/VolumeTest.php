@@ -12,13 +12,13 @@ test('volume model can be instantiated and returns correct values', function () 
 
     $volume = new Volume(
         id: 1,
-        edition_id: 2,
-        api_id: 'api123',
+        editionId: 2,
+        apiId: 'api123',
         isbn: '9781234567890',
         number: '1',
         title: 'Naruto Vol. 1',
-        published_date: '2000-01-01',
-        cover_url: 'http://example.com/volume1.jpg',
+        publishedDate: '2000-01-01',
+        coverUrl: 'http://example.com/volume1.jpg',
         edition: $edition,
         series: $series
     );
@@ -41,13 +41,13 @@ test('volume model can be instantiated and returns correct values', function () 
 test('volume model can be instantiated with ownership and loan flags', function () {
     $volume = new Volume(
         id: 2,
-        edition_id: 1,
-        api_id: null,
+        editionId: 1,
+        apiId: null,
         isbn: '1234567890123',
         number: '2',
         title: 'Bleach Vol. 2',
-        published_date: null,
-        cover_url: null,
+        publishedDate: null,
+        coverUrl: null,
         isOwned: true,
         isLoaned: true,
         loanedTo: 'John',

@@ -11,8 +11,8 @@ use Mockery;
 
 test('it lists volumes by edition id', function () {
     $volumes = [
-        new Volume(id: 1, edition_id: 1, api_id: 'a', isbn: '1', number: '1', title: 'a', published_date: null, cover_url: null),
-        new Volume(id: 2, edition_id: 1, api_id: 'b', isbn: '2', number: '2', title: 'b', published_date: null, cover_url: null),
+        new Volume(id: 1, editionId: 1, apiId: 'a', isbn: '1', number: '1', title: 'a', publishedDate: null, coverUrl: null),
+        new Volume(id: 2, editionId: 1, apiId: 'b', isbn: '2', number: '2', title: 'b', publishedDate: null, coverUrl: null),
     ];
 
     $repo = Mockery::mock(VolumeRepositoryInterface::class);

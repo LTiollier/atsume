@@ -8,15 +8,15 @@ use App\Manga\Domain\Models\Volume;
 test('VolumeAddedToCollection event stores volume and userId', function () {
     $volume = new Volume(
         id: 1,
-        edition_id: 2,
-        api_id: 'api123',
+        editionId: 2,
+        apiId: 'api123',
         isbn: '123456',
         number: '1',
         title: 'Title',
 
-        published_date: null,
+        publishedDate: null,
 
-        cover_url: null
+        coverUrl: null
     );
 
     $userId = 42;

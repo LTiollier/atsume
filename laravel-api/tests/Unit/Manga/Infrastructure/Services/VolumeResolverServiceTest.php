@@ -15,13 +15,13 @@ test('it resolves volume by isbn', function () {
 
     $volume = new Volume(
         id: 1,
-        edition_id: 1,
-        api_id: 'api-123',
+        editionId: 1,
+        apiId: 'api-123',
         isbn: '1234567890123',
         number: '1',
         title: 'Volume 1',
-        published_date: null,
-        cover_url: null
+        publishedDate: null,
+        coverUrl: null
     );
 
     $repository->shouldReceive('findByIsbn')
@@ -52,13 +52,13 @@ test('it resolves volume by api id', function () {
 
     $volume = new Volume(
         id: 1,
-        edition_id: 1,
-        api_id: 'api-123',
+        editionId: 1,
+        apiId: 'api-123',
         isbn: '1234567890123',
         number: '1',
         title: 'Volume 1',
-        published_date: null,
-        cover_url: null
+        publishedDate: null,
+        coverUrl: null
     );
 
     $repository->shouldReceive('findByApiId')

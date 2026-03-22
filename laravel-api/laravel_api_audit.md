@@ -69,7 +69,7 @@
 
 ### 2.3 Domain Model [Volume](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/EloquentModels/Volume.php#15-70) — convention de nommage des propriétés
 
-- [ ] Les propriétés `$edition_id`, `$api_id`, `$isbn`, `$published_date`, `$cover_url` dans `App\Manga\Domain\Models\Volume` utilisent le **snake_case** — les propriétés d'un objet PHP pur devraient utiliser le **camelCase** (`$editionId`, `$apiId`, etc.) pour respecter PSR-12.
+- [x] Les propriétés `$edition_id`, `$api_id`, `$isbn`, `$published_date`, `$cover_url` dans `App\Manga\Domain\Models\Volume` utilisent désormais le **camelCase** (`$editionId`, `$apiId`, etc.) pour respecter PSR-12. Les tests et mappers associés ont été mis à jour.
 
 ### 2.4 [something()](file:///Users/leoelmy/Projects/mangastore/laravel-api/tests/Pest.php#47-51) helper non utilisé dans [tests/Pest.php](file:///Users/leoelmy/Projects/mangastore/laravel-api/tests/Pest.php)
 
