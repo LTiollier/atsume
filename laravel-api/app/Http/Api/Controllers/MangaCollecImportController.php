@@ -27,7 +27,7 @@ class MangaCollecImportController
 
         $dto = new ImportMangaCollecDTO(
             username: $username,
-            userId: $user->id,
+            userId: (int) $user->id,
         );
 
         try {

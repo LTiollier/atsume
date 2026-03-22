@@ -85,7 +85,7 @@
 
 ### 2.7 Cohérence des `null` vs `false` comme flags conditionnels
 
-- [ ] Dans `EloquentVolumeRepository::findByEditionId()`, [auth()->id()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Requests/AddMangaRequest.php#11-15) peut retourner `null` ou un `int` — le code fait des vérifications de nullabilité correctes, mais le `/** @var int|null $userId */` docblock est légitime. S'assurer qu'il est systématique partout où [auth()->id()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Requests/AddMangaRequest.php#11-15) est utilisé (ex : `ReadingProgressController::index()` l'utilise via `$user->id` sans cast de type).
+- [x] Dans `EloquentVolumeRepository::findByEditionId()`, [auth()->id()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Requests/AddMangaRequest.php#11-15) peut retourner `null` ou un `int` — le code fait des vérifications de nullabilité correctes, mais le `/** @var int|null $userId */` docblock est légitime. S'assurer qu'il est systématique partout où [auth()->id()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Requests/AddMangaRequest.php#11-15) est utilisé (ex : `ReadingProgressController::index()` l'utilise via `$user->id` avec un cast `(int)` pour plus de clarté). Les autres contrôleurs et requests ont été passés en revue et corrigés.
 
 ---
 

@@ -19,7 +19,7 @@ class ReadingProgressController
     {
         /** @var User $user */
         $user = $request->user();
-        $items = $action->execute($user->id);
+        $items = $action->execute((int) $user->id);
 
         return ReadingProgressResource::collection($items);
     }

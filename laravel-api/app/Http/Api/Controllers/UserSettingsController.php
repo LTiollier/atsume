@@ -35,7 +35,7 @@ class UserSettingsController
 
             $dto = $request->toDTO();
 
-            $updatedUser = $action->execute($dto, $user->id);
+            $updatedUser = $action->execute($dto, (int) $user->id);
 
             return new UserResource($updatedUser);
         } catch (InvalidCredentialsException $e) {
@@ -53,7 +53,7 @@ class UserSettingsController
 
             $dto = $request->toDTO();
 
-            $updatedUser = $action->execute($dto, $user->id);
+            $updatedUser = $action->execute($dto, (int) $user->id);
 
             return new UserResource($updatedUser);
         } catch (InvalidCredentialsException $e) {

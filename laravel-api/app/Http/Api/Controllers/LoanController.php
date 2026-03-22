@@ -25,7 +25,7 @@ class LoanController
     {
         /** @var User $user */
         $user = $request->user();
-        $loans = $action->execute($user->id);
+        $loans = $action->execute((int) $user->id);
 
         return LoanResource::collection($loans);
     }

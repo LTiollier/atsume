@@ -39,7 +39,7 @@ class UpdateUserSettingsRequest extends FormRequest
         $username = $this->input('username');
 
         return new UpdateUserSettingsDTO(
-            userId: $user->id,
+            userId: (int) $user->id,
             username: is_string($username) ? $username : null,
             isPublic: $this->boolean('is_public'),
             theme: $this->string('theme')->toString(),
