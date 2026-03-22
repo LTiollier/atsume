@@ -24,8 +24,11 @@ Route::middleware('throttle:auth')->group(function () {
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 });
 
-Route::get('/reset-password/{token}', function () {
-    return response()->json(['message' => 'Please use the PWA to reset your password.']);
+Route::get('/reset-password/{token}', function (Request $request, string $token) {
+    /** @var string $frontendUrl */
+    $frontendUrl = config('app.frontend_url');
+
+    return redirect($frontendUrl.'/reset-password?token='.$token.'&email='.$request->query('email'));
 })->name('password.reset');
 
 // Public catalog & profiles (unauthenticated)

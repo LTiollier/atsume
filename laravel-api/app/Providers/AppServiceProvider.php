@@ -37,7 +37,9 @@ use App\Providers\TelescopeServiceProvider as LocalTelescopeServiceProvider;
 use App\ReadingProgress\Domain\Repositories\ReadingProgressRepositoryInterface;
 use App\ReadingProgress\Infrastructure\Repositories\EloquentReadingProgressRepository;
 use App\User\Domain\Repositories\UserRepositoryInterface;
+use App\User\Infrastructure\EloquentModels\User;
 use App\User\Infrastructure\Repositories\EloquentUserRepository;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
@@ -136,6 +138,14 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        ResetPassword::createUrlUsing(function (mixed $notifiable, string $token) {
+            /** @var User $notifiable */
+            /** @var string $frontendUrl */
+            $frontendUrl = config('app.frontend_url');
+
+            return $frontendUrl.'/reset-password?token='.$token.'&email='.$notifiable->getEmailForPasswordReset();
         });
 
         if ($this->app->runningInConsole()) {
