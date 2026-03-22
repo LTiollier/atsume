@@ -51,14 +51,18 @@ function SeriesProgressRow({ series, volumes, readSet }: SeriesProgressRowProps)
     [volumes, readSet],
   );
 
-  // Total = sum of total_volumes across unique editions; fallback to owned count
+  // Total = sum of released count across unique editions; fallback to owned count
   const total = useMemo(() => {
+    const now = new Date().toISOString();
     const seen = new Set<number>();
     let sum = 0;
     for (const v of volumes) {
       if (v.edition?.id != null && !seen.has(v.edition.id)) {
         seen.add(v.edition.id);
-        if (v.edition.total_volumes != null) sum += v.edition.total_volumes;
+        const ownedOfThisEdition = volumes.filter(vol => vol.edition?.id === v.edition?.id);
+        const futureOwnedOfThisEdition = ownedOfThisEdition.filter(vol => !!(vol.published_date && vol.published_date > now)).length;
+        const totalOfEdition = v.edition.total_volumes || ownedOfThisEdition.length;
+        sum += Math.max(0, totalOfEdition - futureOwnedOfThisEdition);
       }
     }
     return sum || volumes.length;
@@ -134,11 +138,10 @@ function SeriesProgressRow({ series, volumes, readSet }: SeriesProgressRowProps)
             ? 'var(--secondary)'
             : 'color-mix(in oklch, var(--primary) 15%, transparent)',
           borderRadius: 'var(--radius)',
-          border: `1px solid ${
-            allRead
+          border: `1px solid ${allRead
               ? 'var(--border)'
               : 'color-mix(in oklch, var(--primary) 30%, transparent)'
-          }`,
+            }`,
         }}
         aria-label={
           allRead
@@ -171,21 +174,58 @@ export function ReadingTab() {
 
   const grouped = useGroupedCollection(ownedMangas);
 
-  // Series where readCount === total published volumes (mirrors SeriesProgressRow logic)
-  // Uses edition.total_volumes, not owned count — (rerender-derived-state-no-effect)
+  // Volumes count across all acquired editions (at least 1 owned volume)
+  // (rerender-derived-state-no-effect)
+  const unreadVolumesCount = useMemo(() => {
+    const now = new Date().toISOString();
+    const acquiredEditions = new Map<number, { total: number, owned: number, futureOwned: number }>();
+    
+    for (const m of ownedMangas) {
+      if (m.edition?.id != null) {
+        const eid = m.edition.id;
+        const isFuture = !!(m.published_date && m.published_date > now);
+        
+        const entry = acquiredEditions.get(eid);
+        if (!entry) {
+          acquiredEditions.set(eid, {
+            total: m.edition.total_volumes ?? 0,
+            owned: 1,
+            futureOwned: isFuture ? 1 : 0
+          });
+        } else {
+          entry.owned++;
+          if (isFuture) entry.futureOwned++;
+        }
+      }
+    }
+
+    let totalVolumesAcrossEditions = 0;
+    acquiredEditions.forEach((data) => {
+      // Exclude future owned volumes from the total count
+      const effectiveTotal = Math.max(0, (data.total || data.owned) - data.futureOwned);
+      totalVolumesAcrossEditions += effectiveTotal;
+    });
+
+    return Math.max(0, totalVolumesAcrossEditions - readingProgress.length);
+  }, [ownedMangas, readingProgress.length]);
+
   const completedSeriesCount = useMemo(
     () =>
       grouped
         .filter(gs => gs.series.id > 0)
         .filter(({ volumes }) => {
           if (volumes.length === 0) return false;
-          // Sum total_volumes across unique editions (same as SeriesProgressRow)
+          // Sum total_volumes (minus future ones) across unique editions (same as SeriesProgressRow)
+          const now = new Date().toISOString();
           const seen = new Set<number>();
           let total = 0;
           for (const v of volumes) {
             if (v.edition?.id != null && !seen.has(v.edition.id)) {
               seen.add(v.edition.id);
-              if (v.edition.total_volumes != null) total += v.edition.total_volumes;
+              const ownedOfThisEdition = volumes.filter(vol => vol.edition?.id === v.edition?.id);
+              const futureOwnedOfThisEdition = ownedOfThisEdition.filter(vol => !!(vol.published_date && vol.published_date > now)).length;
+              const totalOfEdition = v.edition.total_volumes || ownedOfThisEdition.length;
+              total += Math.max(0, totalOfEdition - futureOwnedOfThisEdition);
             }
           }
           if (total === 0) total = volumes.length;
@@ -202,6 +242,7 @@ export function ReadingTab() {
     <div className="flex flex-col">
       <CollectionStatBar items={[
         { value: readingProgress.length, label: 'Volumes lus' },
+        { value: unreadVolumesCount, label: 'Tomes non lus' },
         { value: completedSeriesCount, label: 'Séries finies' },
       ]} />
       {grouped.filter(gs => gs.series.id > 0).length === 0 ? (

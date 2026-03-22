@@ -8,7 +8,7 @@ interface StatBarItem {
 }
 
 export interface CollectionStatBarProps {
-  items: [StatBarItem] | [StatBarItem, StatBarItem];
+  items: StatBarItem[];
 }
 
 // ─── Skeleton — hoisted at module level (rendering-hoist-jsx) ─────────────────
