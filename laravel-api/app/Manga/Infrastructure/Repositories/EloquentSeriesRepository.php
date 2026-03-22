@@ -11,7 +11,7 @@ use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;
 use App\Manga\Infrastructure\Mappers\SeriesMapper;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class EloquentSeriesRepository implements SeriesRepositoryInterface
+final class EloquentSeriesRepository implements SeriesRepositoryInterface
 {
     public function findById(int $id, ?int $userId = null): ?Series
     {

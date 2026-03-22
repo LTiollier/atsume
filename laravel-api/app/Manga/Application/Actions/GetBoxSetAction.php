@@ -7,7 +7,7 @@ namespace App\Manga\Application\Actions;
 use App\Manga\Domain\Models\BoxSet;
 use App\Manga\Domain\Repositories\BoxSetRepositoryInterface;
 
-class GetBoxSetAction
+final class GetBoxSetAction
 {
     public function __construct(
         private readonly BoxSetRepositoryInterface $boxSetRepository

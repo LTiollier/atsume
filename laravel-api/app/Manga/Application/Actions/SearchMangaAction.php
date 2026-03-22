@@ -9,7 +9,7 @@ use App\Manga\Domain\Models\Series;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class SearchMangaAction
+final class SearchMangaAction
 {
     public function __construct(
         private readonly SeriesRepositoryInterface $seriesRepository

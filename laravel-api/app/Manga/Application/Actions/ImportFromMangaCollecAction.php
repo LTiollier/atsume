@@ -14,7 +14,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ImportFromMangaCollecAction
+final class ImportFromMangaCollecAction
 {
     public function __construct(
         private readonly MangaCollecScraperService $scraperService,

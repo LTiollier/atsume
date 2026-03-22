@@ -11,7 +11,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class AddBulkScannedMangasAction
+final class AddBulkScannedMangasAction
 {
     public function __construct(
         private readonly AddScannedMangaAction $addScannedMangaAction

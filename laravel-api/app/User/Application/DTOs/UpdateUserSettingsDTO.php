@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\User\Application\DTOs;
 
-class UpdateUserSettingsDTO
+final class UpdateUserSettingsDTO
 {
     public function __construct(
         public readonly int $userId,

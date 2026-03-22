@@ -60,9 +60,14 @@ test('it returns 404 for collection of private profile', function () {
 });
 
 test('it returns 404 if user has no ID', function () {
-    $user = Mockery::mock(DomainUser::class);
-    $user->shouldReceive('isPublic')->andReturn(true);
-    $user->shouldReceive('getId')->andReturn(null);
+    $user = new DomainUser(
+        name: 'test',
+        email: 'test@example.com',
+        password: 'password',
+        id: null,
+        username: 'username',
+        isPublic: true
+    );
 
     $userRepository = Mockery::mock(UserRepositoryInterface::class);
     $userRepository->shouldReceive('findByUsername')->with('username')->andReturn($user);

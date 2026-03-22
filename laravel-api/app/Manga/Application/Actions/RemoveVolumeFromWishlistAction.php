@@ -6,7 +6,7 @@ namespace App\Manga\Application\Actions;
 
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
 
-class RemoveVolumeFromWishlistAction
+final class RemoveVolumeFromWishlistAction
 {
     public function __construct(
         private readonly WishlistRepositoryInterface $wishlistRepository

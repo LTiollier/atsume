@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\DB;
  *   is_wishlisted: int|string|bool,
  * }
  */
-class EloquentPlanningRepository implements PlanningRepositoryInterface
+final class EloquentPlanningRepository implements PlanningRepositoryInterface
 {
     public function findPlanning(PlanningFiltersDTO $dto): PlanningResult
     {

@@ -8,7 +8,7 @@ use App\Manga\Domain\Exceptions\MangaNotFoundException;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 
-class SearchMangaByIsbnAction
+final class SearchMangaByIsbnAction
 {
     public function __construct(
         private readonly VolumeRepositoryInterface $volumeRepository,

@@ -11,7 +11,7 @@ use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 
-class ReturnItemAction
+final class ReturnItemAction
 {
     public function __construct(
         private readonly LoanRepositoryInterface $loanRepository,

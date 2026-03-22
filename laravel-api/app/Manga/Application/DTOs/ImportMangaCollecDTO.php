@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-class ImportMangaCollecDTO
+final class ImportMangaCollecDTO
 {
     public function __construct(
         public readonly string $username,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Domain\Models;
 
-class PlanningResult
+final class PlanningResult
 {
     /**
      * @param  PlanningItem[]  $items

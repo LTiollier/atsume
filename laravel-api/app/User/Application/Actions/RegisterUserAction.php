@@ -9,7 +9,7 @@ use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 
-class RegisterUserAction
+final class RegisterUserAction
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Domain\Models;
 
-class Box
+final class Box
 {
     /**
      * @param  Volume[]  $volumes

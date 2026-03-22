@@ -11,7 +11,7 @@ use App\Manga\Infrastructure\EloquentModels\Box as EloquentBox;
 use App\Manga\Infrastructure\Mappers\BoxMapper;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 
-class EloquentBoxRepository implements BoxRepositoryInterface
+final class EloquentBoxRepository implements BoxRepositoryInterface
 {
     public function findById(int $id, ?int $userId = null): ?Box
     {

@@ -11,7 +11,7 @@ use App\ReadingProgress\Domain\Repositories\ReadingProgressRepositoryInterface;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 
-class BulkToggleReadingProgressAction
+final class BulkToggleReadingProgressAction
 {
     public function __construct(
         private readonly ReadingProgressRepositoryInterface $readingProgressRepository,

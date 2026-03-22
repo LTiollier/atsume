@@ -7,7 +7,7 @@ namespace App\Manga\Application\Actions;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 
-class ListUserMangasAction
+final class ListUserMangasAction
 {
     public function __construct(
         private readonly VolumeRepositoryInterface $volumeRepository

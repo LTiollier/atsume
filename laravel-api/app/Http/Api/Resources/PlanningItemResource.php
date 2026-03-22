@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property PlanningItem $resource
  */
-class PlanningItemResource extends JsonResource
+final class PlanningItemResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ReadingProgress\Application\DTOs;
 
-class BulkToggleReadingProgressDTO
+final class BulkToggleReadingProgressDTO
 {
     /**
      * @param  int[]  $volumeIds

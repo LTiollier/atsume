@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Domain\Models;
 
-class Series
+final class Series
 {
     /**
      * @param  Edition[]  $editions

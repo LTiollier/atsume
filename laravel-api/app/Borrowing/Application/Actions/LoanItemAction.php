@@ -14,7 +14,7 @@ use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 
-class LoanItemAction
+final class LoanItemAction
 {
     public function __construct(
         private readonly LoanRepositoryInterface $loanRepository,

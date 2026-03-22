@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-class AddToWishlistDTO
+final class AddToWishlistDTO
 {
     public function __construct(
         public readonly int $userId,

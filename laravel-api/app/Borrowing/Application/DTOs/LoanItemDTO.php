@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Borrowing\Application\DTOs;
 
-class LoanItemDTO
+final class LoanItemDTO
 {
     public function __construct(
         public readonly int $userId,

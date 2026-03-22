@@ -8,7 +8,7 @@ use App\Manga\Application\DTOs\BulkRemoveVolumesDTO;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
-class BulkRemoveVolumesFromCollectionAction
+final class BulkRemoveVolumesFromCollectionAction
 {
     public function __construct(
         private readonly VolumeRepositoryInterface $volumeRepository

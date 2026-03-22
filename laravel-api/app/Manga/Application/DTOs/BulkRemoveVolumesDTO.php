@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-class BulkRemoveVolumesDTO
+final class BulkRemoveVolumesDTO
 {
     /**
      * @param  int[]  $volumeIds

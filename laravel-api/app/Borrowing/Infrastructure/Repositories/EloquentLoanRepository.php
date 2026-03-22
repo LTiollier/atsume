@@ -14,7 +14,7 @@ use App\Manga\Infrastructure\Mappers\VolumeMapper;
 use Carbon\Carbon;
 use DateTimeImmutable;
 
-class EloquentLoanRepository implements LoanRepositoryInterface
+final class EloquentLoanRepository implements LoanRepositoryInterface
 {
     public function save(DomainLoan $loan): DomainLoan
     {

@@ -9,7 +9,7 @@ use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use InvalidArgumentException;
 
-class UpdateUserSettingsAction
+final class UpdateUserSettingsAction
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository

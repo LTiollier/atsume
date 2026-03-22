@@ -11,7 +11,7 @@ use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\Manga\Domain\Services\VolumeResolverServiceInterface;
 use Illuminate\Support\Facades\DB;
 
-class AddMangaAction
+final class AddMangaAction
 {
     public function __construct(
         private readonly VolumeResolverServiceInterface $volumeResolver,

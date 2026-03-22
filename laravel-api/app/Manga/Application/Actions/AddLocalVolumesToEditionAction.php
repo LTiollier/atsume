@@ -16,7 +16,7 @@ use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
-class AddLocalVolumesToEditionAction
+final class AddLocalVolumesToEditionAction
 {
     public function __construct(
         private readonly VolumeRepositoryInterface $volumeRepository,

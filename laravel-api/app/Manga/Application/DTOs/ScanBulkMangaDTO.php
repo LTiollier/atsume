@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-class ScanBulkMangaDTO
+final class ScanBulkMangaDTO
 {
     /**
      * @param  string[]  $isbns

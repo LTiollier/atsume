@@ -10,7 +10,7 @@ use App\ReadingProgress\Infrastructure\EloquentModels\ReadingProgress as Eloquen
 use Carbon\Carbon;
 use DateTimeImmutable;
 
-class EloquentReadingProgressRepository implements ReadingProgressRepositoryInterface
+final class EloquentReadingProgressRepository implements ReadingProgressRepositoryInterface
 {
     public function save(DomainReadingProgress $readingProgress): DomainReadingProgress
     {

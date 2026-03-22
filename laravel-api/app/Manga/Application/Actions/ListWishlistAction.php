@@ -8,7 +8,7 @@ use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
 
-class ListWishlistAction
+final class ListWishlistAction
 {
     public function __construct(
         private readonly WishlistRepositoryInterface $wishlistRepository

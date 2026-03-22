@@ -15,7 +15,7 @@ use App\Manga\Infrastructure\Mappers\VolumeMapper;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 use Illuminate\Database\Eloquent\Collection;
 
-class EloquentVolumeRepository implements VolumeRepositoryInterface
+final class EloquentVolumeRepository implements VolumeRepositoryInterface
 {
     public function create(CreateVolumeDTO $dto): Volume
     {

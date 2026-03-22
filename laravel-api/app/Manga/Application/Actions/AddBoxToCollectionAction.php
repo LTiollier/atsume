@@ -9,7 +9,7 @@ use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
-class AddBoxToCollectionAction
+final class AddBoxToCollectionAction
 {
     public function __construct(
         private readonly BoxRepositoryInterface $boxRepository,

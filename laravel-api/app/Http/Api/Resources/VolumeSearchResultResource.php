@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property Volume $resource
  */
-class VolumeSearchResultResource extends JsonResource
+final class VolumeSearchResultResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Domain\Models;
 
-class PlanningItem
+final class PlanningItem
 {
     public function __construct(
         private readonly int $id,

@@ -14,7 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property Series $resource
  */
-class MangaSearchResultResource extends JsonResource
+final class MangaSearchResultResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property-read ReadingProgress $resource
  */
-class ReadingProgressResource extends JsonResource
+final class ReadingProgressResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

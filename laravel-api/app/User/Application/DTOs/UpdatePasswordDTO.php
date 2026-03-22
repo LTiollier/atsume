@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\User\Application\DTOs;
 
-class UpdatePasswordDTO
+final class UpdatePasswordDTO
 {
     public function __construct(
         public readonly string $currentPassword,

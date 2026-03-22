@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-class CreateEditionDTO
+final class CreateEditionDTO
 {
     public function __construct(
         public readonly int $seriesId,

@@ -13,7 +13,7 @@ use App\Manga\Infrastructure\Mappers\BoxMapper;
 use App\Manga\Infrastructure\Mappers\EditionMapper;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 
-class EloquentWishlistRepository implements WishlistRepositoryInterface
+final class EloquentWishlistRepository implements WishlistRepositoryInterface
 {
     public function addEditionWishlistToUser(int $editionId, int $userId): void
     {

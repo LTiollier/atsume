@@ -7,7 +7,7 @@ namespace App\Http\Api\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ImportSummaryResource extends JsonResource
+final class ImportSummaryResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

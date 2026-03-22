@@ -9,7 +9,7 @@ use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Models\Edition;
 use InvalidArgumentException;
 
-class AddToWishlistAction
+final class AddToWishlistAction
 {
     public function __construct(
         private readonly AddEditionToWishlistAction $addEditionAction,

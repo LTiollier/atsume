@@ -6,7 +6,7 @@ namespace App\ReadingProgress\Domain\Models;
 
 use DateTimeImmutable;
 
-class ReadingProgress
+final class ReadingProgress
 {
     public function __construct(
         private readonly ?int $id,

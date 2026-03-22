@@ -13,7 +13,16 @@ test('it resolves volume by isbn', function () {
     $repository = Mockery::mock(VolumeRepositoryInterface::class);
     $service = new VolumeResolverService($repository);
 
-    $volume = Mockery::mock(Volume::class);
+    $volume = new Volume(
+        id: 1,
+        edition_id: 1,
+        api_id: 'api-123',
+        isbn: '1234567890123',
+        number: '1',
+        title: 'Volume 1',
+        published_date: null,
+        cover_url: null
+    );
 
     $repository->shouldReceive('findByIsbn')
         ->once()
@@ -41,7 +50,16 @@ test('it resolves volume by api id', function () {
     $repository = Mockery::mock(VolumeRepositoryInterface::class);
     $service = new VolumeResolverService($repository);
 
-    $volume = Mockery::mock(Volume::class);
+    $volume = new Volume(
+        id: 1,
+        edition_id: 1,
+        api_id: 'api-123',
+        isbn: '1234567890123',
+        number: '1',
+        title: 'Volume 1',
+        published_date: null,
+        cover_url: null
+    );
 
     $repository->shouldReceive('findByApiId')
         ->once()

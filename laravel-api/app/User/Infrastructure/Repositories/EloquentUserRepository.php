@@ -8,7 +8,7 @@ use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 
-class EloquentUserRepository implements UserRepositoryInterface
+final class EloquentUserRepository implements UserRepositoryInterface
 {
     public function create(User $user): User
     {

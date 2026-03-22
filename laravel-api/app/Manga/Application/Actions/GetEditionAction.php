@@ -7,7 +7,7 @@ namespace App\Manga\Application\Actions;
 use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 
-class GetEditionAction
+final class GetEditionAction
 {
     public function __construct(
         private readonly EditionRepositoryInterface $editionRepository

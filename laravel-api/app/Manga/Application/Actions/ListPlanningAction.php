@@ -8,7 +8,7 @@ use App\Manga\Application\DTOs\PlanningFiltersDTO;
 use App\Manga\Domain\Models\PlanningResult;
 use App\Manga\Domain\Repositories\PlanningRepositoryInterface;
 
-class ListPlanningAction
+final class ListPlanningAction
 {
     public function __construct(
         private readonly PlanningRepositoryInterface $planningRepository,

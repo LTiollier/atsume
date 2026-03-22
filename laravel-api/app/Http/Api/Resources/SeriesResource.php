@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property Series $resource
  */
-class SeriesResource extends JsonResource
+final class SeriesResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property BoxSet $resource
  */
-class BoxSetResource extends JsonResource
+final class BoxSetResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

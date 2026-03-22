@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\User\Domain\Models;
 
-class User
+final class User
 {
     private ?int $id;
 

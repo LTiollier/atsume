@@ -10,7 +10,7 @@ use App\Manga\Domain\Repositories\BoxSetRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\BoxSet as EloquentBoxSet;
 use App\Manga\Infrastructure\Mappers\BoxSetMapper;
 
-class EloquentBoxSetRepository implements BoxSetRepositoryInterface
+final class EloquentBoxSetRepository implements BoxSetRepositoryInterface
 {
     public function findByApiId(string $apiId): ?BoxSet
     {

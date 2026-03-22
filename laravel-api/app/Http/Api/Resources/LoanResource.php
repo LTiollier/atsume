@@ -13,7 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property-read Loan $resource
  */
-class LoanResource extends JsonResource
+final class LoanResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

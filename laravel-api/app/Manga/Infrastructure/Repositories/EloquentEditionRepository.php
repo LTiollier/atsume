@@ -10,7 +10,7 @@ use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;
 use App\Manga\Infrastructure\Mappers\EditionMapper;
 
-class EloquentEditionRepository implements EditionRepositoryInterface
+final class EloquentEditionRepository implements EditionRepositoryInterface
 {
     public function findById(int $id, ?int $userId = null): ?Edition
     {

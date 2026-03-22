@@ -64,7 +64,8 @@
 
 ### 2.2 Classes non marquées `final`
 
-- [ ] Les **Actions**, **DTOs**, **Domain Models**, **Repositories** et **Resources** devraient tous être marqués `final` pour renforcer l'encapsulation et éviter l'héritage accidentel (standard Laravel Specialist).
+- [x] Les **Actions**, **DTOs**, **Domain Models**, **Repositories** et **Resources** devraient tous être marqués `final` pour renforcer l'encapsulation et éviter l'héritage accidentel (standard Laravel Specialist).
+    - *Note : Une exception a été faite pour les classes `Loan`, `Volume`, `AddScannedMangaAction`, `AddEditionToWishlistAction` et `AddBoxToWishlistAction` car elles sont intensivement mockées dans les tests unitaires via Mockery, qui ne supporte pas le mocking de classes `final`.*
 
 ### 2.3 Domain Model [Volume](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/EloquentModels/Volume.php#15-70) — convention de nommage des propriétés
 

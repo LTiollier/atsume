@@ -11,7 +11,7 @@ use App\User\Domain\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 use InvalidArgumentException;
 
-class UpdateEmailAction
+final class UpdateEmailAction
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository

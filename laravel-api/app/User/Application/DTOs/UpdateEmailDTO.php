@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\User\Application\DTOs;
 
-class UpdateEmailDTO
+final class UpdateEmailDTO
 {
     public function __construct(
         public readonly string $email,

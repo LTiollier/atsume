@@ -8,7 +8,7 @@ use App\Manga\Domain\Models\Edition;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class WishlistItemResource extends JsonResource
+final class WishlistItemResource extends JsonResource
 {
     /**
      * @return array<string, mixed>

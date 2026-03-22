@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-class CreateVolumeDTO
+final class CreateVolumeDTO
 {
     public function __construct(
         public readonly int $editionId,

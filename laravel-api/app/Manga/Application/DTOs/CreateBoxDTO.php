@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-class CreateBoxDTO
+final class CreateBoxDTO
 {
     public function __construct(
         public readonly int $boxSetId,

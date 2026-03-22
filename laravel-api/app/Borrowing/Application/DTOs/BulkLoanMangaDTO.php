@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Borrowing\Application\DTOs;
 
-class BulkLoanMangaDTO
+final class BulkLoanMangaDTO
 {
     /**
      * @param  int[]  $volumeIds

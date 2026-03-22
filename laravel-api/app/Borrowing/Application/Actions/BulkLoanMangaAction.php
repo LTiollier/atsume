@@ -13,7 +13,7 @@ use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 
-class BulkLoanMangaAction
+final class BulkLoanMangaAction
 {
     public function __construct(
         private readonly LoanRepositoryInterface $loanRepository,

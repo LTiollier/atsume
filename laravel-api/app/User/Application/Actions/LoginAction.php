@@ -10,7 +10,7 @@ use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 
-class LoginAction
+final class LoginAction
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
