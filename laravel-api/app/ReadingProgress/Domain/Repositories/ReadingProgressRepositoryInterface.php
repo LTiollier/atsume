@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ReadingProgress\Domain\Repositories;
 
 use App\ReadingProgress\Domain\Models\ReadingProgress;

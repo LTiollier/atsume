@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Events\VolumeAddedToCollection;
 use App\Manga\Domain\Models\Volume;
 

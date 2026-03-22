@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Domain\Exceptions\AlreadyLoanedException;
 
 test('AlreadyLoanedException is a DomainException', function (): void {

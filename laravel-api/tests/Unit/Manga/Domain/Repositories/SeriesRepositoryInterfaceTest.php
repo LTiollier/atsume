@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 
 test('SeriesRepositoryInterface exists', function () {

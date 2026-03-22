@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Api\Requests;
 
 use App\User\Application\DTOs\UpdateUserSettingsDTO;
@@ -40,8 +42,8 @@ class UpdateUserSettingsRequest extends FormRequest
             userId: $user->id,
             username: is_string($username) ? $username : null,
             isPublic: $this->boolean('is_public'),
-            theme: $this->string('theme'),
-            palette: $this->string('palette')
+            theme: $this->string('theme')->toString(),
+            palette: $this->string('palette')->toString()
         );
     }
 }

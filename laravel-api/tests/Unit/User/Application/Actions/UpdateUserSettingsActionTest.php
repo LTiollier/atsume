@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\User\Application\Actions;
 
 use App\User\Application\Actions\UpdateUserSettingsAction;

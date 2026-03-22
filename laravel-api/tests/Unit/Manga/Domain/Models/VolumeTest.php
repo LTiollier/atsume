@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Models\Series;
 use App\Manga\Domain\Models\Volume;

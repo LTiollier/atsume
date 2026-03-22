@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;

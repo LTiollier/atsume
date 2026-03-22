@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Events\BoxAddedToCollection;
 
 test('BoxAddedToCollection holds boxId and userId', function () {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Infrastructure\EloquentModels\Volume;
 use App\Manga\Infrastructure\Policies\VolumePolicy;
 use App\User\Infrastructure\EloquentModels\User;

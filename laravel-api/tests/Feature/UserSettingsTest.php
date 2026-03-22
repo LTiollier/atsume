@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Infrastructure\EloquentModels\User;
 
 it('updates user settings successfully', function () {

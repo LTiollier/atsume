@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Application\Actions\GetBoxAction;
 use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Manga\Infrastructure\Console;
 
 use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;

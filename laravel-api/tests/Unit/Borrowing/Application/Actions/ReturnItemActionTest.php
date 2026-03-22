@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Application\Actions\ReturnItemAction;
 use App\Borrowing\Application\DTOs\ReturnItemDTO;
 use App\Borrowing\Domain\Exceptions\LoanNotFoundException;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Application\Actions\ImportFromMangaCollecAction;
 
 test('action class exists', function () {

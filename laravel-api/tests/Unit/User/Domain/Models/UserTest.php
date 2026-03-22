@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Domain\Models\User;
 
 test('user model can be instantiated and returns correct values', function () {

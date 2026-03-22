@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Manga\Infrastructure\Services;
 
 use App\Manga\Application\DTOs\CreateBoxDTO;

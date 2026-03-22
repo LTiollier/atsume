@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Borrowing\Application\Actions;
 
 use App\Borrowing\Application\Actions\BulkLoanMangaAction;

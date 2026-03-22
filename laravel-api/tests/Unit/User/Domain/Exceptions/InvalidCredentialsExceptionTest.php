@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Domain\Exceptions\InvalidCredentialsException;
 
 test('it sets the correct default message', function () {

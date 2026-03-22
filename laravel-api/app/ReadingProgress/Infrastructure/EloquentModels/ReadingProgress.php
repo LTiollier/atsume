@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ReadingProgress\Infrastructure\EloquentModels;
 
 use App\Manga\Infrastructure\EloquentModels\Volume;

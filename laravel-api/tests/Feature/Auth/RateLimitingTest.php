@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Infrastructure\EloquentModels\User;
 
 test('login route has rate limiting', function () {

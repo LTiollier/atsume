@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Domain\Exceptions\LoanNotFoundException;
 
 test('LoanNotFoundException is a DomainException', function (): void {

@@ -60,7 +60,7 @@
 
 ### 2.1 `declare(strict_types=1)` manquant
 
-- [ ] Ajouter `declare(strict_types=1)` à **tous les fichiers PHP** de l'application. Actuellement absent dans la grande majorité des fichiers ([AddScannedMangaAction](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Application/Actions/AddScannedMangaAction.php#12-32), [MangaCollecSeriesImportService](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Services/MangaCollecSeriesImportService.php#23-341), [EloquentVolumeRepository](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Repositories/EloquentVolumeRepository.php#16-205), etc.). C'est une exigence PHP 8.2+ et une protection contre les bugs de type silencieux.
+- [x] Ajouter `declare(strict_types=1)` à **tous les fichiers PHP** de l'application. Actuellement absent dans la grande majorité des fichiers ([AddScannedMangaAction](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Application/Actions/AddScannedMangaAction.php#12-32), [MangaCollecSeriesImportService](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Services/MangaCollecSeriesImportService.php#23-341), [EloquentVolumeRepository](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Repositories/EloquentVolumeRepository.php#16-205), etc.). C'est une exigence PHP 8.2+ et une protection contre les bugs de type silencieux.
 
 ### 2.2 Classes non marquées `final`
 

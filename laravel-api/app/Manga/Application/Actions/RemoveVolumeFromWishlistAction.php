@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Manga\Application\Actions;
 
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;

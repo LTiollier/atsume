@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Manga\Infrastructure\Repositories;
 
 use App\Manga\Infrastructure\EloquentModels\Edition;

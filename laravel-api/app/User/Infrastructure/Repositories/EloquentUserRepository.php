@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\User\Infrastructure\Repositories;
 
 use App\User\Domain\Models\User;

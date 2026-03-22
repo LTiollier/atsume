@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Domain\Exceptions\VolumeNotInCollectionException;
 
 test('VolumeNotInCollectionException is a DomainException', function (): void {

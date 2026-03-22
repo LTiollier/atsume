@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Application\Actions\LoanItemAction;
 use App\Borrowing\Application\DTOs\LoanItemDTO;
 use App\Borrowing\Domain\Exceptions\AlreadyLoanedException;

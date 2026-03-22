@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\User\Infrastructure\Repositories;
 
 use App\User\Domain\Models\User as DomainUser;

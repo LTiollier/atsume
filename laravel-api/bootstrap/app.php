@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Domain\Exceptions\AlreadyLoanedException;
 use App\Borrowing\Domain\Exceptions\LoanNotFoundException;
 use App\Borrowing\Domain\Exceptions\VolumeNotInCollectionException;

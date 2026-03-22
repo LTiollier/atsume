@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Models\Series;
 
 test('series model can be instantiated and returns correct values', function () {

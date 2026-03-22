@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Application\Actions\LogoutAction;
 use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;

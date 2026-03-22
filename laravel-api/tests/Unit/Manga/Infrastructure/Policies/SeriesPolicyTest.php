@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Infrastructure\EloquentModels\Series;
 use App\Manga\Infrastructure\Policies\SeriesPolicy;
 use App\User\Infrastructure\EloquentModels\User;

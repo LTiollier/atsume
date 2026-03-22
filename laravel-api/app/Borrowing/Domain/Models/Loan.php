@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Borrowing\Domain\Models;
 
 use App\Manga\Domain\Models\Box;

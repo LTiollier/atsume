@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Domain\Models\Loan as DomainLoan;
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use App\Manga\Infrastructure\EloquentModels\Volume;

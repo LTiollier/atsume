@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Exceptions\MangaCollecProfilePrivateException;
 
 test('MangaCollecProfilePrivateException is an Exception', function (): void {

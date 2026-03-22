@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Application\Actions\AddBoxToWishlistAction;
 use App\Manga\Domain\Exceptions\MangaNotFoundException;
 use App\Manga\Domain\Models\Box;

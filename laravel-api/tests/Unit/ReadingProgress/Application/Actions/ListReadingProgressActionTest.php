@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\ReadingProgress\Application\Actions\ListReadingProgressAction;
 use App\ReadingProgress\Domain\Models\ReadingProgress;
 use App\ReadingProgress\Domain\Repositories\ReadingProgressRepositoryInterface;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\ReadingProgress\Domain\Models\ReadingProgress;
 
 test('exposes correct getters', function () {

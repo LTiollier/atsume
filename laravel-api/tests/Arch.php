@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // 1. Domain Layer Isolation
 arch('domain models should be isolated')
     ->expect('App\*\Domain\Models')

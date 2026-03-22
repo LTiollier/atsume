@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\ReadingProgress\Application\Actions\BulkToggleReadingProgressAction;
 use App\ReadingProgress\Application\DTOs\BulkToggleReadingProgressDTO;

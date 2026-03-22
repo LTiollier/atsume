@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Application\Actions\LoginAction;
 use App\User\Application\DTOs\LoginDTO;
 use App\User\Domain\Exceptions\InvalidCredentialsException;

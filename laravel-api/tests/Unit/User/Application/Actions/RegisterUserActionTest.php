@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\User\Application\Actions\RegisterUserAction;
 use App\User\Application\DTOs\RegisterUserDTO;
 use App\User\Domain\Models\User;

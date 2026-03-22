@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Borrowing\Infrastructure\Repositories;
 
 use App\Borrowing\Domain\Models\Loan as DomainLoan;

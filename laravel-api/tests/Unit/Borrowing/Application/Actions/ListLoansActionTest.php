@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Application\Actions\ListLoansAction;
 use App\Borrowing\Domain\Models\Loan;
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;

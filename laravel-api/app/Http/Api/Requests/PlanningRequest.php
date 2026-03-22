@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Api\Requests;
 
 use App\Manga\Application\DTOs\PlanningFiltersDTO;

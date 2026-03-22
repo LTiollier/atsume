@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Api\Controllers\AuthController;
 use App\Http\Api\Controllers\BoxCollectionController;
 use App\Http\Api\Controllers\LoanController;

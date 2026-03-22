@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Borrowing\Domain\Models\Loan;
 
 test('loan model stores and returns values correctly', function () {

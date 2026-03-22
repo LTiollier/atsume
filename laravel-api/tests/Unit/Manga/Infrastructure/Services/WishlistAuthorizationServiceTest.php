@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Infrastructure\EloquentModels\Box as EloquentBox;
 use App\Manga\Infrastructure\EloquentModels\BoxSet as EloquentBoxSet;
 use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;

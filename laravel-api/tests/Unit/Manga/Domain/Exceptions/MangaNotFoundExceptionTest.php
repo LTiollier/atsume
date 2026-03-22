@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Manga\Domain\Exceptions\MangaNotFoundException;
 
 test('MangaNotFoundException is a DomainException', function (): void {
