@@ -7,17 +7,17 @@ use App\Http\Api\Requests\LoginRequest;
 use App\Http\Api\Requests\RegisterRequest;
 use App\Http\Api\Requests\ResetPasswordRequest;
 use App\Http\Api\Resources\UserResource;
+use App\User\Application\Actions\ForgotPasswordAction;
 use App\User\Application\Actions\LoginAction;
 use App\User\Application\Actions\LogoutAction;
 use App\User\Application\Actions\RegisterUserAction;
+use App\User\Application\Actions\ResetPasswordAction;
 use App\User\Domain\Exceptions\InvalidCredentialsException;
 use App\User\Domain\Models\User;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 class AuthController
 {
@@ -70,29 +70,18 @@ class AuthController
         ]);
     }
 
-    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse
     {
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $status = $action->execute($request->toDTO());
 
         return $status === Password::RESET_LINK_SENT
             ? response()->json(['message' => __($status)])
             : response()->json(['message' => __($status)], 400);
     }
 
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request, ResetPasswordAction $action): JsonResponse
     {
-        /** @var string $status */
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-            }
-        );
+        $status = $action->execute($request->toDTO());
 
         return $status === Password::PASSWORD_RESET
             ? response()->json(['message' => __($status)])

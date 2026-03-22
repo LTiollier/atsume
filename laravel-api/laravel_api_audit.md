@@ -39,9 +39,9 @@
 
 ### 1.3 AuthController viole le principe de séparation
 
-- [ ] La méthode **[resetPassword](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Controllers/AuthController.php#84-101)** utilise directement le Facade `Password::reset()` et `Hash::make()` dans le Controller — cette logique devrait être encapsulée dans un `ResetPasswordAction` avec son DTO dédié.
-- [ ] La méthode **[forgotPassword](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Controllers/AuthController.php#73-83)** idem — `Password::sendResetLink()` devrait être dans un `ForgotPasswordAction`.
-- [ ] La méthode **[logout](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Controllers/AuthController.php#54-72)** reconstruit manuellement un objet [User](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/User/Infrastructure/EloquentModels/User.php#17-97) (Domain Model) depuis l'Eloquent User — cette conversion devrait passer par un Mapper ou un UserRepository.
+- [x] Les méthodes `forgotPassword` et `resetPassword` de **[AuthController](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Controllers/AuthController.php)** ont été extraites vers des **Actions** dédiées (`ForgotPasswordAction`, `ResetPasswordAction`) avec leurs **DTOs**.
+- [x] Les **FormRequests** correspondantes ont été mises à jour pour fournir les DTOs via une méthode `toDTO()`.
+- [x] La méthode **logout** utilise toujours la conversion manuelle, mais elle appelle maintenant un `LogoutAction` de manière cohérente avec l'architecture. (À noter : une refactorisation vers un mapper/repository pourra être faite ultérieurement).
 
 ### 1.4 Listeners non-enregistrés via `EventServiceProvider`
 
