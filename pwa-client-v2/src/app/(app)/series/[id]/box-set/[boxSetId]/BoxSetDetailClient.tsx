@@ -13,6 +13,7 @@ import {
   useLoansQuery,
   useBulkCreateBoxLoan,
   useAddBoxToCollection,
+  useBulkRemoveBoxesFromCollection,
   queryKeys,
 } from '@/hooks/queries';
 import { getApiErrorMessage } from '@/lib/error';
@@ -45,6 +46,7 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
   const toggleWishlist = useToggleWishlist();
   const bulkCreateBoxLoan = useBulkCreateBoxLoan();
   const addBox = useAddBoxToCollection();
+  const bulkRemove = useBulkRemoveBoxesFromCollection();
 
   // Derived during render — no useEffect (rerender-derived-state-no-effect)
   const boxes: Box[] = boxSet?.boxes ?? [];
@@ -127,6 +129,26 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
         },
       },
     );
+  }
+
+  function handleRemoveSelected() {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+
+    confirm({
+      title: 'Retirer de la collection ?',
+      description: `Voulez-vous retirer les ${ids.length} coffret${ids.length > 1 ? 's' : ''} sélectionné${ids.length > 1 ? 's' : ''} de votre collection ?`,
+      onConfirm: () => {
+        bulkRemove.mutate(ids, {
+          onSuccess: () => {
+            clearSelection();
+            queryClient.invalidateQueries({ queryKey: queryKeys.boxSet(boxSetId) });
+          },
+        });
+      },
+      confirmLabel: 'Retirer',
+      variant: 'danger',
+    });
   }
 
   // Pluriel accord boîtes pour le progress label
@@ -279,6 +301,8 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
       <CollectionActionBar
         count={selectedIds.size}
         onLoan={openLoanSheet}
+        onRemove={handleRemoveSelected}
+        removePending={bulkRemove.isPending}
         itemLabel="sélectionnée"
       />
 

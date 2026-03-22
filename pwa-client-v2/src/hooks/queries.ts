@@ -298,12 +298,42 @@ export function useAddBulkToCollection() {
     });
 }
 
+export function useBulkRemoveVolumesFromCollection() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (volumeIds: number[]) =>
+            Promise.all(volumeIds.map(id => mangaService.removeVolume(id))),
+        onSuccess: (_, ids) => {
+            toast.success(`${ids.length} tome${ids.length > 1 ? 's' : ''} retiré${ids.length > 1 ? 's' : ''} de la collection`);
+            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+        },
+        onError: () => {
+            toast.error("Erreur lors du retrait de la collection");
+        },
+    });
+}
+
 export function useAddBoxToCollection() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (boxId: number) => mangaService.addBoxToCollection(boxId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+        },
+    });
+}
+
+export function useBulkRemoveBoxesFromCollection() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (boxIds: number[]) =>
+            Promise.all(boxIds.map(id => mangaService.removeBoxFromCollection(id))),
+        onSuccess: (_, ids) => {
+            toast.success(`${ids.length} boîte${ids.length > 1 ? 's' : ''} retirée${ids.length > 1 ? 's' : ''} de la collection`);
+            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+        },
+        onError: () => {
+            toast.error("Erreur lors du retrait de la collection");
         },
     });
 }

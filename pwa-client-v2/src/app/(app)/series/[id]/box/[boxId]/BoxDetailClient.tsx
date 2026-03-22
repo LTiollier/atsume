@@ -14,6 +14,7 @@ import {
   useBulkToggleReadingProgress,
   useBulkCreateLoan,
   useAddBulkToCollection,
+  useBulkRemoveVolumesFromCollection,
   queryKeys,
 } from '@/hooks/queries';
 import { getApiErrorMessage } from '@/lib/error';
@@ -49,6 +50,7 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
   const { mutate: bulkToggle, isPending: togglePending } = useBulkToggleReadingProgress();
   const bulkCreateLoan = useBulkCreateLoan();
   const addBulk = useAddBulkToCollection();
+  const bulkRemove = useBulkRemoveVolumesFromCollection();
 
   // Derived during render (rerender-derived-state-no-effect)
   const volumes: Manga[] = box?.volumes ?? [];
@@ -183,6 +185,26 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
     if (ids.length === 0) return;
     bulkToggle(ids);
     clearSelection();
+  }
+
+  function handleRemoveSelected() {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+
+    confirm({
+      title: 'Retirer de la collection ?',
+      description: `Voulez-vous retirer les ${ids.length} tome${ids.length > 1 ? 's' : ''} sélectionné${ids.length > 1 ? 's' : ''} de votre collection ?`,
+      onConfirm: () => {
+        bulkRemove.mutate(ids, {
+          onSuccess: () => {
+            clearSelection();
+            queryClient.invalidateQueries({ queryKey: queryKeys.box(boxId) });
+          },
+        });
+      },
+      confirmLabel: 'Retirer',
+      variant: 'danger',
+    });
   }
 
   function handleConfirmLoan() {
@@ -355,6 +377,8 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
         count={selectedIds.size}
         onMarkRead={handleMarkSelected}
         onLoan={openLoanSheet}
+        onRemove={handleRemoveSelected}
+        removePending={bulkRemove.isPending}
         markPending={togglePending}
       />
 

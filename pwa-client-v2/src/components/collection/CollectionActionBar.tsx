@@ -1,7 +1,7 @@
 'use client';
 
 import { createPortal } from 'react-dom';
-import { BookMarked, BookUp, Loader2 } from 'lucide-react';
+import { BookMarked, BookUp, Loader2, Trash2 } from 'lucide-react';
 
 interface CollectionActionBarProps {
   count: number;
@@ -15,6 +15,8 @@ interface CollectionActionBarProps {
   /** When omitted the "Marquer" button is hidden (BoxSet has no bulk-read action) */
   onMarkRead?: () => void;
   markPending?: boolean;
+  onRemove?: () => void;
+  removePending?: boolean;
 }
 
 // Portal fixed to the bottom — defined outside parent (rerender-no-inline-components)
@@ -24,6 +26,8 @@ export function CollectionActionBar({
   itemLabel = 'sélectionné',
   onMarkRead,
   markPending = false,
+  onRemove,
+  removePending = false,
 }: CollectionActionBarProps) {
   if (typeof document === 'undefined' || count === 0) return null;
 
@@ -40,6 +44,28 @@ export function CollectionActionBar({
         <p className="flex-1 text-xs font-semibold" style={{ color: 'var(--muted-foreground)' }}>
           {count} {itemLabel}{count > 1 ? 's' : ''}
         </p>
+
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            disabled={removePending}
+            className="flex items-center gap-1.5 h-10 px-4 text-sm font-semibold transition-opacity disabled:opacity-40 hover:opacity-90"
+            style={{
+              background: 'color-mix(in oklch, var(--destructive) 10%, var(--card))',
+              color: 'var(--destructive)',
+              border: '1px solid color-mix(in oklch, var(--destructive) 25%, transparent)',
+              borderRadius: 'var(--radius)',
+            }}
+            aria-label="Retirer de la collection"
+          >
+            {removePending
+              ? <Loader2 size={13} className="animate-spin" aria-hidden />
+              : <Trash2 size={13} aria-hidden />}
+            Retirer
+          </button>
+        )}
+
         {onMarkRead && (
           <button
             type="button"
@@ -59,6 +85,7 @@ export function CollectionActionBar({
             Marquer
           </button>
         )}
+
         <button
           type="button"
           onClick={onLoan}
@@ -77,3 +104,4 @@ export function CollectionActionBar({
     document.body,
   );
 }
+
