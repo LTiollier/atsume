@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { ForgotPasswordForm } from '@/components/forms/ForgotPasswordForm';
 
 export const metadata: Metadata = {
-  title: 'Mot de passe oublié — Mangastore',
+  title: 'Mot de passe oublié — Atsume',
 };
 
 export default function ForgotPasswordPage() {

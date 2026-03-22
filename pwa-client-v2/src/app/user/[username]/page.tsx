@@ -10,8 +10,8 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   return {
-    title: `@${username} — Mangastore`,
-    description: `Collection publique de @${username} sur Mangastore.`,
+    title: `@${username} — Atsume`,
+    description: `Collection publique de @${username} sur Atsume.`,
   };
 }
 
@@ -31,7 +31,7 @@ export default async function PublicProfilePage({ params }: Props) {
           style={{ color: 'var(--muted-foreground)' }}
         >
           <ChevronLeft size={15} aria-hidden />
-          Mangastore
+          Atsume
         </Link>
 
         <PublicProfileClient username={username} />

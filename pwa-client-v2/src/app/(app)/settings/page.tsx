@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { SettingsClient } from './SettingsClient';
 
 export const metadata: Metadata = {
-  title: 'Paramètres — Mangastore',
+  title: 'Paramètres — Atsume',
 };
 
 export default function SettingsPage() {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { ResetPasswordForm } from '@/components/forms/ResetPasswordForm';
 
 export const metadata: Metadata = {
-  title: 'Réinitialiser le mot de passe — Mangastore',
+  title: 'Réinitialiser le mot de passe — Atsume',
 };
 
 interface Props {

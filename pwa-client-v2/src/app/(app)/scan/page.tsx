@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { ScanClient } from './ScanClient';
 
 export const metadata: Metadata = {
-  title: 'Scanner — Mangastore',
+  title: 'Scanner — Atsume',
 };
 
 export default function ScanPage() {

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ThemeContext — Mangastore Void/Light
+ * ThemeContext — Atsume Void/Light
  *
  * Gère le thème de surface actif : 'void' (dark) ou 'light'.
  * Indépendant de la palette — les 8 combinaisons thème × palette sont valides.
@@ -37,7 +37,7 @@ export interface ThemeContextValue {
 /* Constantes                                         */
 /* -------------------------------------------------- */
 
-const STORAGE_KEY = 'mangastore-theme:v1';
+const STORAGE_KEY = 'atsume-theme:v1';
 const DEFAULT_THEME: Theme = 'void';
 export const THEMES: readonly Theme[] = ['void', 'light'] as const;
 

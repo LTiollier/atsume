@@ -1,4 +1,4 @@
-# Mangathèque
+# Atsume
 
 Une application de gestion de collection de mangas complète ("mobile-first"), permettant aux collectionneurs de mangas de gérer leur collection physique, suivre leur progression de lecture, lister les prêts en cours et maintenir une liste de souhaits.
 

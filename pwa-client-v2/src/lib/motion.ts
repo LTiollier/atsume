@@ -1,5 +1,5 @@
 /**
- * Variants Framer Motion — Mangastore Void
+ * Variants Framer Motion — Atsume Void
  *
  * RÈGLE : animations avec parcimonie.
  * ❌ Pas de stagger sur les grilles de volumes au mount (lag sur 50+ items)

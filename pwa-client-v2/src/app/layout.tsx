@@ -30,13 +30,13 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Mangastore',
+  title: 'Atsume',
   description: 'Gérez votre collection de mangas',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Mangastore',
+    title: 'Atsume',
   },
 };
 
@@ -58,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Inline blocking script — runs before first paint to apply saved theme/palette.
             Prevents flash of default theme-void/palette-ember when user has a different preference.
             suppressHydrationWarning on <html> absorbs the class mismatch. (rendering-hydration-no-flicker) */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var themes=['void','light'],palettes=['ember','crimson','indigo','forest'],h=document.documentElement,t=localStorage.getItem('mangastore-theme:v1'),p=localStorage.getItem('mangastore-palette:v1');if(t&&themes.includes(t)){themes.forEach(function(x){h.classList.remove('theme-'+x)});h.classList.add('theme-'+t)}if(p&&palettes.includes(p)){palettes.forEach(function(x){h.classList.remove('palette-'+x)});h.classList.add('palette-'+p)}}catch(e){}})();` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var themes=['void','light'],palettes=['ember','crimson','indigo','forest'],h=document.documentElement,t=localStorage.getItem('atsume-theme:v1'),p=localStorage.getItem('atsume-palette:v1');if(t&&themes.includes(t)){themes.forEach(function(x){h.classList.remove('theme-'+x)});h.classList.add('theme-'+t)}if(p&&palettes.includes(p)){palettes.forEach(function(x){h.classList.remove('palette-'+x)});h.classList.add('palette-'+p)}}catch(e){}})();` }} />
         <ReactQueryProvider>
           <ThemeProvider>
           <PaletteProvider>

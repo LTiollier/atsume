@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { BoxDetailClient } from './BoxDetailClient';
 
 export const metadata: Metadata = {
-  title: 'Boîte — Mangastore',
+  title: 'Boîte — Atsume',
 };
 
 interface Props {

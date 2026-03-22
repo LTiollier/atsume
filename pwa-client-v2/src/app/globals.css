@@ -1,5 +1,5 @@
 /* ============================================
-   MANGASTORE PWA v2 — Système de design Void
+   Atsume PWA v2 — Système de design Void
    ============================================
 
    CONVENTION DE TOKENS
@@ -170,7 +170,7 @@
     --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(72% 0.24 55) 25%, transparent);
     --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(72% 0.24 55) 20%, transparent);
 
-    /* Sémantique Mangastore */
+    /* Sémantique Atsume */
     --color-read:     oklch(70% 0.18 155);  /* Vert émeraude */
     --color-loaned:   oklch(74% 0.20 55);   /* Ambre clair — proche primary, état distinct */
     --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
@@ -357,7 +357,7 @@
 }
 
 /* ============================================
-   UTILITAIRES VOID — Classes métier Mangastore
+   UTILITAIRES VOID — Classes métier Atsume
    ============================================ */
 @layer components {
 

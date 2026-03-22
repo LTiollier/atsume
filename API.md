@@ -1,4 +1,4 @@
-# Mangastore API Documentation
+# Atsume API Documentation
 
 ## Authentication
 

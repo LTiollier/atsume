@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { DashboardClient } from './DashboardClient';
 
 export const metadata: Metadata = {
-  title: 'Accueil — Mangastore',
+  title: 'Accueil — Atsume',
 };
 
 /**

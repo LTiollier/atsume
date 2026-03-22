@@ -10,8 +10,8 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   return {
-    title: `Collection de @${username} — Mangastore`,
-    description: `Collection publique de @${username} sur Mangastore.`,
+    title: `Collection de @${username} — Atsume`,
+    description: `Collection publique de @${username} sur Atsume.`,
   };
 }
 

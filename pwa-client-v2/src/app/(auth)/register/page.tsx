@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { RegisterForm } from '@/components/forms/RegisterForm';
 
 export const metadata: Metadata = {
-  title: 'Créer un compte — Mangastore',
+  title: 'Créer un compte — Atsume',
 };
 
 export default function RegisterPage() {

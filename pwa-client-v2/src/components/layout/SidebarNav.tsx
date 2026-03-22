@@ -35,7 +35,7 @@ export function SidebarNav() {
           className="text-sm font-semibold tracking-wide"
           style={{ fontFamily: 'var(--font-display)', color: 'var(--sidebar-foreground)' }}
         >
-          Mangastore
+          Atsume
         </span>
       </div>
 

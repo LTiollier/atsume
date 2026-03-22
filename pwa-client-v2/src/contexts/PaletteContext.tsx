@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * PaletteContext — Mangastore Void
+ * PaletteContext — Atsume Void
  *
  * Gère la palette de couleurs active parmi les 4 options :
  * ember (défaut) · crimson · indigo · forest
@@ -37,7 +37,7 @@ export interface PaletteContextValue {
 /* Constantes                                         */
 /* -------------------------------------------------- */
 
-const STORAGE_KEY = 'mangastore-palette:v1';
+const STORAGE_KEY = 'atsume-palette:v1';
 const DEFAULT_PALETTE: Palette = 'ember';
 export const PALETTES: readonly Palette[] = [
   'ember',

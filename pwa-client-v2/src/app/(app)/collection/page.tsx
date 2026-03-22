@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { CollectionHub } from './CollectionHub';
 
 export const metadata: Metadata = {
-  title: 'Collection — Mangastore',
+  title: 'Collection — Atsume',
 };
 
 interface Props {

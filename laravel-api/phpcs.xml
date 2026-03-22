@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="MangaStore Import Standard">
-    <description>MangaStore coding standard - Only enforcing imports (no inline FQCN).</description>
+<ruleset name="Atsume Import Standard">
+    <description>Atsume coding standard - Only enforcing imports (no inline FQCN).</description>
 
     <!-- Paths to check -->
     <file>app</file>

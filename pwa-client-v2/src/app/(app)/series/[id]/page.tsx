@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { SeriesDetailClient } from './SeriesDetailClient';
 
 export const metadata: Metadata = {
-  title: 'Série — Mangastore',
+  title: 'Série — Atsume',
 };
 
 interface Props {
