@@ -152,30 +152,6 @@
   }
 
   /* ============================================
-     PALETTE KITSUNE — Orange Brûlé hue 45°
-     ============================================ */
-  .palette-kitsune {
-    --primary:                        oklch(68% 0.22 45);
-    --primary-foreground:             oklch(10% 0.020 45);
-    --accent:                         oklch(16% 0.018 250);
-    --accent-foreground:              oklch(90% 0.006 60);
-    --ring:                           oklch(68% 0.22 45);
-
-    --sidebar-primary:                oklch(68% 0.22 45);
-    --sidebar-primary-foreground:     oklch(10% 0.020 45);
-    --sidebar-ring:                   oklch(68% 0.22 45);
-
-    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(68% 0.22 45) 30%, transparent);
-    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(68% 0.22 45) 25%, transparent);
-    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(68% 0.22 45) 20%, transparent);
-
-    --color-read:     oklch(70% 0.18 155);
-    --color-loaned:   oklch(68% 0.22 45);   /* = primary orange */
-    --color-wishlist: oklch(65% 0.22 300);
-    --color-owned:    oklch(62% 0.18 215);
-  }
-
-  /* ============================================
      PALETTE ONI — Rouge sang hue 18° ⭐ DÉFAUT
      Contraste primary-foreground/primary : ~6.0:1 ✅ AA
      ============================================ */
@@ -200,6 +176,31 @@
     --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
     --color-owned:    oklch(62% 0.18 215);  /* Bleu-cyan */
   }
+
+  /* ============================================
+     PALETTE KITSUNE — Orange Brûlé hue 45°
+     ============================================ */
+  .palette-kitsune {
+    --primary:                        oklch(68% 0.22 45);
+    --primary-foreground:             oklch(10% 0.020 45);
+    --accent:                         oklch(16% 0.018 250);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(68% 0.22 45);
+
+    --sidebar-primary:                oklch(68% 0.22 45);
+    --sidebar-primary-foreground:     oklch(10% 0.020 45);
+    --sidebar-ring:                   oklch(68% 0.22 45);
+
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(68% 0.22 45) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(68% 0.22 45) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(68% 0.22 45) 20%, transparent);
+
+    --color-read:     oklch(70% 0.18 155);
+    --color-loaned:   oklch(68% 0.22 45);   /* = primary orange */
+    --color-wishlist: oklch(65% 0.22 300);
+    --color-owned:    oklch(62% 0.18 215);
+  }
+
 
   /* ============================================
      PALETTE KAMINARI — Jaune Or hue 90°
