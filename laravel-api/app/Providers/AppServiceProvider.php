@@ -4,10 +4,10 @@ namespace App\Providers;
 
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use App\Borrowing\Infrastructure\Repositories\EloquentLoanRepository;
-use App\Manga\Application\Listeners\RemoveBoxFromWishlistOnCollection;
-use App\Manga\Application\Listeners\RemoveEditionFromWishlistOnCollection;
 use App\Manga\Domain\Events\BoxAddedToCollection;
 use App\Manga\Domain\Events\EditionAddedToCollection;
+use App\Manga\Domain\Listeners\RemoveBoxFromWishlistOnCollection;
+use App\Manga\Domain\Listeners\RemoveEditionFromWishlistOnCollection;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\BoxSetRepositoryInterface;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;

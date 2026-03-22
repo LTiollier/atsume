@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Manga\Application\Listeners;
+declare(strict_types=1);
+
+namespace App\Manga\Domain\Listeners;
 
 use App\Manga\Domain\Events\BoxAddedToCollection;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
 
-class RemoveBoxFromWishlistOnCollection
+final class RemoveBoxFromWishlistOnCollection
 {
     public function __construct(
         private readonly WishlistRepositoryInterface $wishlistRepository
