@@ -81,6 +81,12 @@ class EloquentEditionRepository implements EditionRepositoryInterface
         return $this->toDomain($eloquent);
     }
 
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void
+    {
+        EloquentEdition::query()->where('id', $id)->update($data);
+    }
+
     private function toDomain(EloquentEdition $eloquent): Edition
     {
         return EditionMapper::toDomain($eloquent);

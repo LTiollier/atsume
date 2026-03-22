@@ -12,11 +12,6 @@ use App\Manga\Domain\Repositories\BoxSetRepositoryInterface;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Domain\Repositories\SeriesRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
-use App\Manga\Infrastructure\EloquentModels\Box as EloquentBox;
-use App\Manga\Infrastructure\EloquentModels\BoxSet as EloquentBoxSet;
-use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;
-use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;
-use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
 use Closure;
 use Illuminate\Support\Facades\DB;
 
@@ -67,11 +62,8 @@ class MangaCollecSeriesImportService
                     authors: $authors,
                     apiId: $seriesUuid
                 ));
-            }
-
-            $seriesModel = EloquentSeries::find($series->getId());
-            if ($seriesModel) {
-                $seriesModel->update([
+            } else {
+                $this->seriesRepository->update($series->getId(), [
                     'authors' => $authors,
                     'title' => $seriesTitle,
                     'api_id' => $seriesUuid,
@@ -107,7 +99,7 @@ class MangaCollecSeriesImportService
                     ));
                     $debug(sprintf('[editions] CREATED "%s" (api_id: %s) → local id %d', $editionName, $editionId, $edition->getId()));
                 } else {
-                    EloquentEdition::find($edition->getId())?->update([
+                    $this->editionRepository->update($edition->getId(), [
                         'publisher' => $publisherName,
                         'total_volumes' => $totalVolumes,
                         'is_finished' => $isFinished,
@@ -157,7 +149,7 @@ class MangaCollecSeriesImportService
                 }
 
                 if ($existingVolume) {
-                    EloquentVolume::find($existingVolume->getId())?->update([
+                    $this->volumeRepository->update($existingVolume->getId(), [
                         'title' => $volumeTitle,
                         'isbn' => $isbn,
                         'published_date' => $publishedDate,
@@ -193,8 +185,8 @@ class MangaCollecSeriesImportService
             }
 
             // Update series cover if we found one and it is not yet set
-            if ($firstVolumeCover && $seriesModel && ! $seriesModel->cover_url) {
-                $seriesModel->update(['cover_url' => $firstVolumeCover]);
+            if ($firstVolumeCover && ! $series->getCoverUrl()) {
+                $this->seriesRepository->update($series->getId(), ['cover_url' => $firstVolumeCover]);
             }
 
             // 4. Handle Box Sets
@@ -217,7 +209,7 @@ class MangaCollecSeriesImportService
                         apiId: $beUuid
                     ));
                 } else {
-                    EloquentBoxSet::find($boxSet->getId())?->update([
+                    $this->boxSetRepository->update($boxSet->getId(), [
                         'title' => $beTitle,
                         'publisher' => $bePublisherName,
                         'api_id' => $beUuid,
@@ -256,7 +248,7 @@ class MangaCollecSeriesImportService
                 }
 
                 if ($existingBox) {
-                    EloquentBox::find($existingBox->getId())?->update([
+                    $this->boxRepository->update($existingBox->getId(), [
                         'title' => $boxTitle,
                         'isbn' => $boxIsbn,
                         'release_date' => $boxReleaseDate,

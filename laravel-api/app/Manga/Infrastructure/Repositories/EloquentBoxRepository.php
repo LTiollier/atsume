@@ -104,6 +104,12 @@ class EloquentBoxRepository implements BoxRepositoryInterface
         }
     }
 
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void
+    {
+        EloquentBox::query()->where('id', $id)->update($data);
+    }
+
     public function attachToUser(int $boxId, int $userId): void
     {
         $user = EloquentUser::findOrFail($userId);

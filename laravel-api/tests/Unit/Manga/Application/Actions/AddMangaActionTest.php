@@ -4,11 +4,11 @@ namespace Tests\Unit\Manga\Application\Actions;
 
 use App\Manga\Application\Actions\AddMangaAction;
 use App\Manga\Application\DTOs\AddMangaDTO;
-use App\Manga\Application\Services\VolumeResolverService;
 use App\Manga\Domain\Events\VolumeAddedToCollection;
 use App\Manga\Domain\Exceptions\MangaNotFoundException;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
+use App\Manga\Domain\Services\VolumeResolverServiceInterface;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 
@@ -17,7 +17,7 @@ test('adds manga to collection and dispatches event', function () {
 
     $volume = new Volume(33, 1, 'api123', 'isbn123', '1', 'Naruto 1', null, null, null, null);
 
-    $resolver = Mockery::mock(VolumeResolverService::class);
+    $resolver = Mockery::mock(VolumeResolverServiceInterface::class);
     $resolver->shouldReceive('resolveByApiId')->with('api123')->once()->andReturn($volume);
 
     $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);
@@ -33,7 +33,7 @@ test('adds manga to collection and dispatches event', function () {
 });
 
 test('propagates MangaNotFoundException when api id not found', function () {
-    $resolver = Mockery::mock(VolumeResolverService::class);
+    $resolver = Mockery::mock(VolumeResolverServiceInterface::class);
     $resolver->shouldReceive('resolveByApiId')->with('invalid')->andThrow(MangaNotFoundException::class);
 
     $volumeRepo = Mockery::mock(VolumeRepositoryInterface::class);

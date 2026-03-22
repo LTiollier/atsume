@@ -53,6 +53,12 @@ class EloquentBoxSetRepository implements BoxSetRepositoryInterface
         return $this->toDomain($eloquent);
     }
 
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void
+    {
+        EloquentBoxSet::query()->where('id', $id)->update($data);
+    }
+
     private function toDomain(EloquentBoxSet $eloquent): BoxSet
     {
         return BoxSetMapper::toDomain($eloquent);

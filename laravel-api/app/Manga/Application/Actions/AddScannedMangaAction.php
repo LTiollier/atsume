@@ -3,16 +3,16 @@
 namespace App\Manga\Application\Actions;
 
 use App\Manga\Application\DTOs\ScanMangaDTO;
-use App\Manga\Application\Services\VolumeResolverService;
 use App\Manga\Domain\Events\VolumeAddedToCollection;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
+use App\Manga\Domain\Services\VolumeResolverServiceInterface;
 use Illuminate\Support\Facades\DB;
 
 class AddScannedMangaAction
 {
     public function __construct(
-        private readonly VolumeResolverService $volumeResolver,
+        private readonly VolumeResolverServiceInterface $volumeResolver,
         private readonly VolumeRepositoryInterface $volumeRepository,
     ) {}
 

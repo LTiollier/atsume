@@ -108,6 +108,12 @@ class EloquentSeriesRepository implements SeriesRepositoryInterface
             ->through(fn (EloquentSeries $s) => $this->toDomain($s));
     }
 
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void
+    {
+        EloquentSeries::query()->where('id', $id)->update($data);
+    }
+
     private function toDomain(EloquentSeries $eloquent): Series
     {
         return SeriesMapper::toDomain($eloquent);

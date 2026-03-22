@@ -25,6 +25,9 @@ interface BoxRepositoryInterface
     /** @param array<int> $volumeIds */
     public function attachVolumes(int $boxId, array $volumeIds): void;
 
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void;
+
     public function attachToUser(int $boxId, int $userId): void;
 
     public function detachFromUser(int $boxId, int $userId): void;

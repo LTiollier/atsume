@@ -34,8 +34,8 @@
 
 ### 1.2 Services dans la mauvaise couche
 
-- [ ] **`VolumeResolverService`** est dans `Manga/Application/Services/` — les services qui font des appels à des repositories ou à de la logique métier doivent être clairement catégorisés : s'ils sont purement orchestrateurs, ils peuvent rester en Application ; sinon ils appartiennent à Infrastructure.
-- [ ] **[MangaCollecSeriesImportService](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Services/MangaCollecSeriesImportService.php#23-341)** accède directement aux **EloquentModels** (`EloquentSeries::find()`, `EloquentEdition::find()`, `EloquentVolume::find()`) en plus d'utiliser les repositories — viole le principe d'isolation Infrastructure. Toutes les mutations doivent passer par les repository interfaces.
+- [x] **`VolumeResolverService`** a été déplacé dans `Manga/Infrastructure/Services/` car il encapsule une logique de résolution d'entités via repository.
+- [x] **[MangaCollecSeriesImportService](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Services/MangaCollecSeriesImportService.php)** a été refactoré pour n'utiliser que les **Repository Interfaces**. Des méthodes `update()` ont été ajoutées aux interfaces et implémentations correspondantes.
 
 ### 1.3 AuthController viole le principe de séparation
 

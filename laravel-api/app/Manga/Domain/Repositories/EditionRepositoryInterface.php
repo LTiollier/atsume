@@ -17,4 +17,7 @@ interface EditionRepositoryInterface
     public function findBySeriesId(int $seriesId, ?int $userId = null): array;
 
     public function create(CreateEditionDTO $dto): Edition;
+
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void;
 }

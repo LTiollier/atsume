@@ -31,6 +31,9 @@ interface VolumeRepositoryInterface
     /** @param int[] $volumeIds */
     public function detachManyFromUser(array $volumeIds, int $userId): void;
 
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void;
+
     public function detachSeriesFromUser(int $seriesId, int $userId): void;
 
     /**

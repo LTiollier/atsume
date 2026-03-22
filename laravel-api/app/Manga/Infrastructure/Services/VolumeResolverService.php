@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Manga\Application\Services;
+declare(strict_types=1);
+
+namespace App\Manga\Infrastructure\Services;
 
 use App\Manga\Domain\Exceptions\MangaNotFoundException;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
+use App\Manga\Domain\Services\VolumeResolverServiceInterface;
 
-class VolumeResolverService
+final class VolumeResolverService implements VolumeResolverServiceInterface
 {
     public function __construct(
         private readonly VolumeRepositoryInterface $volumeRepository,

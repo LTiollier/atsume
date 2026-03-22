@@ -12,4 +12,7 @@ interface BoxSetRepositoryInterface
     public function findById(int $id, ?int $userId = null): ?BoxSet;
 
     public function create(CreateBoxSetDTO $dto): BoxSet;
+
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void;
 }

@@ -188,6 +188,12 @@ class EloquentVolumeRepository implements VolumeRepositoryInterface
         return $volumes;
     }
 
+    /** @param array<string, mixed> $data */
+    public function update(int $id, array $data): void
+    {
+        EloquentVolume::query()->where('id', $id)->update($data);
+    }
+
     private function toDomain(
         EloquentVolume $eloquent,
         bool $isOwned = false,
