@@ -51,14 +51,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="fr"
-      className={`${syne.variable} ${nunitoSans.variable} ${ibmPlexMono.variable} theme-void palette-crimson`}
+      className={`${syne.variable} ${nunitoSans.variable} ${ibmPlexMono.variable} theme-void palette-oni`}
       suppressHydrationWarning
     >
       <body style={{ fontFamily: 'var(--font-body)', background: 'var(--background)', color: 'var(--foreground)' }}>
         {/* Inline blocking script — runs before first paint to apply saved theme/palette.
-            Prevents flash of default theme-void/palette-crimson when user has a different preference.
+            Prevents flash of default theme-void/palette-oni when user has a different preference.
             suppressHydrationWarning on <html> absorbs the class mismatch. (rendering-hydration-no-flicker) */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var themes=['void','light'],palettes=['crimson','ember','indigo','forest'],h=document.documentElement,t=localStorage.getItem('atsume-theme:v1'),p=localStorage.getItem('atsume-palette:v1');if(t&&themes.includes(t)){themes.forEach(function(x){h.classList.remove('theme-'+x)});h.classList.add('theme-'+t)}if(p&&palettes.includes(p)){palettes.forEach(function(x){h.classList.remove('palette-'+x)});h.classList.add('palette-'+p)}}catch(e){}})();` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var themes=['void','light'],palettes=['oni','kitsune','kaminari','matcha','sakura','katana','mangaka'],h=document.documentElement,t=localStorage.getItem('atsume-theme:v1'),p=localStorage.getItem('atsume-palette:v1');if(t&&themes.includes(t)){themes.forEach(function(x){h.classList.remove('theme-'+x)});h.classList.add('theme-'+t)}if(p&&palettes.includes(p)){palettes.forEach(function(x){h.classList.remove('palette-'+x)});h.classList.add('palette-'+p)}}catch(e){}})();` }} />
         <ReactQueryProvider>
           <ThemeProvider>
           <PaletteProvider>

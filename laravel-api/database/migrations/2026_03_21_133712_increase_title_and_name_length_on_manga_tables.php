@@ -17,7 +17,7 @@ return new class extends Migration
 
         Schema::table('editions', function (Blueprint $table) {
             $table->text('name')->change();
-            $table->text('publisher')->change();
+            $table->text('publisher')->nullable()->change();
         });
 
         Schema::table('volumes', function (Blueprint $table) {
@@ -26,7 +26,7 @@ return new class extends Migration
 
         Schema::table('box_sets', function (Blueprint $table) {
             $table->text('title')->change();
-            $table->text('publisher')->change();
+            $table->text('publisher')->nullable()->change();
         });
 
         Schema::table('boxes', function (Blueprint $table) {
@@ -45,7 +45,7 @@ return new class extends Migration
 
         Schema::table('editions', function (Blueprint $table) {
             $table->string('name')->change();
-            $table->string('publisher')->change();
+            $table->string('publisher')->nullable()->change();
         });
 
         Schema::table('volumes', function (Blueprint $table) {
@@ -54,7 +54,7 @@ return new class extends Migration
 
         Schema::table('box_sets', function (Blueprint $table) {
             $table->string('title')->change();
-            $table->string('publisher')->change();
+            $table->string('publisher')->nullable()->change();
         });
 
         Schema::table('boxes', function (Blueprint $table) {

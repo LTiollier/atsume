@@ -5296,7 +5296,7 @@ class MangaDataSeeder extends Seeder
                     $seqName = DB::selectOne("SELECT pg_get_serial_sequence(?, 'id') as seq", [$tableName])->seq;
                     if ($seqName) {
                         $maxId = DB::table($tableName)->max('id') ?: 0;
-                        DB::statement("SELECT setval(?, ?, true)", [$seqName, $maxId]);
+                        DB::statement('SELECT setval(?, ?, true)', [$seqName, $maxId]);
                     }
                 } catch (\Exception $e) {
                     // Skip tables where we can't get sequence or max id

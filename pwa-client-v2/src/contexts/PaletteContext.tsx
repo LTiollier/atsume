@@ -4,10 +4,10 @@
  * PaletteContext — Atsume Void
  *
  * Gère la palette de couleurs active parmi les 4 options :
- * crimson (défaut) · ember · indigo · forest
+ * oni (défaut) · kitsune · kaminari · matcha · sakura · katana · mangaka
  *
  * Implémentation hydration-safe via useSyncExternalStore :
- * - getServerSnapshot() retourne toujours 'crimson'
+ * - getServerSnapshot() retourne toujours 'oni'
  * - getSnapshot() lit l'état en mémoire (initialisé depuis localStorage côté client)
  * - La classe .palette-X est appliquée sur <html> — jamais via un état React
  *   pour éviter le flash ou un re-render de l'arbre complet.
@@ -25,7 +25,7 @@ import {
 /* Types                                              */
 /* -------------------------------------------------- */
 
-export type Palette = 'ember' | 'crimson' | 'indigo' | 'forest';
+export type Palette = 'oni' | 'kitsune' | 'kaminari' | 'matcha' | 'sakura' | 'katana' | 'mangaka';
 
 export interface PaletteContextValue {
   palette: Palette;
@@ -38,12 +38,15 @@ export interface PaletteContextValue {
 /* -------------------------------------------------- */
 
 const STORAGE_KEY = 'atsume-palette:v1';
-const DEFAULT_PALETTE: Palette = 'crimson';
+const DEFAULT_PALETTE: Palette = 'oni';
 export const PALETTES: readonly Palette[] = [
-  'crimson',
-  'ember',
-  'indigo',
-  'forest',
+  'oni',
+  'kitsune',
+  'kaminari',
+  'matcha',
+  'sakura',
+  'katana',
+  'mangaka',
 ] as const;
 
 /* -------------------------------------------------- */

@@ -18,7 +18,7 @@ class UpdateUserSettingsActionTest extends TestCase
 
         $existingUser = new User('Test User', 'test@example.com', 'password', 1);
 
-        $dto = new UpdateUserSettingsDTO(1, 'new_username', true, 'light', 'indigo');
+        $dto = new UpdateUserSettingsDTO(1, 'new_username', true, 'light', 'kaminari');
 
         $userRepository->expects($this->once())
             ->method('findById')
@@ -31,7 +31,7 @@ class UpdateUserSettingsActionTest extends TestCase
                 $this->assertEquals('new_username', $user->getUsername());
                 $this->assertTrue($user->isPublic());
                 $this->assertEquals('light', $user->getTheme());
-                $this->assertEquals('indigo', $user->getPalette());
+                $this->assertEquals('kaminari', $user->getPalette());
 
                 return $user;
             });
@@ -40,7 +40,7 @@ class UpdateUserSettingsActionTest extends TestCase
         $this->assertEquals('new_username', $updatedUser->getUsername());
         $this->assertTrue($updatedUser->isPublic());
         $this->assertEquals('light', $updatedUser->getTheme());
-        $this->assertEquals('indigo', $updatedUser->getPalette());
+        $this->assertEquals('kaminari', $updatedUser->getPalette());
     }
 
     public function test_it_throws_exception_if_user_not_found(): void
@@ -48,7 +48,7 @@ class UpdateUserSettingsActionTest extends TestCase
         $userRepository = $this->createMock(UserRepositoryInterface::class);
         $action = new UpdateUserSettingsAction($userRepository);
 
-        $dto = new UpdateUserSettingsDTO(999, 'new_username', true, 'void', 'ember');
+        $dto = new UpdateUserSettingsDTO(999, 'new_username', true, 'void', 'oni');
 
         $userRepository->expects($this->once())
             ->method('findById')

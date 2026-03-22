@@ -12,7 +12,7 @@ it('updates user settings successfully', function () {
         'username' => 'new_username',
         'is_public' => true,
         'theme' => 'void',
-        'palette' => 'ember',
+        'palette' => 'oni',
     ]);
 
     $response->assertOk()
@@ -21,7 +21,7 @@ it('updates user settings successfully', function () {
                 'username' => 'new_username',
                 'is_public' => true,
                 'theme' => 'void',
-                'palette' => 'ember',
+                'palette' => 'oni',
             ],
         ]);
 
@@ -30,7 +30,7 @@ it('updates user settings successfully', function () {
         'username' => 'new_username',
         'is_public' => true,
         'theme' => 'void',
-        'palette' => 'ember',
+        'palette' => 'oni',
     ]);
 });
 
@@ -47,7 +47,7 @@ it('prevents duplicate usernames', function () {
         'username' => 'taken_username',
         'is_public' => true,
         'theme' => 'void',
-        'palette' => 'ember',
+        'palette' => 'oni',
     ]);
 
     $response->assertUnprocessable()
@@ -64,7 +64,7 @@ it('allows updating settings without changing username', function () {
         'username' => 'my_username',
         'is_public' => true,
         'theme' => 'void',
-        'palette' => 'ember',
+        'palette' => 'oni',
     ]);
 
     $response->assertOk();
@@ -78,28 +78,28 @@ it('allows updating settings without changing username', function () {
 it('persists theme and palette choices', function () {
     $user = User::factory()->create([
         'theme' => 'void',
-        'palette' => 'ember',
+        'palette' => 'oni',
     ]);
 
     $response = $this->actingAs($user)->putJson('/api/user/settings', [
         'username' => $user->username,
         'is_public' => false,
         'theme' => 'light',
-        'palette' => 'indigo',
+        'palette' => 'kaminari',
     ]);
 
     $response->assertOk()
         ->assertJson([
             'data' => [
                 'theme' => 'light',
-                'palette' => 'indigo',
+                'palette' => 'kaminari',
             ],
         ]);
 
     $this->assertDatabaseHas('users', [
         'id' => $user->id,
         'theme' => 'light',
-        'palette' => 'indigo',
+        'palette' => 'kaminari',
     ]);
 });
 
@@ -110,7 +110,7 @@ it('rejects invalid theme', function () {
         'username' => $user->username,
         'is_public' => false,
         'theme' => 'dark',
-        'palette' => 'ember',
+        'palette' => 'oni',
     ]);
 
     $response->assertUnprocessable()

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('theme')->default('void')->after('is_public');
-            $table->string('palette')->default('ember')->after('theme');
+            $table->string('palette')->default('oni')->after('theme');
         });
     }
 

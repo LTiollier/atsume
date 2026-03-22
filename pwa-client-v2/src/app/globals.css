@@ -27,9 +27,11 @@
      --sidebar-accent · --sidebar-accent-foreground
      --shadow-glow-* (glows réduits 6-8% vs 20-30% en Void)
 
-   Palette par défaut : Crimson (rouge sang hue 18°)
-   Classe sur <html> : .palette-crimson | .palette-ember
-                       .palette-indigo | .palette-forest
+   Palette par défaut : Oni (rouge sang hue 18°)
+   Classe sur <html> : .palette-oni | .palette-kitsune
+                       .palette-kaminari | .palette-matcha
+                       .palette-sakura | .palette-katana
+                       .palette-mangaka
 
    Thème par défaut : Void (dark)
    Classe sur <html> : .theme-void | .theme-light
@@ -150,38 +152,35 @@
   }
 
   /* ============================================
-     PALETTE EMBER — Ambre chaud hue 55°
-     Contraste primary-foreground/primary : ~7.8:1 ✅ AAA
+     PALETTE KITSUNE — Orange Brûlé hue 45°
      ============================================ */
-  .palette-ember {
-    --primary:                        oklch(72% 0.24 55);
-    --primary-foreground:             oklch(8%  0.008 55);
-    --accent:                         oklch(16% 0.014 250);
+  .palette-kitsune {
+    --primary:                        oklch(68% 0.22 45);
+    --primary-foreground:             oklch(10% 0.020 45);
+    --accent:                         oklch(16% 0.018 250);
     --accent-foreground:              oklch(90% 0.006 60);
-    --ring:                           oklch(72% 0.24 55);
+    --ring:                           oklch(68% 0.22 45);
 
-    --sidebar-primary:                oklch(72% 0.24 55);
-    --sidebar-primary-foreground:     oklch(8%  0.008 55);
-    --sidebar-ring:                   oklch(72% 0.24 55);
+    --sidebar-primary:                oklch(68% 0.22 45);
+    --sidebar-primary-foreground:     oklch(10% 0.020 45);
+    --sidebar-ring:                   oklch(68% 0.22 45);
 
-    /* Glow teintée par l'ambre — change avec la palette */
-    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(72% 0.24 55) 30%, transparent);
-    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(72% 0.24 55) 25%, transparent);
-    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(72% 0.24 55) 20%, transparent);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(68% 0.22 45) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(68% 0.22 45) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(68% 0.22 45) 20%, transparent);
 
-    /* Sémantique Atsume */
-    --color-read:     oklch(70% 0.18 155);  /* Vert émeraude */
-    --color-loaned:   oklch(74% 0.20 55);   /* Ambre clair — proche primary, état distinct */
-    --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
-    --color-owned:    oklch(62% 0.18 215);  /* Bleu-cyan */
+    --color-read:     oklch(70% 0.18 155);
+    --color-loaned:   oklch(68% 0.22 45);   /* = primary orange */
+    --color-wishlist: oklch(65% 0.22 300);
+    --color-owned:    oklch(62% 0.18 215);
   }
 
   /* ============================================
-     PALETTE CRIMSON — Rouge sang hue 18° ⭐ DÉFAUT
+     PALETTE ONI — Rouge sang hue 18° ⭐ DÉFAUT
      Contraste primary-foreground/primary : ~6.0:1 ✅ AA
      ============================================ */
   :root,
-  .palette-crimson {
+  .palette-oni {
     --primary:                        oklch(62% 0.24 18);
     --primary-foreground:             oklch(10% 0.015 18);
     --accent:                         oklch(16% 0.018 250);
@@ -203,53 +202,125 @@
   }
 
   /* ============================================
-     PALETTE INDIGO — Violet hue 290°
-     Contraste primary-foreground/primary : ~6.4:1 ✅ AA
+     PALETTE KAMINARI — Jaune Or hue 90°
      ============================================ */
-  .palette-indigo {
-    --primary:                        oklch(65% 0.26 290);
-    --primary-foreground:             oklch(10% 0.020 290);
-    --accent:                         oklch(17% 0.020 265);
+  .palette-kaminari {
+    --primary:                        oklch(82% 0.20 90);
+    --primary-foreground:             oklch(15% 0.020 90);
+    --accent:                         oklch(16% 0.018 250);
     --accent-foreground:              oklch(90% 0.006 60);
-    --ring:                           oklch(65% 0.26 290);
+    --ring:                           oklch(82% 0.20 90);
 
-    --sidebar-primary:                oklch(65% 0.26 290);
-    --sidebar-primary-foreground:     oklch(10% 0.020 290);
-    --sidebar-ring:                   oklch(65% 0.26 290);
+    --sidebar-primary:                oklch(82% 0.20 90);
+    --sidebar-primary-foreground:     oklch(15% 0.020 90);
+    --sidebar-ring:                   oklch(82% 0.20 90);
 
-    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(65% 0.26 290) 30%, transparent);
-    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(65% 0.26 290) 25%, transparent);
-    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(65% 0.26 290) 20%, transparent);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(82% 0.20 90) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(82% 0.20 90) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(82% 0.20 90) 20%, transparent);
+
+    --color-read:     oklch(68% 0.18 155);
+    --color-loaned:   oklch(82% 0.20 90);   /* = primary yellow */
+    --color-wishlist: oklch(65% 0.26 290);
+    --color-owned:    oklch(68% 0.20 220);
+  }
+
+  /* ============================================
+     PALETTE MATCHA — Vert Lime hue 135°
+     ============================================ */
+  .palette-matcha {
+    --primary:                        oklch(76% 0.18 135);
+    --primary-foreground:             oklch(15% 0.020 135);
+    --accent:                         oklch(16% 0.016 250);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(76% 0.18 135);
+
+    --sidebar-primary:                oklch(76% 0.18 135);
+    --sidebar-primary-foreground:     oklch(15% 0.020 135);
+    --sidebar-ring:                   oklch(76% 0.18 135);
+
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(76% 0.18 135) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(76% 0.18 135) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(76% 0.18 135) 20%, transparent);
+
+    --color-read:     oklch(76% 0.18 135);  /* = primary matcha */
+    --color-loaned:   oklch(72% 0.20 55);
+    --color-wishlist: oklch(65% 0.22 295);
+    --color-owned:    oklch(65% 0.20 215);
+  }
+
+  /* ============================================
+     PALETTE MANGAKA — Monochrome Argent hue 250°
+     ============================================ */
+  .palette-mangaka {
+    --primary:                        oklch(91% 0.005 250);
+    --primary-foreground:             oklch(15% 0.012 250);
+    --accent:                         oklch(16% 0.010 250);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(91% 0.005 250);
+
+    --sidebar-primary:                oklch(91% 0.005 250);
+    --sidebar-primary-foreground:     oklch(15% 0.012 250);
+    --sidebar-ring:                   oklch(91% 0.005 250);
+
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(91% 0.005 250) 15%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(91% 0.005 250) 10%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(91% 0.005 250) 8%, transparent);
+
+    --color-read:     oklch(75% 0 0);
+    --color-loaned:   oklch(65% 0 0);
+    --color-wishlist: oklch(85% 0 0);
+    --color-owned:    oklch(91% 0.005 250); /* = primary */
+  }
+
+  /* ============================================
+     PALETTE SAKURA — Rose néon hue 345°
+     Contraste primary-foreground/primary : ~6.5:1 ✅ AA
+     ============================================ */
+  .palette-sakura {
+    --primary:                        oklch(65% 0.26 345);
+    --primary-foreground:             oklch(10% 0.020 345);
+    --accent:                         oklch(16% 0.020 345);
+    --accent-foreground:              oklch(90% 0.006 60);
+    --ring:                           oklch(65% 0.26 345);
+
+    --sidebar-primary:                oklch(65% 0.26 345);
+    --sidebar-primary-foreground:     oklch(10% 0.020 345);
+    --sidebar-ring:                   oklch(65% 0.26 345);
+
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(65% 0.26 345) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(65% 0.26 345) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(65% 0.26 345) 20%, transparent);
 
     --color-read:     oklch(68% 0.18 155);  /* Vert émeraude */
     --color-loaned:   oklch(72% 0.20 55);   /* Ambre */
-    --color-wishlist: oklch(65% 0.26 290);  /* = primary indigo */
+    --color-wishlist: oklch(65% 0.26 345);  /* = primary rose */
     --color-owned:    oklch(68% 0.20 220);  /* Teal */
   }
 
   /* ============================================
-     PALETTE FOREST — Vert forêt hue 155°
-     Contraste primary-foreground/primary : ~5.9:1 ✅ AA
+     PALETTE KATANA — Cyan acier hue 200°
+     Contraste primary-foreground/primary : ~7.0:1 ✅ AAA
      ============================================ */
-  .palette-forest {
-    --primary:                        oklch(62% 0.22 155);
-    --primary-foreground:             oklch(10% 0.018 155);
-    --accent:                         oklch(16% 0.016 250);
+  .palette-katana {
+    --primary:                        oklch(70% 0.22 200);
+    --primary-foreground:             oklch(10% 0.020 200);
+    --accent:                         oklch(16% 0.020 200);
     --accent-foreground:              oklch(90% 0.006 60);
-    --ring:                           oklch(62% 0.22 155);
+    --ring:                           oklch(70% 0.22 200);
 
-    --sidebar-primary:                oklch(62% 0.22 155);
-    --sidebar-primary-foreground:     oklch(10% 0.018 155);
-    --sidebar-ring:                   oklch(62% 0.22 155);
+    --sidebar-primary:                oklch(70% 0.22 200);
+    --sidebar-primary-foreground:     oklch(10% 0.020 200);
+    --sidebar-ring:                   oklch(70% 0.22 200);
 
-    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(62% 0.22 155) 30%, transparent);
-    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(62% 0.22 155) 25%, transparent);
-    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(62% 0.22 155) 20%, transparent);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(70% 0.22 200) 30%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(70% 0.22 200) 25%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(70% 0.22 200) 20%, transparent);
 
-    --color-read:     oklch(62% 0.22 155);  /* = primary vert */
+    --color-read:     oklch(68% 0.18 155);  /* Vert émeraude */
     --color-loaned:   oklch(72% 0.20 55);   /* Ambre */
-    --color-wishlist: oklch(65% 0.22 295);  /* Lavande */
-    --color-owned:    oklch(65% 0.20 215);  /* Cyan */
+    --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
+    --color-owned:    oklch(70% 0.22 200);  /* = primary cyan */
   }
 
   /* ============================================
@@ -258,20 +329,19 @@
      Spécificité (0,2,0) > palette seule (0,1,0) ✅
      ============================================ */
 
-  /* Light × Ember */
-  .theme-light.palette-ember,
-  .theme-light :root {
-    --accent:                   oklch(93% 0.020 55);   /* ambre très clair */
-    --accent-foreground:        oklch(20% 0.020 55);
-    --sidebar-accent:           oklch(90% 0.022 55);
-    --sidebar-accent-foreground: oklch(20% 0.020 55);
-    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(72% 0.24 55) 8%, transparent);
-    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(72% 0.24 55) 6%, transparent);
-    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(72% 0.24 55) 5%, transparent);
+  /* Light × Kitsune */
+  .theme-light.palette-kitsune {
+    --accent:                   oklch(93% 0.020 45);
+    --accent-foreground:        oklch(20% 0.020 45);
+    --sidebar-accent:           oklch(90% 0.022 45);
+    --sidebar-accent-foreground: oklch(20% 0.020 45);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(68% 0.22 45) 8%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(68% 0.22 45) 6%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(68% 0.22 45) 5%, transparent);
   }
 
-  /* Light × Crimson */
-  .theme-light.palette-crimson {
+  /* Light × Oni */
+  .theme-light.palette-oni {
     --accent:                   oklch(93% 0.020 18);   /* rouge très clair */
     --accent-foreground:        oklch(20% 0.020 18);
     --sidebar-accent:           oklch(90% 0.022 18);
@@ -281,26 +351,59 @@
     --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(62% 0.24 18) 5%, transparent);
   }
 
-  /* Light × Indigo */
-  .theme-light.palette-indigo {
-    --accent:                   oklch(92% 0.022 290);  /* violet très clair */
-    --accent-foreground:        oklch(20% 0.025 290);
-    --sidebar-accent:           oklch(89% 0.024 290);
-    --sidebar-accent-foreground: oklch(20% 0.025 290);
-    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(65% 0.26 290) 8%, transparent);
-    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(65% 0.26 290) 6%, transparent);
-    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(65% 0.26 290) 5%, transparent);
+  /* Light × Kaminari */
+  .theme-light.palette-kaminari {
+    --accent:                   oklch(92% 0.022 90);
+    --accent-foreground:        oklch(20% 0.025 90);
+    --sidebar-accent:           oklch(89% 0.024 90);
+    --sidebar-accent-foreground: oklch(20% 0.025 90);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(82% 0.20 90) 8%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(82% 0.20 90) 6%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(82% 0.20 90) 5%, transparent);
   }
 
-  /* Light × Forest */
-  .theme-light.palette-forest {
-    --accent:                   oklch(92% 0.022 155);  /* vert très clair */
-    --accent-foreground:        oklch(20% 0.020 155);
-    --sidebar-accent:           oklch(89% 0.024 155);
-    --sidebar-accent-foreground: oklch(20% 0.020 155);
-    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(62% 0.22 155) 8%, transparent);
-    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(62% 0.22 155) 6%, transparent);
-    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(62% 0.22 155) 5%, transparent);
+  /* Light × Matcha */
+  .theme-light.palette-matcha {
+    --accent:                   oklch(92% 0.022 135);
+    --accent-foreground:        oklch(20% 0.020 135);
+    --sidebar-accent:           oklch(89% 0.024 135);
+    --sidebar-accent-foreground: oklch(20% 0.020 135);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(76% 0.18 135) 8%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(76% 0.18 135) 6%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(76% 0.18 135) 5%, transparent);
+  }
+
+  /* Light × Mangaka */
+  .theme-light.palette-mangaka {
+    --accent:                   oklch(96% 0.005 250);
+    --accent-foreground:        oklch(20% 0.012 250);
+    --sidebar-accent:           oklch(92% 0.008 250);
+    --sidebar-accent-foreground: oklch(20% 0.012 250);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(91% 0.005 250) 4%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(91% 0.005 250) 3%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(91% 0.005 250) 2%, transparent);
+  }
+
+  /* Light × Sakura */
+  .theme-light.palette-sakura {
+    --accent:                   oklch(93% 0.022 345);  /* rose très clair */
+    --accent-foreground:        oklch(20% 0.025 345);
+    --sidebar-accent:           oklch(90% 0.024 345);
+    --sidebar-accent-foreground: oklch(20% 0.025 345);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(65% 0.26 345) 8%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(65% 0.26 345) 6%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(65% 0.26 345) 5%, transparent);
+  }
+
+  /* Light × Katana */
+  .theme-light.palette-katana {
+    --accent:                   oklch(93% 0.020 200);  /* cyan très clair */
+    --accent-foreground:        oklch(20% 0.025 200);
+    --sidebar-accent:           oklch(90% 0.022 200);
+    --sidebar-accent-foreground: oklch(20% 0.025 200);
+    --shadow-glow-sm: 0 0 12px color-mix(in oklch, oklch(70% 0.22 200) 8%, transparent);
+    --shadow-glow-md: 0 0 24px color-mix(in oklch, oklch(70% 0.22 200) 6%, transparent);
+    --shadow-glow-lg: 0 0 80px color-mix(in oklch, oklch(70% 0.22 200) 5%, transparent);
   }
 
 }
