@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-final class CreateBoxDTO
+final readonly class CreateBoxDTO
 {
     public function __construct(
-        public readonly int $boxSetId,
-        public readonly string $title,
-        public readonly ?string $number = null,
-        public readonly ?string $isbn = null,
-        public readonly ?string $apiId = null,
-        public readonly ?string $releaseDate = null,
-        public readonly ?string $coverUrl = null,
-        public readonly bool $isEmpty = false,
+        public int $boxSetId,
+        public string $title,
+        public ?string $number = null,
+        public ?string $isbn = null,
+        public ?string $apiId = null,
+        public ?string $releaseDate = null,
+        public ?string $coverUrl = null,
+        public bool $isEmpty = false,
     ) {}
 }

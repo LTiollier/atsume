@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\ReadingProgress\Application\DTOs;
 
-final class BulkToggleReadingProgressDTO
+final readonly class BulkToggleReadingProgressDTO
 {
     /**
      * @param  int[]  $volumeIds
      */
     public function __construct(
-        public readonly int $userId,
-        public readonly array $volumeIds,
+        public int $userId,
+        public array $volumeIds,
     ) {}
 }

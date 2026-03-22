@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\User\Application\DTOs;
 
-final class ResetPasswordDTO
+final readonly class ResetPasswordDTO
 {
     public function __construct(
-        public readonly string $email,
-        public readonly string $password,
-        public readonly string $passwordConfirmation,
-        public readonly string $token,
+        public string $email,
+        public string $password,
+        public string $passwordConfirmation,
+        public string $token,
     ) {}
 }

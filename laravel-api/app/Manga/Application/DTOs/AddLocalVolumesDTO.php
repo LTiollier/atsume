@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-final class AddLocalVolumesDTO
+final readonly class AddLocalVolumesDTO
 {
     /**
      * @param  int[]  $numbers
      */
     public function __construct(
-        public readonly int $editionId,
-        public readonly array $numbers,
-        public readonly int $userId,
+        public int $editionId,
+        public array $numbers,
+        public int $userId,
     ) {}
 }

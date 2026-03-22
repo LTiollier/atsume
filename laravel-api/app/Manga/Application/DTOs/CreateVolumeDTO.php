@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-final class CreateVolumeDTO
+final readonly class CreateVolumeDTO
 {
     public function __construct(
-        public readonly int $editionId,
-        public readonly string $title,
-        public readonly ?string $number = null,
-        public readonly ?string $isbn = null,
-        public readonly ?string $apiId = null,
-        public readonly ?string $publishedDate = null,
-        public readonly ?string $coverUrl = null,
+        public int $editionId,
+        public string $title,
+        public ?string $number = null,
+        public ?string $isbn = null,
+        public ?string $apiId = null,
+        public ?string $publishedDate = null,
+        public ?string $coverUrl = null,
     ) {}
 }

@@ -109,11 +109,11 @@
 
 ### 3.4 Arch tests à enrichir
 
-- [ ] [tests/Arch.php](file:///Users/leoelmy/Projects/mangastore/laravel-api/tests/Arch.php) ne contient que 3 règles — enrichir avec :
-  - [ ] Vérifier que les Controllers n'utilisent pas directement `EloquentModels`
-  - [ ] Vérifier que les Domain Models n'importent pas de classes Laravel (Eloquent, Facades, etc.)
-  - [ ] Vérifier que les DTOs sont des `readonly` classes
-  - [ ] Vérifier que les Actions implémentent toutes une méthode [execute()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Application/Actions/ImportFromMangaCollecAction.php#24-96)
+- [x] [tests/Arch.php](file:///Users/leoelmy/Projects/mangastore/laravel-api/tests/Arch.php) ne contient que 3 règles — enrichir avec :
+  - [x] Vérifier que les Controllers n'utilisent pas directement `EloquentModels`
+  - [x] Vérifier que les Domain Models n'importent pas de classes Laravel (Eloquent, Facades, etc.)
+  - [x] Vérifier que les DTOs sont des `readonly` classes
+  - [x] Vérifier que les Actions implémentent toutes une méthode [execute()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Application/Actions/ImportFromMangaCollecAction.php#24-96)
 
 ---
 

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\DTOs;
 
-final class PlanningFiltersDTO
+final readonly class PlanningFiltersDTO
 {
     public function __construct(
-        public readonly int $userId,
-        public readonly string $from,
-        public readonly string $to,
-        public readonly int $perPage,
-        public readonly ?string $cursor,
+        public int $userId,
+        public string $from,
+        public string $to,
+        public int $perPage,
+        public ?string $cursor,
     ) {}
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\User\Application\DTOs;
 
-final class ForgotPasswordDTO
+final readonly class ForgotPasswordDTO
 {
     public function __construct(
-        public readonly string $email,
+        public string $email,
     ) {}
 }
