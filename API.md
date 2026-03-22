@@ -136,6 +136,32 @@ Update profile settings.
 `username`: nullable, max 50, alpha_dash, unique
 **Response 200**: `UserResource`
 
+### PUT /api/user/settings/email
+Update the user's email address. Requires current password for security.
+
+**Body**:
+```json
+{ "email": "string", "current_password": "string" }
+```
+`email`: required, valid email, unique in `users` table
+**Response 200**: `UserResource`
+**Response 401**: Incorrect current password
+**Response 422**: Email already taken or invalid format
+
+---
+
+### PUT /api/user/settings/password
+Update the user's password. Requires current password for security.
+
+**Body**:
+```json
+{ "current_password": "string", "password": "string", "password_confirmation": "string" }
+```
+`password`: required, min 8 chars, mixed case, numbers, confirmed
+**Response 200**: `UserResource`
+**Response 401**: Incorrect current password
+**Response 422**: Validation failure
+
 ---
 
 ---

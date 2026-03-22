@@ -45,8 +45,12 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     // User
     Route::get('/user', fn (Request $request) => new UserResource($request->user()));
-    Route::put('/user/settings', [UserSettingsController::class, 'update']);
-    Route::post('/user/settings/import/mangacollec', [MangaCollecImportController::class, 'store']);
+    Route::prefix('/user/settings')->group(function () {
+        Route::put('/', [UserSettingsController::class, 'update']);
+        Route::put('/email', [UserSettingsController::class, 'updateEmail']);
+        Route::put('/password', [UserSettingsController::class, 'updatePassword']);
+        Route::post('/import/mangacollec', [MangaCollecImportController::class, 'store']);
+    });
 
     // Catalog (hierarchy)
     Route::prefix('/series/{id}')->group(function () {

@@ -130,3 +130,112 @@ it('rejects invalid palette', function () {
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['palette']);
 });
+
+it('updates user email successfully', function () {
+    $user = User::factory()->create([
+        'email' => 'old@example.com',
+        'password' => Hash::make('password123'),
+    ]);
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings/email', [
+        'email' => 'new@example.com',
+        'current_password' => 'password123',
+    ]);
+
+    $response->assertOk()
+        ->assertJson([
+            'data' => [
+                'email' => 'new@example.com',
+            ],
+        ]);
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'email' => 'new@example.com',
+    ]);
+});
+
+it('prevents updating email with incorrect password', function () {
+    $user = User::factory()->create([
+        'email' => 'old@example.com',
+        'password' => Hash::make('password123'),
+    ]);
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings/email', [
+        'email' => 'new@example.com',
+        'current_password' => 'wrong_password',
+    ]);
+
+    $response->assertStatus(401);
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'email' => 'old@example.com',
+    ]);
+});
+
+it('prevents duplicate emails during email update', function () {
+    User::factory()->create(['email' => 'taken@example.com']);
+
+    $user = User::factory()->create([
+        'email' => 'my@example.com',
+        'password' => Hash::make('password123'),
+    ]);
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings/email', [
+        'email' => 'taken@example.com',
+        'current_password' => 'password123',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['email']);
+});
+
+it('updates user password successfully', function () {
+    $user = User::factory()->create([
+        'password' => Hash::make('OldPassword123!'),
+    ]);
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings/password', [
+        'current_password' => 'OldPassword123!',
+        'password' => 'NewSecurePassword123!',
+        'password_confirmation' => 'NewSecurePassword123!',
+    ]);
+
+    $response->assertOk();
+
+    $user->refresh();
+    expect(Hash::check('NewSecurePassword123!', $user->password))->toBeTrue();
+});
+
+it('prevents updating password with incorrect current password', function () {
+    $user = User::factory()->create([
+        'password' => Hash::make('CorrectPassword123!'),
+    ]);
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings/password', [
+        'current_password' => 'WrongPassword123!',
+        'password' => 'NewSecurePassword123!',
+        'password_confirmation' => 'NewSecurePassword123!',
+    ]);
+
+    $response->assertStatus(401);
+
+    $user->refresh();
+    expect(Hash::check('CorrectPassword123!', $user->password))->toBeTrue();
+});
+
+it('validates new password strength', function () {
+    $user = User::factory()->create([
+        'password' => Hash::make('CorrectPassword123!'),
+    ]);
+
+    $response = $this->actingAs($user)->putJson('/api/user/settings/password', [
+        'current_password' => 'CorrectPassword123!',
+        'password' => 'weak',
+        'password_confirmation' => 'weak',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['password']);
+});
