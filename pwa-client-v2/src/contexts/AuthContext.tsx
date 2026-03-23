@@ -1,10 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useCallback, useSyncExternalStore } from 'react';
+import React, { createContext, useContext, useCallback, useSyncExternalStore, useEffect } from 'react';
 import { User } from '@/types/auth';
 import { tokenStorage } from '@/lib/tokenStorage';
 import { useHasHydrated } from '@/hooks/useHasHydrated';
 import { authService } from '@/services/auth.service';
+import { userService } from '@/services/user.service';
 import { seedThemeFromUser } from '@/contexts/ThemeContext';
 import { seedPaletteFromUser } from '@/contexts/PaletteContext';
 
@@ -79,6 +80,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         seedPaletteFromUser(updatedUser.palette);
         emitUserChange();
     }, []);
+
+    useEffect(() => {
+        // If we have a token but no user, try to fetch the user (e.g. after refresh/new tab if storage was cleared)
+        // Note: we now use localStorage for user too, but this is a safe fallback
+        if (hasHydrated && !user && tokenStorage.getToken()) {
+            userService.getCurrentUser()
+                .then(updateUser)
+                .catch(() => {
+                    // Token invalid or network error
+                    tokenStorage.clear();
+                    emitUserChange();
+                });
+        }
+    }, [hasHydrated, user, updateUser]);
 
     const value = {
         user,

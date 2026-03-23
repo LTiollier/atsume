@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -104,7 +105,7 @@ export function SettingsClient() {
     formState: { errors, isDirty },
   } = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
-    defaultValues: {
+    values: {
       username: user?.username ?? '',
       is_public: user?.is_public ?? false,
     },

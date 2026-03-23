@@ -31,7 +31,7 @@ export const tokenStorage = {
     },
 
     getUser<T>(): T | null {
-        const raw = getSessionStorage()?.getItem(USER_KEY);
+        const raw = getLocalStorage()?.getItem(USER_KEY);
         if (!raw) return null;
         try {
             return JSON.parse(raw) as T;
@@ -41,11 +41,11 @@ export const tokenStorage = {
     },
 
     setUser<T>(user: T): void {
-        getSessionStorage()?.setItem(USER_KEY, JSON.stringify(user));
+        getLocalStorage()?.setItem(USER_KEY, JSON.stringify(user));
     },
 
     removeUser(): void {
-        getSessionStorage()?.removeItem(USER_KEY);
+        getLocalStorage()?.removeItem(USER_KEY);
     },
 
     clear(): void {
