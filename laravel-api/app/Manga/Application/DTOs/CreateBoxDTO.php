@@ -15,5 +15,6 @@ final readonly class CreateBoxDTO
         public ?string $releaseDate = null,
         public ?string $coverUrl = null,
         public bool $isEmpty = false,
+        public float $sortOrder = 0,
     ) {}
 }

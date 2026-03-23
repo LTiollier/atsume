@@ -25,11 +25,11 @@ final class EloquentEditionRepository implements EditionRepositoryInterface
                 $q->withExists(['users as is_owned' => function ($u) use ($userId) {
                     $u->where('users.id', $userId);
                 }]);
-                $q->orderByRaw('CAST(number AS DECIMAL) ASC');
+                $q->orderBy('sort_order', 'asc');
             }]);
         } else {
             $query->with(['volumes' => function ($q) {
-                $q->orderByRaw('CAST(number AS DECIMAL) ASC');
+                $q->orderBy('sort_order', 'asc');
             }]);
         }
 

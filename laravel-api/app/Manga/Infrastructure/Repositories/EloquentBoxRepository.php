@@ -31,11 +31,11 @@ final class EloquentBoxRepository implements BoxRepositoryInterface
                 $q->withExists(['wishlistedBy as is_wishlisted' => function ($u) use ($userId) {
                     $u->where('users.id', $userId);
                 }]);
-                $q->orderByRaw('CAST(number AS DECIMAL) ASC');
+                $q->orderBy('sort_order', 'asc');
             }]);
         } else {
             $query->with(['volumes' => function ($q) {
-                $q->orderByRaw('CAST(number AS DECIMAL) ASC');
+                $q->orderBy('sort_order', 'asc');
             }]);
         }
 
@@ -91,6 +91,7 @@ final class EloquentBoxRepository implements BoxRepositoryInterface
             'release_date' => $dto->releaseDate,
             'cover_url' => $dto->coverUrl,
             'is_empty' => $dto->isEmpty,
+            'sort_order' => $dto->sortOrder,
         ]);
 
         return $this->toDomain($eloquent);

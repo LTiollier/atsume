@@ -27,6 +27,7 @@ final class EloquentVolumeRepository implements VolumeRepositoryInterface
             'api_id' => $dto->apiId,
             'published_date' => $dto->publishedDate,
             'cover_url' => $dto->coverUrl,
+            'sort_order' => $dto->sortOrder,
         ]);
 
         return $this->toDomain($eloquent);
@@ -65,7 +66,7 @@ final class EloquentVolumeRepository implements VolumeRepositoryInterface
                     $q->where('users.id', $userId);
                 }]);
             })
-            ->orderByRaw('CAST(number AS DECIMAL) ASC')
+            ->orderBy('sort_order', 'asc')
             ->get();
 
         /** @var array<int, Volume> $volumes */
@@ -195,7 +196,7 @@ final class EloquentVolumeRepository implements VolumeRepositoryInterface
                 'edition.series',
                 'loans' => fn ($q) => $q->where('user_id', $userId)->whereNull('returned_at'),
             ])
-            ->orderByRaw('CAST(number AS DECIMAL) ASC')
+            ->orderBy('sort_order', 'asc')
             ->get();
 
         /** @var array<int, Volume> $volumes */

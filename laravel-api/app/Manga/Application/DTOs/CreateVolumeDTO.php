@@ -14,5 +14,6 @@ final readonly class CreateVolumeDTO
         public ?string $apiId = null,
         public ?string $publishedDate = null,
         public ?string $coverUrl = null,
+        public float $sortOrder = 0,
     ) {}
 }

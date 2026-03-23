@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Api\Controllers;
 
 use App\Http\Api\Requests\ImportMangaCollecRequest;
-use App\Http\Api\Resources\ImportSummaryResource;
 use App\Manga\Application\Actions\ImportFromMangaCollecAction;
 use App\Manga\Application\DTOs\ImportMangaCollecDTO;
-use App\Manga\Domain\Exceptions\MangaCollecProfilePrivateException;
 use Illuminate\Http\JsonResponse;
 
 class MangaCollecImportController
 {
-    public function store(ImportMangaCollecRequest $request, ImportFromMangaCollecAction $action): ImportSummaryResource|JsonResponse
+    public function store(ImportMangaCollecRequest $request, ImportFromMangaCollecAction $action): JsonResponse
     {
         $username = $request->getUsername();
 
@@ -26,12 +24,8 @@ class MangaCollecImportController
             userId: (int) auth()->id(),
         );
 
-        try {
-            $result = $action->execute($dto);
+        $action->execute($dto);
 
-            return new ImportSummaryResource($result);
-        } catch (MangaCollecProfilePrivateException $e) {
-            return response()->json(['message' => $e->getMessage()], 403);
-        }
+        return response()->json(['message' => 'Import started in background.'], 202);
     }
 }

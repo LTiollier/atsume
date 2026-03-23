@@ -149,20 +149,16 @@
 - [x] La boucle sur `$boxVolumesRaw` appelle `$this->volumeRepository->findByApiId($bvVolumeUuid)` pour chaque volume — soit N requêtes SQL pour un box set avec beaucoup de volumes. Regrouper les `api_id` et faire un seul `whereIn` en amont.
 
 ### 5.3 Import MangaCollec — série par série sans Queue
+- [x] L'importation exploite désormais le système de **Queues** de Laravel via `MangaCollecImportJob` (orchestrateur) et `ImportMangaCollecSeriesJob` (une série par job). Le contrôleur retourne un `202 Accepted` immédiatement.
 
-- [ ] [ImportFromMangaCollecAction](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Application/Actions/ImportFromMangaCollecAction.php#15-97) traite l'import de manière **synchrone** — pour de grands profils MangaCollec, cela peut dépasser le timeout HTTP. Envisager de **dispatcher un Job en arrière-plan** (`ShouldQueue`) et retourner immédiatement un `202 Accepted` avec un statut de progression.
+### 5.4 [ScrapeMangaCollecCommand](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Console/ScrapeMangaCollecCommand.php) — gestion mémoire naturelle
+- [x] La commande `app:scrape-mangacollec` ne traite plus les séries de manière synchrone. Elle dispatche des `ImportMangaCollecSeriesJob`, ce qui permet d'utiliser le cycle de vie des workers pour libérer la mémoire naturellement (Point 5.4, 9.1, 9.2 délégués).
 
-### 5.4 [ScrapeMangaCollecCommand](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Console/ScrapeMangaCollecCommand.php#9-147) — gestion mémoire artisanale
+### 5.5 [attachByApiIdsToUser](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Repositories/EloquentVolumeRepository.php) — optimisation bulk attendue
+- [x] `FinalizeMangaCollecImportJob` utilise `insertOrIgnore` par chunks pour attacher massivement les volumes et box à l'utilisateur sans générer une requête par record.
 
-- [ ] La commande appelle `gc_collect_cycles()` et `unset($detail)` manuellement — une meilleure approche est de traiter les séries en **chunks** ou de dispatcher des **Jobs** par série pour exploiter le garbage collector de PHP naturellement.
-
-### 5.5 [attachByApiIdsToUser](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Repositories/EloquentVolumeRepository.php#131-147) — potentiel de charge élevée
-
-- [ ] `EloquentVolumeRepository::attachByApiIdsToUser()` récupère tous les IDs locaux via un `whereIn` puis fait un `syncWithoutDetaching` — sur un profil avec 5000+ volumes, le `syncWithoutDetaching` peut générer beaucoup de requêtes INSERT. Utiliser `insertOrIgnore` avec des chunks pour de meilleures performances.
-
-### 5.6 `CAST(number AS DECIMAL)` sans index
-
-- [ ] La clause `orderByRaw('CAST(number AS DECIMAL) ASC')` dans plusieurs repositories ne peut pas utiliser d'index — si les volumes sont nombreux, envisager de stocker `number` comme `DECIMAL` en base ou d'ajouter une colonne `sort_order` indexée.
+### 5.6 `CAST(number AS DECIMAL)` avec index `sort_order`
+- [x] Une colonne `sort_order` de type `DECIMAL` indexée a été ajoutée aux tables `volumes` et `boxes`. Les repositories utilisent désormais `orderBy('sort_order')` au lieu d'un cast dynamique, améliorant drastiquement les performances sur les grandes collections.
 
 ---
 
@@ -228,13 +224,11 @@
 
 ## 9. Commandes Artisan
 
-### 9.1 [ScrapeMangaCollecCommand](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Console/ScrapeMangaCollecCommand.php#9-147) — `ini_set('memory_limit', '1024M')` 
+### 9.1 [ScrapeMangaCollecCommand](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Console/ScrapeMangaCollecCommand.php) — suppression des hacks de limites mémoire
+- [x] Suppression de `ini_set('memory_limit', '1024M')` car la commande délègue désormais le travail lourd à des jobs unitaires.
 
-- [ ] Modifier la limite mémoire en runtime via `ini_set` est une mauvaise pratique — configurer `memory_limit` dans la configuration PHP ou via les options Docker/PHP-FPM plutôt que dans le code.
-
-### 9.2 [ScrapeMangaCollecCommand](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Console/ScrapeMangaCollecCommand.php#9-147) — fichier de progression en `storage/app/`
-
-- [ ] Le fichier de progression est un fichier JSON local — si l'application tourne sur plusieurs workers ou containers, ce fichier de progression ne sera pas partagé. Utiliser la **cache** Laravel (Redis) pour stocker la progression de manière distribuée.
+### 9.2 [ScrapeMangaCollecCommand](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Console/ScrapeMangaCollecCommand.php) — progression via Cache (Redis/DB)
+- [x] Le fichier JSON local `scrape-progress.json` a été supprimé au profit d'une clé de **cache** centralisée, permettant la reprise du scraping sur plusieurs instances/containers.
 
 ### 9.3 Pas de gestion des erreurs pour [markSeriesComplete](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Console/ScrapeMangaCollecCommand.php#117-122)
 

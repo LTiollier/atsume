@@ -31,7 +31,7 @@ final class EloquentSeriesRepository implements SeriesRepositoryInterface
                         $v->withExists(['users as is_owned' => function ($u) use ($userId) {
                             $u->where('users.id', $userId);
                         }]);
-                        $v->orderByRaw('CAST(number AS DECIMAL) ASC');
+                        $v->orderBy('sort_order', 'asc');
                     }]);
                 },
                 'boxSets' => function ($q) use ($userId) {

@@ -161,6 +161,8 @@ class MangaCollecSeriesImportService
                     $existingVolume = $this->volumeRepository->findByEditionAndIsbn($mappedEditionId, $isbn);
                 }
 
+                $sortOrder = $this->resolveSortOrder($volumeNumber);
+
                 if ($existingVolume) {
                     $this->volumeRepository->update($existingVolume->getId(), [
                         'title' => $volumeTitle,
@@ -168,6 +170,7 @@ class MangaCollecSeriesImportService
                         'published_date' => $publishedDate,
                         'cover_url' => $coverUrl,
                         'api_id' => $volumeUuid,
+                        'sort_order' => $sortOrder,
                     ]);
                     $debug(sprintf('[volumes] UPDATED #%s "%s" (api_id: %s)', $volumeNumber, $volumeTitle, $volumeUuid));
 
@@ -192,7 +195,8 @@ class MangaCollecSeriesImportService
                     isbn: $isbn,
                     apiId: $volumeUuid,
                     publishedDate: $publishedDate,
-                    coverUrl: $coverUrl
+                    coverUrl: $coverUrl,
+                    sortOrder: $sortOrder,
                 ));
                 $volumesByApiId[$volumeUuid] = $newVolume;
                 $debug(sprintf('[volumes] CREATED #%s "%s" → edition local id %d', $volumeNumber, $volumeTitle, $mappedEditionId));
@@ -245,6 +249,7 @@ class MangaCollecSeriesImportService
                 $boxReleaseDate = is_string($boxData['release_date'] ?? null) ? $boxData['release_date'] : null;
                 $boxCoverUrl = is_string($boxData['image_url'] ?? null) ? $boxData['image_url'] : null;
                 $boxIsEmpty = str_contains(strtolower($boxTitle), 'vide');
+                $boxSortOrder = $this->resolveSortOrder($boxNumber);
 
                 $existingBox = $this->boxRepository->findByApiId($boxUuid);
 
@@ -269,6 +274,7 @@ class MangaCollecSeriesImportService
                         'cover_url' => $boxCoverUrl,
                         'is_empty' => $boxIsEmpty,
                         'api_id' => $boxUuid,
+                        'sort_order' => $boxSortOrder,
                     ]);
                     $boxesMap[$boxUuid] = $existingBox->getId();
 
@@ -288,6 +294,7 @@ class MangaCollecSeriesImportService
                     releaseDate: $boxReleaseDate,
                     coverUrl: $boxCoverUrl,
                     isEmpty: $boxIsEmpty,
+                    sortOrder: $boxSortOrder,
                 ));
                 $boxesMap[$boxUuid] = $box->getId();
             }
@@ -364,5 +371,23 @@ class MangaCollecSeriesImportService
         }
 
         return null;
+    }
+
+    private function resolveSortOrder(string $number): float
+    {
+        // Extract numeric part from string like "1", "1.5", "1-2" (takes "1")
+        $numeric = preg_replace('/[^0-9.]/', '', $number);
+
+        if (empty($numeric)) {
+            return 0;
+        }
+
+        // Handle cases like "1-2" or "1.5"
+        if (str_contains($numeric, '-')) {
+            $parts = explode('-', $numeric);
+            $numeric = $parts[0];
+        }
+
+        return (float) $numeric;
     }
 }
