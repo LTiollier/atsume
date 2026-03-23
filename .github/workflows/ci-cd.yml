@@ -109,3 +109,8 @@ jobs:
             php artisan view:cache
             php artisan storage:link
             php artisan queue:restart
+
+      - name: 'Deploy Vercel'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: "Vercel - mangatheque: deploy-backend"
