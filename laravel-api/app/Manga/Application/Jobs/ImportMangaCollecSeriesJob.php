@@ -14,6 +14,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 
 final class ImportMangaCollecSeriesJob implements ShouldQueue
 {
@@ -35,17 +36,28 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
             return;
         }
 
-        try {
-            $detail = $scraperService->getSeriesDetail($this->seriesApiId);
-            if ($detail !== null) {
-                $importService->import($this->seriesApiId, $detail);
-            }
-        } catch (Exception $e) {
-            Log::error("Failed to import series {$this->seriesApiId} in job", [
-                'error' => $e->getMessage(),
-                'series_id' => $this->seriesApiId,
-            ]);
-            throw $e;
+        $executed = RateLimiter::attempt(
+            'mangacollec-api',
+            2,
+            function () use ($scraperService, $importService) {
+                try {
+                    $detail = $scraperService->getSeriesDetail($this->seriesApiId);
+                    if ($detail !== null) {
+                        $importService->import($this->seriesApiId, $detail);
+                    }
+                } catch (Exception $e) {
+                    Log::error("Failed to import series {$this->seriesApiId} in job", [
+                        'error' => $e->getMessage(),
+                        'series_id' => $this->seriesApiId,
+                    ]);
+                    throw $e;
+                }
+            },
+            1 // limit window in seconds
+        );
+
+        if (! $executed) {
+            $this->release(5);
         }
     }
 }
