@@ -15,21 +15,22 @@ use App\User\Application\Actions\LoginAction;
 use App\User\Application\Actions\LogoutAction;
 use App\User\Application\Actions\RegisterUserAction;
 use App\User\Application\Actions\ResetPasswordAction;
+use App\User\Domain\Events\UserVerified;
 use App\User\Domain\Exceptions\InvalidCredentialsException;
 use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
-class AuthController
+final class AuthController
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
     ) {}
+
     public function register(RegisterRequest $request, RegisterUserAction $action): JsonResponse
     {
         $dto = $request->toDTO();
@@ -96,7 +97,7 @@ class AuthController
 
         if (! $user->isEmailVerified()) {
             $user = $this->userRepository->markAsVerified($user);
-            event(new Verified($user));
+            event(new UserVerified($user));
         }
 
         if ($request->wantsJson()) {

@@ -7,7 +7,7 @@ namespace App\Http\Api\Requests;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use Illuminate\Foundation\Http\FormRequest;
 
-class VerifyEmailRequest extends FormRequest
+final class VerifyEmailRequest extends FormRequest
 {
     public function authorize(): bool
     {

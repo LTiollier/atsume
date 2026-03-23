@@ -170,10 +170,13 @@ class AppServiceProvider extends ServiceProvider
             /** @var string $frontendUrl */
             $frontendUrl = config('app.frontend_url');
 
+            /** @var int $expire */
+            $expire = config('auth.verification.expire', 60);
+
             // Generate the backend signed URL to extract its parameters
             $temporarySignedUrl = URL::temporarySignedRoute(
                 'verification.verify',
-                now()->addMinutes(config('auth.verification.expire', 60)),
+                now()->addMinutes($expire),
                 ['id' => $id, 'hash' => $hash]
             );
 
