@@ -14,6 +14,10 @@ on:
       - 'pwa-client-v2/**'
       - '.github/workflows/ci-cd.yml'
 
+permissions:
+  contents: read
+  statuses: write
+
 jobs:
   backend-ci:
     name: Backend CI
