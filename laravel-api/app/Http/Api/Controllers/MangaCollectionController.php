@@ -16,7 +16,6 @@ use App\Manga\Application\Actions\AddMangaAction;
 use App\Manga\Application\Actions\BulkRemoveVolumesFromCollectionAction;
 use App\Manga\Application\Actions\ListUserMangasAction;
 use App\Manga\Application\Actions\RemoveSeriesFromCollectionAction;
-use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -25,10 +24,7 @@ class MangaCollectionController
 {
     public function index(Request $request, ListUserMangasAction $action): AnonymousResourceCollection
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        $mangas = $action->execute((int) $user->id);
+        $mangas = $action->execute((int) auth()->id());
 
         return MangaResource::collection(collect($mangas));
     }
@@ -71,10 +67,7 @@ class MangaCollectionController
 
     public function removeSeries(RemoveSeriesRequest $request, RemoveSeriesFromCollectionAction $action, int $seriesId): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        $action->execute($seriesId, (int) $user->id);
+        $action->execute($seriesId, (int) auth()->id());
 
         return response()->json(['message' => 'Series removed from collection'], 200);
     }

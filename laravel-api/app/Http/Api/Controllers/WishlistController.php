@@ -12,7 +12,6 @@ use App\Manga\Application\Actions\ListWishlistAction;
 use App\Manga\Application\Actions\RemoveVolumeFromWishlistAction;
 use App\Manga\Application\DTOs\AddToWishlistDTO;
 use App\Manga\Infrastructure\Services\WishlistAuthorizationService;
-use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -21,9 +20,7 @@ class WishlistController
 {
     public function index(Request $request, ListWishlistAction $action): AnonymousResourceCollection
     {
-        /** @var User $user */
-        $user = $request->user();
-        $wishlist = $action->execute((int) $user->id);
+        $wishlist = $action->execute((int) auth()->id());
 
         return WishlistItemResource::collection($wishlist);
     }
@@ -33,16 +30,13 @@ class WishlistController
         AddToWishlistAction $action,
         WishlistAuthorizationService $authService,
     ): JsonResponse {
-        /** @var User $user */
-        $user = $request->user();
-
         $wishlistId = $request->integer('wishlist_id');
         $wishlistType = $request->string('wishlist_type')->toString();
 
         $authService->authorizeAdd($wishlistId, $wishlistType);
 
         $dto = new AddToWishlistDTO(
-            userId: (int) $user->id,
+            userId: (int) auth()->id(),
             wishlistableId: $wishlistId,
             wishlistableType: $wishlistType,
         );
@@ -54,11 +48,8 @@ class WishlistController
 
     public function destroy(RemoveFromWishlistRequest $request, RemoveVolumeFromWishlistAction $action, int $id): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-
         $type = $request->string('wishlist_type')->toString();
-        $action->execute($id, $type, (int) $user->id);
+        $action->execute($id, $type, (int) auth()->id());
 
         return response()->json(['message' => 'Item removed from wishlist'], 200);
     }

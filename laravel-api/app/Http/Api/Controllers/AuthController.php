@@ -15,11 +15,10 @@ use App\User\Application\Actions\LoginAction;
 use App\User\Application\Actions\LogoutAction;
 use App\User\Application\Actions\RegisterUserAction;
 use App\User\Application\Actions\ResetPasswordAction;
-use App\User\Domain\Events\UserVerified;
+use App\User\Application\Actions\SendVerificationNotificationAction;
+use App\User\Application\Actions\VerifyEmailAction;
+use App\User\Domain\Exceptions\EmailAlreadyVerifiedException;
 use App\User\Domain\Exceptions\InvalidCredentialsException;
-use App\User\Domain\Models\User;
-use App\User\Domain\Repositories\UserRepositoryInterface;
-use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,10 +26,6 @@ use Illuminate\Support\Facades\Password;
 
 final class AuthController
 {
-    public function __construct(
-        private readonly UserRepositoryInterface $userRepository
-    ) {}
-
     public function register(RegisterRequest $request, RegisterUserAction $action): JsonResponse
     {
         $dto = $request->toDTO();
@@ -63,42 +58,21 @@ final class AuthController
 
     public function logout(Request $request, LogoutAction $action): JsonResponse
     {
-        /** @var EloquentUser $eloquentUser */
-        $eloquentUser = $request->user();
-
-        $domainUser = new User(
-            name: (string) $eloquentUser->name,
-            email: (string) $eloquentUser->email,
-            password: (string) $eloquentUser->password,
-            id: (int) $eloquentUser->id,
-            username: $eloquentUser->username ? (string) $eloquentUser->username : null,
-            isPublic: (bool) $eloquentUser->is_public,
-            theme: (string) ($eloquentUser->theme ?? 'void'),
-            palette: (string) ($eloquentUser->palette ?? 'ember'),
-            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
-        );
-
-        $action->execute($domainUser);
+        /** @var string|int|null $userId */
+        $userId = $request->user()?->getAuthIdentifier();
+        $action->execute(intval($userId));
 
         return response()->json([
             'message' => 'Successfully logged out.',
         ]);
     }
 
-    public function verify(VerifyEmailRequest $request): JsonResponse|RedirectResponse
+    public function verify(VerifyEmailRequest $request, VerifyEmailAction $action): JsonResponse|RedirectResponse
     {
-        /** @var string $id */
+        /** @var string|null $id */
         $id = $request->route('id');
-        $user = $this->userRepository->findById((int) $id);
 
-        if (! $user) {
-            abort(404);
-        }
-
-        if (! $user->isEmailVerified()) {
-            $user = $this->userRepository->markAsVerified($user);
-            event(new UserVerified($user));
-        }
+        $action->execute(intval($id));
 
         if ($request->wantsJson()) {
             return response()->json(['message' => 'Email verified successfully.']);
@@ -110,18 +84,17 @@ final class AuthController
         return redirect($frontendUrl.'/dashboard?verified=1');
     }
 
-    public function sendVerificationNotification(Request $request): JsonResponse
+    public function sendVerificationNotification(Request $request, SendVerificationNotificationAction $action): JsonResponse
     {
-        /** @var EloquentUser $user */
-        $user = $request->user();
+        try {
+            /** @var string|int|null $userId */
+            $userId = $request->user()?->getAuthIdentifier();
+            $action->execute(intval($userId));
 
-        if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified.'], 400);
+            return response()->json(['message' => 'Verification link sent.']);
+        } catch (EmailAlreadyVerifiedException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        $user->sendEmailVerificationNotification();
-
-        return response()->json(['message' => 'Verification link sent.']);
     }
 
     public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse

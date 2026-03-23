@@ -15,7 +15,6 @@ use App\Manga\Application\Actions\GetEditionAction;
 use App\Manga\Application\Actions\GetSeriesAction;
 use App\Manga\Application\Actions\ListEditionsAction;
 use App\Manga\Application\Actions\ListVolumesByEditionAction;
-use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -23,10 +22,8 @@ class MangaHierarchyController
 {
     public function showSeries(Request $request, GetSeriesAction $action, int $seriesId): SeriesResource
     {
-        /** @var User|null $user */
-        $user = $request->user();
-
-        $series = $action->execute($seriesId, $user ? (int) $user->id : null);
+        $userId = auth()->id() ? (int) auth()->id() : null;
+        $series = $action->execute($seriesId, $userId);
 
         if (! $series) {
             abort(404, 'Series not found');
@@ -37,9 +34,8 @@ class MangaHierarchyController
 
     public function listEditions(Request $request, ListEditionsAction $action, int $seriesId): AnonymousResourceCollection
     {
-        /** @var User|null $user */
-        $user = $request->user();
-        $editions = $action->execute($seriesId, $user ? (int) $user->id : null);
+        $userId = auth()->id() ? (int) auth()->id() : null;
+        $editions = $action->execute($seriesId, $userId);
 
         return EditionResource::collection($editions);
     }
@@ -53,10 +49,8 @@ class MangaHierarchyController
 
     public function showEdition(Request $request, GetEditionAction $action, int $editionId): EditionResource
     {
-        /** @var User|null $user */
-        $user = $request->user();
-
-        $edition = $action->execute($editionId, $user ? (int) $user->id : null);
+        $userId = auth()->id() ? (int) auth()->id() : null;
+        $edition = $action->execute($editionId, $userId);
 
         if (! $edition) {
             abort(404, 'Edition not found');
@@ -67,10 +61,8 @@ class MangaHierarchyController
 
     public function showBoxSet(Request $request, GetBoxSetAction $action, int $boxSetId): BoxSetResource
     {
-        /** @var User|null $user */
-        $user = $request->user();
-
-        $boxSet = $action->execute($boxSetId, $user ? (int) $user->id : null);
+        $userId = auth()->id() ? (int) auth()->id() : null;
+        $boxSet = $action->execute($boxSetId, $userId);
 
         if (! $boxSet) {
             abort(404, 'Box Set not found');
@@ -81,10 +73,8 @@ class MangaHierarchyController
 
     public function showBox(Request $request, GetBoxAction $action, int $boxId): BoxResource
     {
-        /** @var User|null $user */
-        $user = $request->user();
-
-        $box = $action->execute($boxId, $user ? (int) $user->id : null);
+        $userId = auth()->id() ? (int) auth()->id() : null;
+        $box = $action->execute($boxId, $userId);
 
         if (! $box) {
             abort(404, 'Box not found');

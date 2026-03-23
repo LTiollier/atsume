@@ -14,7 +14,6 @@ use App\Http\Api\Requests\BulkReturnItemRequest;
 use App\Http\Api\Requests\LoanItemRequest;
 use App\Http\Api\Requests\ReturnItemRequest;
 use App\Http\Api\Resources\LoanResource;
-use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -23,9 +22,7 @@ class LoanController
 {
     public function index(Request $request, ListLoansAction $action): AnonymousResourceCollection
     {
-        /** @var User $user */
-        $user = $request->user();
-        $loans = $action->execute((int) $user->id);
+        $loans = $action->execute((int) auth()->id());
 
         return LoanResource::collection($loans);
     }

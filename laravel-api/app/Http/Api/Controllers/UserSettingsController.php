@@ -12,10 +12,8 @@ use App\User\Application\Actions\UpdateEmailAction;
 use App\User\Application\Actions\UpdatePasswordAction;
 use App\User\Application\Actions\UpdateUserSettingsAction;
 use App\User\Domain\Exceptions\InvalidCredentialsException;
-use App\User\Infrastructure\EloquentModels\User as EloquentUser;
 use Illuminate\Http\JsonResponse;
 
-/** @property EloquentUser $user */
 class UserSettingsController
 {
     public function update(UpdateUserSettingsRequest $request, UpdateUserSettingsAction $action): UserResource
@@ -30,12 +28,9 @@ class UserSettingsController
     public function updateEmail(UpdateEmailRequest $request, UpdateEmailAction $action): JsonResponse|UserResource
     {
         try {
-            /** @var EloquentUser $user */
-            $user = $request->user();
-
             $dto = $request->toDTO();
 
-            $updatedUser = $action->execute($dto, (int) $user->id);
+            $updatedUser = $action->execute($dto, (int) auth()->id());
 
             return new UserResource($updatedUser);
         } catch (InvalidCredentialsException $e) {
@@ -48,12 +43,9 @@ class UserSettingsController
     public function updatePassword(UpdatePasswordRequest $request, UpdatePasswordAction $action): JsonResponse|UserResource
     {
         try {
-            /** @var EloquentUser $user */
-            $user = $request->user();
-
             $dto = $request->toDTO();
 
-            $updatedUser = $action->execute($dto, (int) $user->id);
+            $updatedUser = $action->execute($dto, (int) auth()->id());
 
             return new UserResource($updatedUser);
         } catch (InvalidCredentialsException $e) {

@@ -15,12 +15,17 @@ test('it revokes tokens for logout', function () {
         id: 1
     );
 
+    $repository->shouldReceive('findById')
+        ->once()
+        ->with(1)
+        ->andReturn($user);
+
     $repository->shouldReceive('revokeTokens')
         ->once()
         ->with($user);
 
     $action = new LogoutAction($repository);
-    $action->execute($user);
+    $action->execute(1);
 
     // If no exception, test passed
     expect(true)->toBeTrue();

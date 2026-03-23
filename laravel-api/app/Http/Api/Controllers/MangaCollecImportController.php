@@ -9,16 +9,12 @@ use App\Http\Api\Resources\ImportSummaryResource;
 use App\Manga\Application\Actions\ImportFromMangaCollecAction;
 use App\Manga\Application\DTOs\ImportMangaCollecDTO;
 use App\Manga\Domain\Exceptions\MangaCollecProfilePrivateException;
-use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Http\JsonResponse;
 
 class MangaCollecImportController
 {
     public function store(ImportMangaCollecRequest $request, ImportFromMangaCollecAction $action): ImportSummaryResource|JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-
         $username = $request->getUsername();
 
         if (empty($username)) {
@@ -27,7 +23,7 @@ class MangaCollecImportController
 
         $dto = new ImportMangaCollecDTO(
             username: $username,
-            userId: (int) $user->id,
+            userId: (int) auth()->id(),
         );
 
         try {
