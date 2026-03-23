@@ -25,3 +25,4 @@ Thumbs.db
 phpstan-report.txt
 .vercel
 .env*.local
+phpstan_errors.json

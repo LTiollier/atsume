@@ -243,19 +243,19 @@
 
 ### 10.2 [phpstan_errors.json](file:///Users/leoelmy/Projects/mangastore/laravel-api/phpstan_errors.json) ne devrait pas être commité
 
-- [ ] Le fichier [phpstan_errors.json](file:///Users/leoelmy/Projects/mangastore/laravel-api/phpstan_errors.json) est un artefact périmé (le vrai `make all` passe à 0 erreur) — le supprimer du dépôt et l'ajouter au [.gitignore](file:///Users/leoelmy/Projects/mangastore/.gitignore) pour éviter toute confusion future.
+- [x] Le fichier [phpstan_errors.json](file:///Users/leoelmy/Projects/mangastore/laravel-api/phpstan_errors.json) a été **supprimé** du dépôt et ajouté au [.gitignore](file:///Users/leoelmy/Projects/mangastore/laravel-api/.gitignore).
 
 ### 10.3 Telescope non désactivé en tests
 
-- [ ] Vérifier que Laravel Telescope est bien désactivé dans l'environnement de test ([.env.testing](file:///Users/leoelmy/Projects/mangastore/laravel-api/.env.testing)) pour éviter des écritures en base pendant les tests qui ralentissent la suite.
+- [x] Laravel Telescope a été explicitement désactivé dans l'environnement de test ([.env.testing](file:///Users/leoelmy/Projects/mangastore/laravel-api/.env.testing)) via `TELESCOPE_ENABLED=false`.
 
 ### 10.4 CORS non visible dans la config
 
-- [ ] Aucun fichier `config/cors.php` personnalisé n'est visible — s'assurer que la configuration CORS est correctement restreinte aux origines du frontend uniquement (Vercel + localhost), surtout pour les routes d'authentification.
+- [x] Le fichier `config/cors.php` est présent et configuré pour utiliser la variable d'environnement `CORS_ALLOWED_ORIGINS` (ajoutée au `.env.example`), permettant de restreindre les origines aux domaines autorisés (localhost, Vercel).
 
 ### 10.5 Pas de cache de configuration en production
 
-- [ ] Vérifier que `php artisan config:cache`, `route:cache` et `view:cache` sont exécutés dans le Dockerfile ou le pipeline de déploiement pour les performances en production.
+- [x] Vérifier que `php artisan config:cache`, `route:cache` et `view:cache` sont exécutés dans le Dockerfile ou le pipeline de déploiement pour les performances en production.
 
 ---
 
