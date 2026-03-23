@@ -9,6 +9,7 @@ use App\Manga\Application\DTOs\CreateBoxSetDTO;
 use App\Manga\Application\DTOs\CreateEditionDTO;
 use App\Manga\Application\DTOs\CreateSeriesDTO;
 use App\Manga\Application\DTOs\CreateVolumeDTO;
+use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\BoxSetRepositoryInterface;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
@@ -118,6 +119,14 @@ class MangaCollecSeriesImportService
             /** @var array<int, array<string, mixed>> $volumesRaw */
             $volumesRaw = is_array($detail['volumes']) ? $detail['volumes'] : [];
             $debug(sprintf('[volumes] %d volume(s) in API response', count($volumesRaw)));
+
+            /** @var string[] $volumeUuids */
+            $volumeUuids = collect($volumesRaw)->pluck('id')->filter()->unique()->values()->all();
+            /** @var array<string, Volume> $volumesByApiId */
+            $volumesByApiId = collect($this->volumeRepository->findByApiIds($volumeUuids))
+                ->keyBy(fn (Volume $v): string => (string) $v->getApiId())
+                ->all();
+
             foreach ($volumesRaw as $volumeData) {
                 $volumeUuid = is_string($volumeData['id'] ?? null) ? $volumeData['id'] : '';
                 $isbn = is_string($volumeData['isbn'] ?? null) ? $volumeData['isbn'] : null;
@@ -133,7 +142,7 @@ class MangaCollecSeriesImportService
                     $firstVolumeCover = $coverUrl;
                 }
 
-                $existingVolume = $this->volumeRepository->findByApiId($volumeUuid);
+                $existingVolume = $volumesByApiId[$volumeUuid] ?? null;
 
                 $mappedEditionId = $editionsMap[$editionIdRaw] ?? null;
                 if (! $mappedEditionId) {
@@ -141,6 +150,8 @@ class MangaCollecSeriesImportService
                 }
 
                 // Fallback: match by edition + number if api_id lookup yielded nothing
+                // Since this fallback might need DB access, we keep it as-is for now,
+                // but usually api_id is preferred and should be present.
                 if (! $existingVolume && $mappedEditionId && $volumeNumber !== '') {
                     $existingVolume = $this->volumeRepository->findByEditionAndNumber($mappedEditionId, $volumeNumber);
                 }
@@ -160,6 +171,11 @@ class MangaCollecSeriesImportService
                     ]);
                     $debug(sprintf('[volumes] UPDATED #%s "%s" (api_id: %s)', $volumeNumber, $volumeTitle, $volumeUuid));
 
+                    // Update our internal map if it was a fallback match
+                    if (! isset($volumesByApiId[$volumeUuid])) {
+                        $volumesByApiId[$volumeUuid] = $existingVolume;
+                    }
+
                     continue;
                 }
 
@@ -169,7 +185,7 @@ class MangaCollecSeriesImportService
                     continue;
                 }
 
-                $this->volumeRepository->create(new CreateVolumeDTO(
+                $newVolume = $this->volumeRepository->create(new CreateVolumeDTO(
                     editionId: $mappedEditionId,
                     title: $volumeTitle,
                     number: $volumeNumber,
@@ -178,6 +194,7 @@ class MangaCollecSeriesImportService
                     publishedDate: $publishedDate,
                     coverUrl: $coverUrl
                 ));
+                $volumesByApiId[$volumeUuid] = $newVolume;
                 $debug(sprintf('[volumes] CREATED #%s "%s" → edition local id %d', $volumeNumber, $volumeTitle, $mappedEditionId));
             }
 
@@ -280,6 +297,28 @@ class MangaCollecSeriesImportService
             $boxVolumesToAttach = [];
             /** @var array<int, array<string, mixed>> $boxVolumesRaw */
             $boxVolumesRaw = is_array($detail['box_volumes']) ? $detail['box_volumes'] : [];
+
+            /** @var string[] $bvVolumeUuids */
+            $bvVolumeUuids = collect($boxVolumesRaw)
+                ->filter(function (mixed $bv): bool {
+                    /** @var array<string, mixed> $bv */
+                    return (bool) ($bv['included'] ?? true);
+                })
+                ->pluck('volume_id')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            $missingBvVolumeUuids = array_diff($bvVolumeUuids, array_keys($volumesByApiId));
+            if (! empty($missingBvVolumeUuids)) {
+                /** @var array<string, Volume> $extraVolumes */
+                $extraVolumes = collect($this->volumeRepository->findByApiIds($missingBvVolumeUuids))
+                    ->keyBy(fn (Volume $v): string => (string) $v->getApiId())
+                    ->all();
+                $volumesByApiId = array_merge($volumesByApiId, $extraVolumes);
+            }
+
             foreach ($boxVolumesRaw as $bvData) {
                 if (! ($bvData['included'] ?? true)) {
                     continue;
@@ -293,7 +332,7 @@ class MangaCollecSeriesImportService
                     continue;
                 }
 
-                $volume = $this->volumeRepository->findByApiId($bvVolumeUuid);
+                $volume = $volumesByApiId[$bvVolumeUuid] ?? null;
                 if ($volume) {
                     $boxVolumesToAttach[$boxId][] = $volume->getId();
                 }

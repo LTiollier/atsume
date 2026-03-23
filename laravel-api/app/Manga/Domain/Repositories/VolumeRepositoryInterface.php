@@ -50,6 +50,12 @@ interface VolumeRepositoryInterface
     public function areAllOwnedByUser(array $volumeIds, int $userId): bool;
 
     /**
+     * @param  string[]  $apiIds
+     * @return Volume[]
+     */
+    public function findByApiIds(array $apiIds): array;
+
+    /**
      * @return Volume[]
      */
     public function findByUserId(int $userId): array;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Manga\Infrastructure\Services;
 
+use App\Manga\Infrastructure\EloquentModels\Box;
 use App\Manga\Infrastructure\EloquentModels\Series as EloquentSeries;
 use App\Manga\Infrastructure\EloquentModels\Volume as EloquentVolume;
 use App\Manga\Infrastructure\Services\MangaCollecSeriesImportService;
@@ -139,4 +140,44 @@ test('import sets series cover_url from first volume when not already set', func
 
     $series = EloquentSeries::where('api_id', $uuid)->first();
     expect($series->cover_url)->toBe('https://cdn.example.com/cover1.jpg');
+});
+
+test('import correctly handles box volumes linking', function () {
+    $service = app(MangaCollecSeriesImportService::class);
+    $uuid = 'series-uuid-boxes';
+
+    $detail = buildDetail($uuid, 'Box Test', [
+        'box_editions' => [
+            [
+                'id' => 'box-ed-1',
+                'title' => 'Collector Box',
+                'publisher_id' => 'pub-1',
+            ],
+        ],
+        'boxes' => [
+            [
+                'id' => 'box-1',
+                'box_edition_id' => 'box-ed-1',
+                'title' => 'Box 1',
+                'number' => '1',
+                'isbn' => '9999999999999',
+                'image_url' => null,
+                'release_date' => null,
+            ],
+        ],
+        'box_volumes' => [
+            [
+                'box_id' => 'box-1',
+                'volume_id' => 'vol-uuid-1',
+                'included' => true,
+            ],
+        ],
+    ]);
+
+    $service->import($uuid, $detail);
+
+    $box = Box::where('api_id', 'box-1')->first();
+    expect($box)->not->toBeNull();
+    expect($box->volumes)->toHaveCount(1);
+    expect($box->volumes->first()->api_id)->toBe('vol-uuid-1');
 });

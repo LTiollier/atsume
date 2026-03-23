@@ -8,6 +8,7 @@ use App\User\Application\Actions\VerifyEmailAction;
 use App\User\Domain\Events\UserVerified;
 use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
+use Exception;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 
@@ -56,4 +57,4 @@ test('it throws exception if user not found during verification', function () {
 
     $action = new VerifyEmailAction($repository);
     $action->execute(999);
-})->throws(\Exception::class, 'User not found');
+})->throws(Exception::class, 'User not found');

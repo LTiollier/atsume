@@ -7,6 +7,7 @@ namespace App\User\Application\Actions;
 use App\User\Domain\Events\UserVerified;
 use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
+use Exception;
 
 final class VerifyEmailAction
 {
@@ -19,7 +20,7 @@ final class VerifyEmailAction
         $user = $this->userRepository->findById($userId);
 
         if (! $user) {
-            throw new \Exception('User not found');
+            throw new Exception('User not found');
         }
 
         if (! $user->isEmailVerified()) {

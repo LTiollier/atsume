@@ -146,7 +146,7 @@
 
 ### 5.2 N+1 potentiel dans [MangaCollecSeriesImportService](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Services/MangaCollecSeriesImportService.php#23-341)
 
-- [ ] La boucle sur `$boxVolumesRaw` appelle `$this->volumeRepository->findByApiId($bvVolumeUuid)` pour chaque volume — soit N requêtes SQL pour un box set avec beaucoup de volumes. Regrouper les `api_id` et faire un seul `whereIn` en amont.
+- [x] La boucle sur `$boxVolumesRaw` appelle `$this->volumeRepository->findByApiId($bvVolumeUuid)` pour chaque volume — soit N requêtes SQL pour un box set avec beaucoup de volumes. Regrouper les `api_id` et faire un seul `whereIn` en amont.
 
 ### 5.3 Import MangaCollec — série par série sans Queue
 

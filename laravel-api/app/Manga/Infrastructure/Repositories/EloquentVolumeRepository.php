@@ -168,6 +168,20 @@ final class EloquentVolumeRepository implements VolumeRepositoryInterface
     }
 
     /**
+     * @param  string[]  $apiIds
+     * @return Volume[]
+     */
+    public function findByApiIds(array $apiIds): array
+    {
+        $eloquentVolumes = EloquentVolume::whereIn('api_id', $apiIds)->get();
+
+        /** @var Volume[] $volumes */
+        $volumes = $eloquentVolumes->map(fn (EloquentVolume $v): Volume => $this->toDomain($v))->toArray();
+
+        return $volumes;
+    }
+
+    /**
      * @return Volume[]
      */
     public function findByUserId(int $userId): array
