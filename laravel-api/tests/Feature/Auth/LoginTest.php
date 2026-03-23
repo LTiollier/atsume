@@ -27,9 +27,9 @@ test('a user can login', function () {
                 'name',
                 'email',
             ],
+            'token',
         ])
-        ->assertJsonPath('user.email', 'jane@example.com')
-        ->assertCookie('auth_token');
+        ->assertJsonPath('user.email', 'jane@example.com');
 });
 
 test('a user cannot login with invalid credentials', function () {

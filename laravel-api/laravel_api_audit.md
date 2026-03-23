@@ -121,7 +121,7 @@
 
 ### 4.1 Cookie `auth_token` exposé dans la response JSON
 
-- [ ] Dans `AuthController::register()` et [login()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Services/MangaCollecScraperService.php#14-42), le token est retourné à la fois dans le **corps JSON** (`'token' => $result['token']`) et dans un **cookie HttpOnly**. Choisir une seule stratégie — si le cookie HttpOnly est utilisé, le token ne devrait pas être exposé dans le JSON (risque XSS côté client).
+- [x] Dans `AuthController::register()` et [login()](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/Services/MangaCollecScraperService.php#14-42), le token était retourné à la fois dans le **corps JSON** et dans un **cookie HttpOnly**. La stratégie **API Token (Sanctum Token)** a été privilégiée car le frontend et le backend sont sur des domaines différents et `supports_credentials` est à `false` dans `config/cors.php`. Le cookie `auth_token` a été supprimé des réponses.
 
 ### 4.2 Rate limiting des routes authentifiées insuffisant
 

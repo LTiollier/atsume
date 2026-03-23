@@ -20,7 +20,15 @@ test('a user can register and registration event is dispatched', function () {
         'password_confirmation' => 'password',
     ]);
 
-    $response->assertStatus(201);
+    $response->assertStatus(201)
+        ->assertJsonStructure([
+            'user' => [
+                'id',
+                'name',
+                'email',
+            ],
+            'token',
+        ]);
 
     Event::assertDispatched(Registered::class);
 

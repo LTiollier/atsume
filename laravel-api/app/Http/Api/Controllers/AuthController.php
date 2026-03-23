@@ -40,7 +40,7 @@ final class AuthController
         return response()->json([
             'user' => new UserResource($result['user']),
             'token' => $result['token'],
-        ], 201)->cookie('auth_token', $result['token'], 60 * 24 * 30, '/', null, true, true);
+        ], 201);
     }
 
     public function login(LoginRequest $request, LoginAction $action): JsonResponse
@@ -53,7 +53,7 @@ final class AuthController
             return response()->json([
                 'user' => new UserResource($result['user']),
                 'token' => $result['token'],
-            ])->cookie('auth_token', $result['token'], 60 * 24 * 30, '/', null, true, true);
+            ]);
         } catch (InvalidCredentialsException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -82,7 +82,7 @@ final class AuthController
 
         return response()->json([
             'message' => 'Successfully logged out.',
-        ])->withoutCookie('auth_token');
+        ]);
     }
 
     public function verify(VerifyEmailRequest $request): JsonResponse|RedirectResponse
