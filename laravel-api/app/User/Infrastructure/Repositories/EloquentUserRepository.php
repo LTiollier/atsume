@@ -7,6 +7,7 @@ namespace App\User\Infrastructure\Repositories;
 use App\User\Domain\Models\User;
 use App\User\Domain\Repositories\UserRepositoryInterface;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
+use Illuminate\Auth\Events\Registered;
 
 final class EloquentUserRepository implements UserRepositoryInterface
 {
@@ -30,7 +31,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             username: $eloquentUser->username,
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
-            palette: $eloquentUser->palette
+            palette: $eloquentUser->palette,
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
         );
     }
 
@@ -50,7 +52,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             username: $eloquentUser->username,
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
-            palette: $eloquentUser->palette
+            palette: $eloquentUser->palette,
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
         );
     }
 
@@ -70,7 +73,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             username: $eloquentUser->username,
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
-            palette: $eloquentUser->palette
+            palette: $eloquentUser->palette,
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
         );
     }
 
@@ -90,7 +94,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             username: $eloquentUser->username,
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
-            palette: $eloquentUser->palette
+            palette: $eloquentUser->palette,
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
         );
     }
 
@@ -102,6 +107,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             'username' => $user->getUsername(),
             'is_public' => $user->isPublic(),
             'email' => $user->getEmail(),
+            'email_verified_at' => $user->getEmailVerifiedAt(),
             'password' => $user->getPassword(),
             'theme' => $user->getTheme(),
             'palette' => $user->getPalette(),
@@ -115,7 +121,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             username: $eloquentUser->username,
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
-            palette: $eloquentUser->palette
+            palette: $eloquentUser->palette,
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
         );
     }
 
@@ -130,5 +137,11 @@ final class EloquentUserRepository implements UserRepositoryInterface
     {
         $eloquentUser = EloquentUser::findOrFail($user->getId());
         $eloquentUser->tokens()->delete();
+    }
+
+    public function sendEmailVerification(User $user): void
+    {
+        $eloquentUser = EloquentUser::findOrFail($user->getId());
+        event(new Registered($eloquentUser));
     }
 }

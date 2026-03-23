@@ -42,4 +42,7 @@ export const authService = {
 
     resetPassword: (payload: Record<string, unknown>) =>
         api.post('/auth/reset-password', payload),
+
+    sendVerificationEmail: () =>
+        api.post('/auth/email/verification-notification'),
 };

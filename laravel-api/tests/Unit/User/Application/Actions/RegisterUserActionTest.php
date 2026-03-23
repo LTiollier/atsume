@@ -28,6 +28,9 @@ test('it registers a user', function () {
             id: 1
         ));
 
+    $repository->shouldReceive('sendEmailVerification')
+        ->once();
+
     $repository->shouldReceive('createToken')
         ->once()
         ->andReturn('test_token');

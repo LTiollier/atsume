@@ -1,12 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { BookOpen, Library, BookMarked, Users, AlertTriangle } from 'lucide-react';
 import { differenceInDays } from 'date-fns';
+import { toast } from 'sonner';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { userService } from '@/services/user.service';
 import { useMangas, useLoansQuery, useReadingProgressQuery } from '@/hooks/queries';
 import { StatGrid } from '@/components/dashboard/StatGrid';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -53,7 +56,9 @@ function getMangaHref(manga: Manga): string {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function DashboardClient() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   // 3 parallel queries — React Query fires them simultaneously (async-parallel)
   const { data: mangas = [], isLoading: mangasLoading } = useMangas();
@@ -61,6 +66,24 @@ export function DashboardClient() {
   const { data: readingProgress = [], isLoading: progressLoading } = useReadingProgressQuery();
 
   const statsLoading = mangasLoading || loansLoading || progressLoading;
+
+  // Check for verification success
+  useEffect(() => {
+    if (searchParams.get('verified') === '1') {
+      toast.success('Email vérifié avec succès !');
+
+      // Refresh user data to get the updated email_verified_at
+      userService.getCurrentUser().then(updatedUser => {
+        updateUser(updatedUser);
+      }).catch(console.error);
+
+      // Clean up URL
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('verified');
+      const query = params.toString() ? `?${params.toString()}` : '';
+      router.replace(`/dashboard${query}`);
+    }
+  }, [searchParams, router, updateUser]);
 
   // Derived stats during render — no useEffect (rerender-derived-state-no-effect)
   const stats = useMemo(() => {

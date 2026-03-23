@@ -27,6 +27,10 @@ final class RegisterUserAction
         );
 
         $createdUser = $this->userRepository->create($user);
+
+        // Dispatch Registered event for email verification via repository
+        $this->userRepository->sendEmailVerification($createdUser);
+
         $token = $this->userRepository->createToken($createdUser, 'auth_token');
 
         return [

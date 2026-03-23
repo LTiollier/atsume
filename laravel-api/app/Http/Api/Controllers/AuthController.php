@@ -17,7 +17,9 @@ use App\User\Application\Actions\ResetPasswordAction;
 use App\User\Domain\Exceptions\InvalidCredentialsException;
 use App\User\Domain\Models\User;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
@@ -59,17 +61,46 @@ class AuthController
         $eloquentUser = $request->user();
 
         $domainUser = new User(
-            name: $eloquentUser->name,
-            email: $eloquentUser->email,
-            password: $eloquentUser->password,
-            id: $eloquentUser->id
+            name: (string) $eloquentUser->name,
+            email: (string) $eloquentUser->email,
+            password: (string) $eloquentUser->password,
+            id: (int) $eloquentUser->id,
+            username: $eloquentUser->username ? (string) $eloquentUser->username : null,
+            isPublic: (bool) $eloquentUser->is_public,
+            theme: (string) ($eloquentUser->theme ?? 'void'),
+            palette: (string) ($eloquentUser->palette ?? 'ember'),
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
         );
 
         $action->execute($domainUser);
 
         return response()->json([
             'message' => 'Successfully logged out.',
-        ]);
+        ])->withoutCookie('auth_token');
+    }
+
+    public function verify(EmailVerificationRequest $request): RedirectResponse
+    {
+        $request->fulfill();
+
+        /** @var string $frontendUrl */
+        $frontendUrl = config('app.frontend_url');
+
+        return redirect($frontendUrl.'/dashboard?verified=1');
+    }
+
+    public function sendVerificationNotification(Request $request): JsonResponse
+    {
+        /** @var EloquentUser $user */
+        $user = $request->user();
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified.'], 400);
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Verification link sent.']);
     }
 
     public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse

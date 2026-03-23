@@ -43,6 +43,12 @@ test('it updates user email with correct password', function () {
         }))
         ->andReturnArg(0);
 
+    $repository->shouldReceive('sendEmailVerification')
+        ->once()
+        ->with(Mockery::on(function (User $user) use ($newEmail) {
+            return $user->getEmail() === $newEmail;
+        }));
+
     $action = new UpdateEmailAction($repository);
     $result = $action->execute($dto, $userId);
 

@@ -21,4 +21,6 @@ interface UserRepositoryInterface
     public function createToken(User $user, string $tokenName): string;
 
     public function revokeTokens(User $user): void;
+
+    public function sendEmailVerification(User $user): void;
 }

@@ -27,6 +27,9 @@ interface UpdatePasswordPayload {
 }
 
 export const userService = {
+    getCurrentUser: () =>
+        api.get<ApiResponse<User>>('/user').then(r => r.data.data),
+
     updateSettings: (payload: UpdateSettingsPayload) =>
         api.put<ApiResponse<User>>('/user/settings', payload).then(r => r.data.data),
 

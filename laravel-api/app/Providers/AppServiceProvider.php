@@ -44,6 +44,7 @@ use App\User\Domain\Repositories\UserRepositoryInterface;
 use App\User\Infrastructure\EloquentModels\User;
 use App\User\Infrastructure\Repositories\EloquentUserRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
@@ -159,6 +160,16 @@ class AppServiceProvider extends ServiceProvider
             $frontendUrl = config('app.frontend_url');
 
             return $frontendUrl.'/reset-password?token='.$token.'&email='.$notifiable->getEmailForPasswordReset();
+        });
+
+        VerifyEmail::createUrlUsing(function (User $notifiable) {
+            $id = (string) $notifiable->id;
+            $hash = sha1($notifiable->getEmailForVerification());
+
+            /** @var string $frontendUrl */
+            $frontendUrl = config('app.frontend_url');
+
+            return $frontendUrl."/verify-email?id={$id}&hash={$hash}";
         });
 
         if ($this->app->runningInConsole()) {

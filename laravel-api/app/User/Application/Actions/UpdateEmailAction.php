@@ -37,9 +37,15 @@ final class UpdateEmailAction
             username: $user->getUsername(),
             isPublic: $user->isPublic(),
             theme: $user->getTheme(),
-            palette: $user->getPalette()
+            palette: $user->getPalette(),
+            emailVerifiedAt: null
         );
 
-        return $this->userRepository->update($updatedUser);
+        $updatedUserResult = $this->userRepository->update($updatedUser);
+
+        // Resend verification email
+        $this->userRepository->sendEmailVerification($updatedUserResult);
+
+        return $updatedUserResult;
     }
 }

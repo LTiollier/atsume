@@ -24,6 +24,15 @@ Route::middleware('throttle:auth')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+
+    // Email Verification
+    Route::get('/auth/verify-email/{id}/{hash}', [AuthController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    Route::post('/auth/email/verification-notification', [AuthController::class, 'sendVerificationNotification'])
+        ->middleware(['auth:sanctum', 'throttle:6,1'])
+        ->name('verification.send');
 });
 
 Route::get('/reset-password/{token}', function (Request $request, string $token) {

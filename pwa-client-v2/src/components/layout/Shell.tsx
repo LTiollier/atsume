@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { BottomNav } from './BottomNav';
 import { SidebarNav } from './SidebarNav';
+import { VerifyEmailBanner } from './VerifyEmailBanner';
 
 interface ShellProps {
   children: ReactNode;
@@ -23,14 +24,18 @@ export function Shell({ children }: ShellProps) {
       <SidebarNav />
 
       {/* Main content */}
-      {/*
-       * Mobile  : pb accounts for BottomNav (64px) + iOS safe-area
-       * Desktop : BottomNav is hidden, pb reduces to safe-area only
-       * safe-area-bottom utility class is defined in globals.css
-       */}
-      <main className="flex-1 min-w-0 lg:ml-64 safe-area-top [padding-bottom:calc(64px+env(safe-area-inset-bottom))] lg:[padding-bottom:env(safe-area-inset-bottom)]">
-        {children}
-      </main>
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+        <VerifyEmailBanner />
+
+        {/*
+         * Mobile  : pb accounts for BottomNav (64px) + iOS safe-area
+         * Desktop : BottomNav is hidden, pb reduces to safe-area only
+         * safe-area-bottom utility class is defined in globals.css
+         */}
+        <main className="flex-1 safe-area-top [padding-bottom:calc(64px+env(safe-area-inset-bottom))] lg:[padding-bottom:env(safe-area-inset-bottom)]">
+          {children}
+        </main>
+      </div>
 
       {/* Bottom nav mobile (lg:hidden inside BottomNav) */}
       <BottomNav />

@@ -37,7 +37,8 @@ final class UpdatePasswordAction
             username: $user->getUsername(),
             isPublic: $user->isPublic(),
             theme: $user->getTheme(),
-            palette: $user->getPalette()
+            palette: $user->getPalette(),
+            emailVerifiedAt: $user->getEmailVerifiedAt()
         );
 
         return $this->userRepository->update($updatedUser);

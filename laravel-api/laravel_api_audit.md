@@ -133,7 +133,8 @@
 
 ### 4.4 Pas de vérification d'email (`MustVerifyEmail`)
 
-- [ ] Le modèle [User](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/User/Infrastructure/EloquentModels/User.php#17-97) a le contrat `MustVerifyEmail` en commentaire — évaluer si la vérification d'email devrait être activée pour renforcer la sécurité des comptes.
+- [x] Le contrat `MustVerifyEmail` a été activé sur le modèle `User`.
+- [x] L'action `RegisterUserAction` a été mise à jour pour dispatcher l'événement `Registered`, ce qui déclenche l'envoi automatique de l'email de vérification par Laravel.
 
 ---
 

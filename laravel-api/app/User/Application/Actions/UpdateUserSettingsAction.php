@@ -31,7 +31,8 @@ final class UpdateUserSettingsAction
             username: $dto->username,
             isPublic: $dto->isPublic,
             theme: $dto->theme,
-            palette: $dto->palette
+            palette: $dto->palette,
+            emailVerifiedAt: $user->getEmailVerifiedAt()
         );
 
         return $this->userRepository->update($updatedUser);

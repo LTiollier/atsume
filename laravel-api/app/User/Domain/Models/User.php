@@ -14,6 +14,8 @@ final class User
 
     private string $email;
 
+    private ?string $emailVerifiedAt;
+
     private string $password;
 
     private bool $isPublic;
@@ -30,7 +32,8 @@ final class User
         ?string $username = null,
         bool $isPublic = false,
         string $theme = 'void',
-        string $palette = 'ember'
+        string $palette = 'ember',
+        ?string $emailVerifiedAt = null
     ) {
         $this->name = $name;
         $this->email = $email;
@@ -40,6 +43,7 @@ final class User
         $this->isPublic = $isPublic;
         $this->theme = $theme;
         $this->palette = $palette;
+        $this->emailVerifiedAt = $emailVerifiedAt;
     }
 
     public function getId(): ?int
@@ -60,6 +64,16 @@ final class User
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function getEmailVerifiedAt(): ?string
+    {
+        return $this->emailVerifiedAt;
+    }
+
+    public function isEmailVerified(): bool
+    {
+        return $this->emailVerifiedAt !== null;
     }
 
     public function getPassword(): string

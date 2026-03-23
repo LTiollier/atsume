@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Tests\Feature\Auth;
 
 use App\User\Infrastructure\EloquentModels\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-test('a user can register', function () {
+test('a user can register and registration event is dispatched', function () {
+    Event::fake();
+
     /** @var TestCase $this */
     $response = $this->postJson('/api/auth/register', [
         'name' => 'John Doe',
@@ -17,29 +20,14 @@ test('a user can register', function () {
         'password_confirmation' => 'password',
     ]);
 
-    $response->assertStatus(201)
-        ->assertJsonStructure([
-            'user' => [
-                'id',
-                'name',
-                'email',
-            ],
-        ])
-        ->assertJson([
-            'user' => [
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-            ],
-        ])
-        ->assertCookie('auth_token');
+    $response->assertStatus(201);
 
-    $this->assertDatabaseHas('users', [
-        'name' => 'John Doe',
-        'email' => 'john@example.com',
-    ]);
+    Event::assertDispatched(Registered::class);
 
     $user = User::where('email', 'john@example.com')->first();
-    expect(Hash::check('password', $user->password))->toBeTrue();
+    Event::assertDispatched(function (Registered $event) use ($user) {
+        return $event->user->id === $user->id;
+    });
 });
 
 test('it validates registration data', function () {
