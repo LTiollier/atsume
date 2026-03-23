@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, Camera, Loader2 } from 'lucide-react';
@@ -40,7 +40,11 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
   // Always keep the latest callback without re-initializing the scanner
   // (advanced-event-handler-refs + rerender-use-ref-transient-values)
   const onScanRef = useRef(onScan);
-  onScanRef.current = onScan;
+  // Sync the ref after each render — keeps the latest callback without re-initializing
+  // the scanner (advanced-event-handler-refs + rerender-use-ref-transient-values)
+  useLayoutEffect(() => {
+    onScanRef.current = onScan;
+  });
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   // Ref for cooldown — avoids re-initializing scanner on each scan (rerender-use-ref-transient-values)

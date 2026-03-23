@@ -53,7 +53,8 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
   const bulkRemove = useBulkRemoveVolumesFromCollection();
 
   // Derived during render (rerender-derived-state-no-effect)
-  const volumes: Manga[] = box?.volumes ?? [];
+  // Wrapped in useMemo to stabilize the reference for dependent memos (rerender-memo)
+  const volumes: Manga[] = useMemo(() => box?.volumes ?? [], [box?.volumes]);
 
   // O(1) lookup sets (js-set-map-lookups)
   const readSet = useMemo(

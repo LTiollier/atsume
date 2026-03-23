@@ -53,7 +53,8 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
   const bulkRemove = useBulkRemoveVolumesFromCollection();
 
   // Derived during render (rerender-derived-state-no-effect)
-  const volumes: Manga[] = edition?.volumes ?? [];
+  // Wrapped in useMemo to stabilize the reference for dependent memos (rerender-memo)
+  const volumes: Manga[] = useMemo(() => edition?.volumes ?? [], [edition?.volumes]);
 
   // O(1) lookup sets (js-set-map-lookups)
   const readSet = useMemo(

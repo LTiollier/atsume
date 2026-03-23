@@ -30,19 +30,19 @@ export default function VerifyEmailPage() {
     const expires = searchParams.get('expires');
     const signature = searchParams.get('signature');
 
-    if (!id || !hash || !expires || !signature) {
-      setStatus('error');
-      setMessage('Lien de vérification invalide ou incomplet.');
-      return;
-    }
-
     const verify = async () => {
+      if (!id || !hash || !expires || !signature) {
+        setStatus('error');
+        setMessage('Lien de vérification invalide ou incomplet.');
+        return;
+      }
+
       try {
         await authService.verifyEmail(id, hash, expires, signature);
         verifiedRef.current = true;
         setStatus('success');
         setMessage('Votre email a été vérifié avec succès ! Redirection...');
-        
+
         setTimeout(() => {
           router.push('/dashboard?verified=1');
         }, 2000);

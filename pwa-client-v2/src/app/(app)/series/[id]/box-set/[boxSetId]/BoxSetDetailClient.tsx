@@ -49,7 +49,8 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
   const bulkRemove = useBulkRemoveBoxesFromCollection();
 
   // Derived during render — no useEffect (rerender-derived-state-no-effect)
-  const boxes: Box[] = boxSet?.boxes ?? [];
+  // Wrapped in useMemo to stabilize the reference for dependent memos (rerender-memo)
+  const boxes: Box[] = useMemo(() => boxSet?.boxes ?? [], [boxSet?.boxes]);
   const ownedBoxes = useMemo(() => boxes.filter(b => b.is_owned), [boxes]);
   const nonOwnedBoxes = useMemo(() => boxes.filter(b => !b.is_owned), [boxes]);
   const ownedCount = ownedBoxes.length;

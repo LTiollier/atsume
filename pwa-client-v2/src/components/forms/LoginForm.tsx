@@ -104,7 +104,7 @@ export function LoginForm() {
           className="font-medium transition-opacity hover:opacity-80"
           style={{ color: 'var(--primary)' }}
         >
-          S'inscrire
+          S&apos;inscrire
         </Link>
       </p>
     </form>

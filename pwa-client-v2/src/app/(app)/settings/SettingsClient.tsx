@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
@@ -100,7 +100,7 @@ export function SettingsClient() {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors, isDirty },
   } = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -110,9 +110,10 @@ export function SettingsClient() {
     },
   });
 
-  // Watch only the values needed for conditional UI — single call, primitive deps
-  // (rerender-derived-state-no-effect: derived during render, no useEffect)
-  const [usernameValue, isPublic] = watch(['username', 'is_public']);
+  // Subscribe to only the values needed for conditional UI (rerender-split-combined-hooks)
+  // useWatch integrates correctly with React Compiler, unlike watch() (react-hooks/incompatible-library)
+  const usernameValue = useWatch({ control, name: 'username' });
+  const isPublic = useWatch({ control, name: 'is_public' });
 
   const canSave = isDirty && !isPending && !(isPublic && !usernameValue.trim());
 
