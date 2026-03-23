@@ -301,7 +301,7 @@ Add multiple volumes from an edition by volume numbers.
 
 ---
 
-### POST /api/mangas/bulk-remove
+### DELETE /api/mangas/bulk
 Remove multiple volumes from collection.
 
 **Body**:

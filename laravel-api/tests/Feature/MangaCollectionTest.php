@@ -145,7 +145,7 @@ test('can remove volumes from collection in bulk', function () {
 
     actingAs($user);
 
-    $response = postJson('/api/mangas/bulk-remove', [
+    $response = deleteJson('/api/mangas/bulk', [
         'volume_ids' => $volumes->pluck('id')->toArray(),
     ]);
 
@@ -164,7 +164,7 @@ test('cannot remove volumes from collection that user does not own', function ()
     actingAs($user);
 
     // Try to remove volumes owned by otherUser
-    $response = postJson('/api/mangas/bulk-remove', [
+    $response = deleteJson('/api/mangas/bulk', [
         'volume_ids' => $volumes->pluck('id')->toArray(),
     ]);
 
@@ -183,7 +183,7 @@ test('cannot remove volumes if at least one is not owned by user', function () {
 
     actingAs($user);
 
-    $response = postJson('/api/mangas/bulk-remove', [
+    $response = deleteJson('/api/mangas/bulk', [
         'volume_ids' => [$ownedVolume->id, $notOwnedVolume->id],
     ]);
 

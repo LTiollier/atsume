@@ -9,6 +9,7 @@ use App\User\Infrastructure\EloquentModels\User;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\postJson;
 
 test('can bulk scan mangas', function () {
@@ -79,7 +80,7 @@ test('can bulk remove volumes from collection', function () {
     $volumes = Volume::factory()->count(3)->create();
     $user->volumes()->attach($volumes->pluck('id')->toArray());
 
-    $response = postJson('/api/mangas/bulk-remove', [
+    $response = deleteJson('/api/mangas/bulk', [
         'volume_ids' => $volumes->pluck('id')->toArray(),
     ]);
 

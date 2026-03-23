@@ -174,7 +174,7 @@
 
 ### 6.3 Méthode [bulkRemove](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Http/Api/Controllers/MangaCollectionController.php#61-69) utilise `POST` au lieu de `DELETE`
 
-- [ ] `POST /mangas/bulk-remove` — une suppression devrait utiliser `DELETE`. La convention REST serait `DELETE /mangas/bulk` avec un corps JSON (ou `DELETE /mangas?ids[]=1&ids[]=2`).
+- [x] `POST /mangas/bulk-remove` — une suppression devrait utiliser `DELETE`. La convention REST serait `DELETE /mangas/bulk` avec un corps JSON (ou `DELETE /mangas?ids[]=1&ids[]=2`).
 
 ### 6.4 Méthodes `PUT` vs `PATCH` dans les settings
 
