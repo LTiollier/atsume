@@ -8,7 +8,7 @@ use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
-test('a user can verify their email and is redirected to frontend', function () {
+test('a user can verify their email even if not authenticated', function () {
     /** @var User $user */
     $user = User::factory()->create([
         'email_verified_at' => null,
@@ -21,13 +21,34 @@ test('a user can verify their email and is redirected to frontend', function () 
     );
 
     /** @var TestCase $this */
-    $response = $this->actingAs($user)->get($verificationUrl);
+    $response = $this->get($verificationUrl);
 
     $user->refresh();
     expect($user->hasVerifiedEmail())->toBeTrue();
 
     $frontendUrl = config('app.frontend_url');
     $response->assertRedirect($frontendUrl.'/dashboard?verified=1');
+});
+
+test('a user can verify their email via JSON request', function () {
+    /** @var User $user */
+    $user = User::factory()->create([
+        'email_verified_at' => null,
+    ]);
+
+    $verificationUrl = URL::temporarySignedRoute(
+        'verification.verify',
+        now()->addMinutes(60),
+        ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+    );
+
+    /** @var TestCase $this */
+    $response = $this->getJson($verificationUrl);
+
+    $user->refresh();
+    expect($user->hasVerifiedEmail())->toBeTrue();
+    $response->assertStatus(200)
+        ->assertJson(['message' => 'Email verified successfully.']);
 });
 
 test('a user cannot verify email with invalid hash', function () {
@@ -43,7 +64,7 @@ test('a user cannot verify email with invalid hash', function () {
     );
 
     /** @var TestCase $this */
-    $response = $this->actingAs($user)->get($verificationUrl);
+    $response = $this->get($verificationUrl);
 
     $user->refresh();
     expect($user->hasVerifiedEmail())->toBeFalse();

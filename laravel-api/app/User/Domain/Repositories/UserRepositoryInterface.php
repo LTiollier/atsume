@@ -23,4 +23,6 @@ interface UserRepositoryInterface
     public function revokeTokens(User $user): void;
 
     public function sendEmailVerification(User $user): void;
+
+    public function markAsVerified(User $user): User;
 }

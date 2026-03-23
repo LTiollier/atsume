@@ -8,6 +8,7 @@ use App\Http\Api\Requests\ForgotPasswordRequest;
 use App\Http\Api\Requests\LoginRequest;
 use App\Http\Api\Requests\RegisterRequest;
 use App\Http\Api\Requests\ResetPasswordRequest;
+use App\Http\Api\Requests\VerifyEmailRequest;
 use App\Http\Api\Resources\UserResource;
 use App\User\Application\Actions\ForgotPasswordAction;
 use App\User\Application\Actions\LoginAction;
@@ -16,8 +17,9 @@ use App\User\Application\Actions\RegisterUserAction;
 use App\User\Application\Actions\ResetPasswordAction;
 use App\User\Domain\Exceptions\InvalidCredentialsException;
 use App\User\Domain\Models\User;
+use App\User\Domain\Repositories\UserRepositoryInterface;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,6 +27,9 @@ use Illuminate\Support\Facades\Password;
 
 class AuthController
 {
+    public function __construct(
+        private readonly UserRepositoryInterface $userRepository
+    ) {}
     public function register(RegisterRequest $request, RegisterUserAction $action): JsonResponse
     {
         $dto = $request->toDTO();
@@ -79,9 +84,24 @@ class AuthController
         ])->withoutCookie('auth_token');
     }
 
-    public function verify(EmailVerificationRequest $request): RedirectResponse
+    public function verify(VerifyEmailRequest $request): JsonResponse|RedirectResponse
     {
-        $request->fulfill();
+        /** @var string $id */
+        $id = $request->route('id');
+        $user = $this->userRepository->findById((int) $id);
+
+        if (! $user) {
+            abort(404);
+        }
+
+        if (! $user->isEmailVerified()) {
+            $user = $this->userRepository->markAsVerified($user);
+            event(new Verified($user));
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Email verified successfully.']);
+        }
 
         /** @var string $frontendUrl */
         $frontendUrl = config('app.frontend_url');

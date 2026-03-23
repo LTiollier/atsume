@@ -53,6 +53,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Telescope\TelescopeServiceProvider;
 
@@ -169,7 +170,18 @@ class AppServiceProvider extends ServiceProvider
             /** @var string $frontendUrl */
             $frontendUrl = config('app.frontend_url');
 
-            return $frontendUrl."/verify-email?id={$id}&hash={$hash}";
+            // Generate the backend signed URL to extract its parameters
+            $temporarySignedUrl = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(config('auth.verification.expire', 60)),
+                ['id' => $id, 'hash' => $hash]
+            );
+
+            // Extract query parameters from the signed backend URL
+            $urlParts = parse_url($temporarySignedUrl);
+            $queryString = $urlParts['query'] ?? '';
+
+            return $frontendUrl."/verify-email/{$id}/{$hash}?{$queryString}";
         });
 
         if ($this->app->runningInConsole()) {

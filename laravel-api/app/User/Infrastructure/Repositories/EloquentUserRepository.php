@@ -144,4 +144,23 @@ final class EloquentUserRepository implements UserRepositoryInterface
         $eloquentUser = EloquentUser::findOrFail($user->getId());
         event(new Registered($eloquentUser));
     }
+
+    public function markAsVerified(User $user): User
+    {
+        /** @var EloquentUser $eloquentUser */
+        $eloquentUser = EloquentUser::findOrFail($user->getId());
+        $eloquentUser->markEmailAsVerified();
+
+        return new User(
+            name: $eloquentUser->name,
+            email: $eloquentUser->email,
+            password: $eloquentUser->password,
+            id: $eloquentUser->id,
+            username: $eloquentUser->username,
+            isPublic: $eloquentUser->is_public,
+            theme: $eloquentUser->theme,
+            palette: $eloquentUser->palette,
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
+        );
+    }
 }
