@@ -6,7 +6,7 @@ namespace App\Manga\Domain\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 
-class BoxAddedToCollection
+final class BoxRemovedFromCollection
 {
     use Dispatchable;
 

@@ -193,12 +193,10 @@
 - [x] L'event [VolumeAddedToCollection](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Domain/Events/VolumeAddedToCollection.php#9-19) est désormais géré par le listener `RemoveEditionFromWishlistOnVolumeAdded`.
 
 ### 7.2 Events Domain utilisant `SerializesModels`
-
-- [ ] [VolumeAddedToCollection](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Domain/Events/VolumeAddedToCollection.php#9-19) utilise le trait `SerializesModels` sur un **Domain Model** ([Volume](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Infrastructure/EloquentModels/Volume.php#15-70)) qui n'est pas un Eloquent Model — `SerializesModels` est conçu pour sérialiser des Eloquent Models pour les Queues. Sur un POPO, ce trait est sans effet et crée une dépendance Laravel inutile dans la couche Domain.
+- [x] Le trait `SerializesModels` a été supprimé des événements Domain (`VolumeAddedToCollection`, `EditionAddedToCollection`, `BoxAddedToCollection`) car ils utilisent des Pure Models (POPO) et non des Eloquent Models. Cela supprime une dépendance inutile de la couche Infrastructure dans le Domain.
 
 ### 7.3 Pas d'event pour la suppression de volumes
-
-- [ ] [BulkRemoveVolumesFromCollectionAction](file:///Users/leoelmy/Projects/mangastore/laravel-api/app/Manga/Application/Actions/BulkRemoveVolumesFromCollectionAction.php#9-22) et `RemoveSeriesFromCollectionAction` ne dispatchent aucun event — des events `VolumeRemovedFromCollection` / `SeriesRemovedFromCollection` permettraient de réagir (ex: re-ajouter à la wishlist, mettre à jour des stats).
+- [x] Les événements `VolumeRemovedFromCollection`, `SeriesRemovedFromCollection` et `BoxRemovedFromCollection` ont été créés et sont désormais dispatchés par leurs Actions respectives, permettant des réactions métier (nettoyage, stats, etc.).
 
 ---
 

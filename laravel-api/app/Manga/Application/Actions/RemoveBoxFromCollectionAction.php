@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\Actions;
 
+use App\Manga\Domain\Events\BoxRemovedFromCollection;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,8 @@ final class RemoveBoxFromCollectionAction
                     $this->volumeRepository->detachFromUser($volume->getId(), $userId);
                 }
             }
+
+            event(new BoxRemovedFromCollection($boxId, $userId));
         });
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Manga\Application\Actions;
 
 use App\Manga\Application\DTOs\BulkRemoveVolumesDTO;
+use App\Manga\Domain\Events\VolumeRemovedFromCollection;
 use App\Manga\Domain\Exceptions\UnauthorizedVolumeAccessException;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,8 @@ final class BulkRemoveVolumesFromCollectionAction
 
         DB::transaction(function () use ($dto) {
             $this->volumeRepository->detachManyFromUser($dto->volumeIds, $dto->userId);
+
+            event(new VolumeRemovedFromCollection($dto->volumeIds, $dto->userId));
         });
     }
 }

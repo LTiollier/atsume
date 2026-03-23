@@ -6,12 +6,15 @@ namespace App\Manga\Domain\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 
-class BoxAddedToCollection
+final class VolumeRemovedFromCollection
 {
     use Dispatchable;
 
+    /**
+     * @param  int[]  $volumeIds
+     */
     public function __construct(
-        public readonly int $boxId,
+        public readonly array $volumeIds,
         public readonly int $userId
     ) {}
 }
