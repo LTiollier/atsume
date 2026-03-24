@@ -56,6 +56,7 @@ final class AddLocalVolumesToEditionAction
                         title: $volumeTitle,
                         number: $numberStr,
                         coverUrl: $series->getCoverUrl(),
+                        sortOrder: (float) $number,
                     ));
                 }
 
