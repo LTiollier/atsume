@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Manga\Application\Actions\AddBoxToWishlistAction;
-use App\Manga\Domain\Exceptions\MangaNotFoundException;
+use App\Manga\Domain\Exceptions\VolumeNotFoundException;
 use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
@@ -33,7 +33,7 @@ test('adds box to user wishlist and returns it', function () {
     expect($result)->toBe($box);
 });
 
-test('throws MangaNotFoundException when box does not exist', function () {
+test('throws VolumeNotFoundException when box does not exist', function () {
     $boxRepo = Mockery::mock(BoxRepositoryInterface::class);
     $boxRepo->shouldReceive('findById')->with(99, 1)->once()->andReturn(null);
 
@@ -42,5 +42,5 @@ test('throws MangaNotFoundException when box does not exist', function () {
 
     $action = new AddBoxToWishlistAction($boxRepo, $wishlistRepo);
 
-    expect(fn () => $action->execute(99, 1))->toThrow(MangaNotFoundException::class);
+    expect(fn () => $action->execute(99, 1))->toThrow(VolumeNotFoundException::class);
 });

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Manga\Application\Actions\AddEditionToWishlistAction;
-use App\Manga\Domain\Exceptions\MangaNotFoundException;
+use App\Manga\Domain\Exceptions\VolumeNotFoundException;
 use App\Manga\Domain\Models\Edition;
 use App\Manga\Domain\Repositories\EditionRepositoryInterface;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
@@ -30,7 +30,7 @@ test('adds edition to user wishlist and returns it', function () {
     expect($result)->toBe($edition);
 });
 
-test('throws MangaNotFoundException when edition does not exist', function () {
+test('throws VolumeNotFoundException when edition does not exist', function () {
     $editionRepo = Mockery::mock(EditionRepositoryInterface::class);
     $editionRepo->shouldReceive('findById')->with(99, 1)->once()->andReturn(null);
 
@@ -39,5 +39,5 @@ test('throws MangaNotFoundException when edition does not exist', function () {
 
     $action = new AddEditionToWishlistAction($editionRepo, $wishlistRepo);
 
-    expect(fn () => $action->execute(99, 1))->toThrow(MangaNotFoundException::class);
+    expect(fn () => $action->execute(99, 1))->toThrow(VolumeNotFoundException::class);
 });

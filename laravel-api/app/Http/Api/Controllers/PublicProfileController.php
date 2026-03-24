@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Controllers;
 
-use App\Http\Api\Resources\MangaResource;
 use App\Http\Api\Resources\PublicUserResource;
-use App\Manga\Application\Actions\ListUserMangasAction;
+use App\Http\Api\Resources\VolumeResource;
+use App\Manga\Application\Actions\ListUserVolumesAction;
 use App\User\Application\Actions\GetPublicUserAction;
 use App\User\Domain\Exceptions\ProfileNotFoundOrPrivateException;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +24,7 @@ class PublicProfileController
         }
     }
 
-    public function showCollection(string $username, GetPublicUserAction $getPublicUserAction, ListUserMangasAction $listUserMangasAction): JsonResponse
+    public function showCollection(string $username, GetPublicUserAction $getPublicUserAction, ListUserVolumesAction $listUserMangasAction): JsonResponse
     {
         try {
             $user = $getPublicUserAction->execute($username);
@@ -36,7 +36,7 @@ class PublicProfileController
 
             $mangas = $listUserMangasAction->execute($userId);
 
-            return MangaResource::collection(collect($mangas))->response()->setStatusCode(200);
+            return VolumeResource::collection(collect($mangas))->response()->setStatusCode(200);
         } catch (ProfileNotFoundOrPrivateException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         }

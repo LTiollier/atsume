@@ -30,7 +30,7 @@ final class EditionResource extends JsonResource
             'cover_url' => $this->resource->getCoverUrl(),
             'possessed_numbers' => $this->when($this->resource->getPossessedNumbers() !== [], $this->resource->getPossessedNumbers()),
             'series' => $this->when($this->resource->getSeries() !== null, $this->resource->getSeries() ? new SeriesResource($this->resource->getSeries()) : null),
-            'volumes' => MangaResource::collection($this->when($this->resource->getVolumes() !== [], $this->resource->getVolumes())),
+            'volumes' => VolumeResource::collection($this->when($this->resource->getVolumes() !== [], $this->resource->getVolumes())),
         ];
     }
 }

@@ -33,7 +33,7 @@ final class BoxResource extends JsonResource
             'total_volumes' => $this->resource->getTotalVolumes(),
             'possessed_count' => $this->resource->getPossessedCount(),
             'series_id' => $this->resource->getSeriesId(),
-            'volumes' => $this->when(! empty($this->resource->getVolumes()), fn () => MangaResource::collection($this->resource->getVolumes())),
+            'volumes' => $this->when(! empty($this->resource->getVolumes()), fn () => VolumeResource::collection($this->resource->getVolumes())),
         ];
     }
 }

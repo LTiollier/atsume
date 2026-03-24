@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Application\Actions;
 
-use App\Manga\Domain\Exceptions\MangaNotFoundException;
+use App\Manga\Domain\Exceptions\VolumeNotFoundException;
 use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
@@ -20,7 +20,7 @@ class AddBoxToWishlistAction
     {
         $box = $this->boxRepository->findById($boxId, $userId);
         if (! $box) {
-            throw new MangaNotFoundException('Box not found with ID: '.$boxId);
+            throw new VolumeNotFoundException('Box not found with ID: '.$boxId);
         }
 
         $this->wishlistRepository->addBoxWishlistToUser($boxId, $userId);

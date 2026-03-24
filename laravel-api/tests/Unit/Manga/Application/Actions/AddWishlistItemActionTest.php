@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Manga\Application\Actions\AddBoxToWishlistAction;
-use App\Manga\Domain\Exceptions\MangaNotFoundException;
+use App\Manga\Domain\Exceptions\VolumeNotFoundException;
 use App\Manga\Domain\Models\Box;
 use App\Manga\Domain\Repositories\BoxRepositoryInterface;
 use App\Manga\Domain\Repositories\WishlistRepositoryInterface;
@@ -17,7 +17,7 @@ test('does not add to wishlist when box is not found', function () {
 
     $action = new AddBoxToWishlistAction($boxRepo, $wishlistRepo);
 
-    expect(fn () => $action->execute(999, 5))->toThrow(MangaNotFoundException::class);
+    expect(fn () => $action->execute(999, 5))->toThrow(VolumeNotFoundException::class);
 });
 
 test('calls addBoxWishlistToUser with correct ids', function () {

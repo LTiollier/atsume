@@ -37,8 +37,8 @@ use App\Manga\Infrastructure\Repositories\EloquentPlanningRepository;
 use App\Manga\Infrastructure\Repositories\EloquentSeriesRepository;
 use App\Manga\Infrastructure\Repositories\EloquentVolumeRepository;
 use App\Manga\Infrastructure\Repositories\EloquentWishlistRepository;
-use App\Manga\Infrastructure\Services\EloquentMangaLookupService;
-use App\Manga\Infrastructure\Services\MangaLookupServiceInterface;
+use App\Manga\Infrastructure\Services\EloquentVolumeLookupService;
+use App\Manga\Infrastructure\Services\VolumeLookupServiceInterface;
 use App\Manga\Infrastructure\Services\VolumeResolverService;
 use App\Providers\TelescopeServiceProvider as LocalTelescopeServiceProvider;
 use App\ReadingProgress\Domain\Repositories\ReadingProgressRepositoryInterface;
@@ -107,8 +107,8 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            MangaLookupServiceInterface::class,
-            EloquentMangaLookupService::class
+            VolumeLookupServiceInterface::class,
+            EloquentVolumeLookupService::class
         );
 
         $this->app->bind(

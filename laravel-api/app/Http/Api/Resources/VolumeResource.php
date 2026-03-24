@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property Volume $resource
  */
-class VolumeSearchResultResource extends JsonResource
+final class VolumeResource extends JsonResource
 {
     /**
      * @return array<string, mixed>
@@ -19,17 +19,23 @@ class VolumeSearchResultResource extends JsonResource
     public function toArray(Request $request): array
     {
         $series = $this->resource->getSeries();
+        $authorsStr = $series?->getAuthors();
 
         return [
             'id' => $this->resource->getId(),
             'api_id' => $this->resource->getApiId(),
-            'title' => $this->resource->getTitle(),
-            'authors' => $series && $series->getAuthors() ? explode(', ', $series->getAuthors()) : [],
-            'description' => null,
-            'published_date' => $this->resource->getPublishedDate(),
-            'page_count' => null,
-            'cover_url' => $this->resource->getCoverUrl(),
             'isbn' => $this->resource->getIsbn(),
+            'number' => $this->resource->getNumber(),
+            'title' => $this->resource->getTitle(),
+            'authors' => $authorsStr ? explode(', ', $authorsStr) : [],
+            'published_date' => $this->resource->getPublishedDate(),
+            'cover_url' => $this->resource->getCoverUrl(),
+            'is_owned' => $this->resource->isOwned(),
+            'is_loaned' => $this->resource->isLoaned(),
+            'loaned_to' => $this->resource->getLoanedTo(),
+            'is_wishlisted' => $this->resource->isWishlisted(),
+            'series' => $series ? new SeriesResource($series) : null,
+            'edition' => $this->resource->getEdition() ? new EditionResource($this->resource->getEdition()) : null,
         ];
     }
 }

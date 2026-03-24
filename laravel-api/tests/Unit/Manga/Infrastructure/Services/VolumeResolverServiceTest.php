@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Manga\Domain\Exceptions\MangaNotFoundException;
+use App\Manga\Domain\Exceptions\VolumeNotFoundException;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\Manga\Infrastructure\Services\VolumeResolverService;
@@ -43,7 +43,7 @@ test('it throws exception when volume is not found by isbn', function () {
         ->andReturn(null);
 
     $service->resolveByIsbn('unknown');
-})->throws(MangaNotFoundException::class, 'Manga not found locally for barcode: unknown');
+})->throws(VolumeNotFoundException::class, 'Manga not found locally for barcode: unknown');
 
 test('it resolves volume by api id', function () {
     /** @var VolumeRepositoryInterface&MockInterface $repository */
@@ -80,4 +80,4 @@ test('it throws exception when volume is not found by api id', function () {
         ->andReturn(null);
 
     $service->resolveByApiId('api-unknown');
-})->throws(MangaNotFoundException::class, 'Manga not found locally with ID: api-unknown');
+})->throws(VolumeNotFoundException::class, 'Manga not found locally with ID: api-unknown');

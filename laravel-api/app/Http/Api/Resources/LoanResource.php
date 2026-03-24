@@ -26,7 +26,7 @@ final class LoanResource extends JsonResource
         $loanable = $this->resource->getLoanable();
 
         if ($loanable instanceof Volume) {
-            $loanableResource = new MangaResource($loanable);
+            $loanableResource = new VolumeResource($loanable);
         } elseif ($loanable instanceof Box) {
             $loanableResource = new BoxResource($loanable);
         }

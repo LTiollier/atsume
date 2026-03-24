@@ -6,8 +6,8 @@ use App\Borrowing\Domain\Exceptions\AlreadyLoanedException;
 use App\Borrowing\Domain\Exceptions\LoanNotFoundException;
 use App\Borrowing\Domain\Exceptions\VolumeNotInCollectionException;
 use App\Manga\Domain\Exceptions\EditionNotFoundException;
-use App\Manga\Domain\Exceptions\MangaNotFoundException;
 use App\Manga\Domain\Exceptions\SeriesNotFoundException;
+use App\Manga\Domain\Exceptions\VolumeNotFoundException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -25,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Map Domain not-found exceptions → 404 JSON
-        $exceptions->render(function (MangaNotFoundException $e): JsonResponse {
+        $exceptions->render(function (VolumeNotFoundException $e): JsonResponse {
             return response()->json(['message' => $e->getMessage()], 404);
         });
 

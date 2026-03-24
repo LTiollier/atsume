@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Manga\Infrastructure\Services;
 
-use App\Manga\Domain\Exceptions\MangaNotFoundException;
+use App\Manga\Domain\Exceptions\VolumeNotFoundException;
 use App\Manga\Domain\Models\Volume;
 use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
 use App\Manga\Domain\Services\VolumeResolverServiceInterface;
@@ -18,7 +18,7 @@ final class VolumeResolverService implements VolumeResolverServiceInterface
     /**
      * Resolve a Volume by ISBN locally.
      *
-     * @throws MangaNotFoundException
+     * @throws VolumeNotFoundException
      */
     public function resolveByIsbn(string $isbn): Volume
     {
@@ -28,13 +28,13 @@ final class VolumeResolverService implements VolumeResolverServiceInterface
             return $volume;
         }
 
-        throw new MangaNotFoundException('Manga not found locally for barcode: '.$isbn);
+        throw new VolumeNotFoundException('Manga not found locally for barcode: '.$isbn);
     }
 
     /**
      * Resolve a Volume by API ID locally.
      *
-     * @throws MangaNotFoundException
+     * @throws VolumeNotFoundException
      */
     public function resolveByApiId(string $apiId): Volume
     {
@@ -44,6 +44,6 @@ final class VolumeResolverService implements VolumeResolverServiceInterface
             return $volume;
         }
 
-        throw new MangaNotFoundException('Manga not found locally with ID: '.$apiId);
+        throw new VolumeNotFoundException('Manga not found locally with ID: '.$apiId);
     }
 }

@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Manga\Application\Actions;
+
+use App\Manga\Application\DTOs\AddVolumeDTO;
+use App\Manga\Domain\Events\VolumeAddedToCollection;
+use App\Manga\Domain\Models\Volume;
+use App\Manga\Domain\Repositories\VolumeRepositoryInterface;
+use App\Manga\Domain\Services\VolumeResolverServiceInterface;
+use Illuminate\Support\Facades\DB;
+
+final class AddVolumeAction
+{
+    public function __construct(
+        private readonly VolumeResolverServiceInterface $volumeResolver,
+        private readonly VolumeRepositoryInterface $volumeRepository,
+    ) {}
+
+    public function execute(AddVolumeDTO $dto): Volume
+    {
+        return DB::transaction(function () use ($dto) {
+            $volume = $this->volumeResolver->resolveByApiId($dto->api_id);
+
+            $this->volumeRepository->attachToUser($volume->getId(), $dto->userId);
+
+            event(new VolumeAddedToCollection($volume, $dto->userId));
+
+            return $volume;
+        });
+    }
+}

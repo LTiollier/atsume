@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 use App\Http\Api\Controllers\AuthController;
 use App\Http\Api\Controllers\BoxCollectionController;
+use App\Http\Api\Controllers\CatalogController;
 use App\Http\Api\Controllers\LoanController;
 use App\Http\Api\Controllers\MangaCollecImportController;
-use App\Http\Api\Controllers\MangaCollectionController;
-use App\Http\Api\Controllers\MangaHierarchyController;
-use App\Http\Api\Controllers\MangaSearchController;
 use App\Http\Api\Controllers\PlanningController;
 use App\Http\Api\Controllers\PublicProfileController;
 use App\Http\Api\Controllers\ReadingProgressController;
 use App\Http\Api\Controllers\UserSettingsController;
+use App\Http\Api\Controllers\VolumeCollectionController;
+use App\Http\Api\Controllers\VolumeSearchController;
 use App\Http\Api\Controllers\WishlistController;
 use App\Http\Api\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -37,8 +37,8 @@ Route::middleware('throttle:auth')->group(function () {
 
 // Public catalog & profiles (unauthenticated)
 Route::middleware('throttle:api')->group(function () {
-    Route::get('/mangas/search', [MangaSearchController::class, 'search']);
-    Route::get('/mangas/search/isbn', [MangaSearchController::class, 'searchByIsbn']);
+    Route::get('/mangas/search', [VolumeSearchController::class, 'search']);
+    Route::get('/mangas/search/isbn', [VolumeSearchController::class, 'searchByIsbn']);
 
     Route::prefix('/users/{username}')->group(function () {
         Route::get('/', [PublicProfileController::class, 'showProfile']);
@@ -64,26 +64,26 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     // Catalog (hierarchy)
     Route::prefix('/series/{seriesId}')->group(function () {
-        Route::get('/', [MangaHierarchyController::class, 'showSeries']);
-        Route::get('/editions', [MangaHierarchyController::class, 'listEditions']);
-        Route::delete('/', [MangaCollectionController::class, 'removeSeries']);
+        Route::get('/', [CatalogController::class, 'showSeries']);
+        Route::get('/editions', [CatalogController::class, 'listEditions']);
+        Route::delete('/', [VolumeCollectionController::class, 'removeSeries']);
     });
 
     Route::prefix('/editions/{editionId}')->group(function () {
-        Route::get('/', [MangaHierarchyController::class, 'showEdition']);
-        Route::get('/volumes', [MangaHierarchyController::class, 'listVolumes']);
+        Route::get('/', [CatalogController::class, 'showEdition']);
+        Route::get('/volumes', [CatalogController::class, 'listVolumes']);
     });
 
-    Route::get('/box-sets/{boxSetId}', [MangaHierarchyController::class, 'showBoxSet']);
-    Route::get('/boxes/{boxId}', [MangaHierarchyController::class, 'showBox']);
+    Route::get('/box-sets/{boxSetId}', [CatalogController::class, 'showBoxSet']);
+    Route::get('/boxes/{boxId}', [CatalogController::class, 'showBox']);
 
     // Collection
     Route::prefix('/mangas')->group(function () {
-        Route::get('/', [MangaCollectionController::class, 'index']);
-        Route::post('/', [MangaCollectionController::class, 'store']);
-        Route::post('/scan-bulk', [MangaCollectionController::class, 'scanBulk']);
-        Route::post('/bulk', [MangaCollectionController::class, 'bulkAdd']);
-        Route::delete('/bulk', [MangaCollectionController::class, 'bulkRemove']);
+        Route::get('/', [VolumeCollectionController::class, 'index']);
+        Route::post('/', [VolumeCollectionController::class, 'store']);
+        Route::post('/scan-bulk', [VolumeCollectionController::class, 'scanBulk']);
+        Route::post('/bulk', [VolumeCollectionController::class, 'bulkAdd']);
+        Route::delete('/bulk', [VolumeCollectionController::class, 'bulkRemove']);
     });
 
     // Boxes
