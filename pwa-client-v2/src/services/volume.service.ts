@@ -2,13 +2,13 @@ import { cache } from 'react';
 import api, { ApiResponse } from '@/lib/api';
 import { isHttpError } from '@/lib/error';
 import {
-    Manga, MangaSearchResult, Series, Edition, Box, BoxSet,
+    Volume, VolumeSearchResult, Series, Edition, Box, BoxSet,
     PaginatedSeriesSearchResult,
-} from '@/types/manga';
+} from '@/types/volume';
 import {
-    MangaSchema, MangaSearchResultSchema, PaginatedSeriesSearchResultSchema,
+    VolumeSchema, VolumeSearchResultSchema, PaginatedSeriesSearchResultSchema,
     SeriesSchema, EditionSchema, BoxSchema, BoxSetSchema,
-} from '@/schemas/manga';
+} from '@/schemas/volume';
 import { z } from 'zod';
 
 /**
@@ -27,15 +27,15 @@ import { z } from 'zod';
 
 /** Pour les Server Components : déduplication via React.cache() */
 export const getCollection = cache(() =>
-    api.get<ApiResponse<Manga[]>>('/volumes')
-        .then(r => z.array(MangaSchema).parse(r.data.data))
+    api.get<ApiResponse<Volume[]>>('/volumes')
+        .then(r => z.array(VolumeSchema).parse(r.data.data))
 );
 
-export const mangaService = {
+export const volumeService = {
     /** Client-side : via React Query (utilise le même endpoint) */
     getCollection: () =>
-        api.get<ApiResponse<Manga[]>>('/volumes')
-            .then(r => z.array(MangaSchema).parse(r.data.data)),
+        api.get<ApiResponse<Volume[]>>('/volumes')
+            .then(r => z.array(VolumeSchema).parse(r.data.data)),
 
     search: (query: string, page = 1) =>
         api.get<PaginatedSeriesSearchResult>(
@@ -48,12 +48,12 @@ export const mangaService = {
             }
         }),
 
-    searchByIsbn: async (isbn: string): Promise<MangaSearchResult | null> => {
+    searchByIsbn: async (isbn: string): Promise<VolumeSearchResult | null> => {
         try {
-            const r = await api.get<ApiResponse<MangaSearchResult>>(
+            const r = await api.get<ApiResponse<VolumeSearchResult>>(
                 `/volumes/search/isbn?isbn=${encodeURIComponent(isbn)}`
             );
-            return MangaSearchResultSchema.parse(r.data.data);
+            return VolumeSearchResultSchema.parse(r.data.data);
         } catch (err) {
             if (isHttpError(err, 404)) return null;
             throw err;
@@ -95,9 +95,9 @@ export const mangaService = {
             .then(r => BoxSetSchema.parse(r.data.data) as BoxSet),
 
     getEditionVolumes: (editionId: number) =>
-        api.get<ApiResponse<Manga[]>>(`/editions/${editionId}/volumes`)
-            .then(r => z.array(MangaSchema).parse(r.data.data) as Manga[]),
+        api.get<ApiResponse<Volume[]>>(`/editions/${editionId}/volumes`)
+            .then(r => z.array(VolumeSchema).parse(r.data.data) as Volume[]),
 
-    // Unused — kept for type compatibility with MangaSearchResult
-    _searchResultSchema: MangaSearchResultSchema,
+    // Unused — kept for type compatibility with VolumeSearchResult
+    _searchResultSchema: VolumeSearchResultSchema,
 };

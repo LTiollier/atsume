@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-interface MangaGridProps {
+interface VolumeGridProps {
   children: ReactNode;
   /**
    * 'volumes' (défaut) — grille dense covers : 2→3→4→5→6 cols
-   *   Utilise la classe CSS .manga-grid (globals.css).
+   *   Utilise la classe CSS .volume-grid (globals.css).
    *   ⚠️ PAS d'animation sur les items — lag garanti sur 50+ volumes.
    *
    * 'series' — grille cartes séries : 2→3→4→5 cols
@@ -16,7 +16,7 @@ interface MangaGridProps {
   className?: string;
 }
 
-export function MangaGrid({ children, variant = 'volumes', className }: MangaGridProps) {
+export function VolumeGrid({ children, variant = 'volumes', className }: VolumeGridProps) {
   if (variant === 'series') {
     return (
       <div
@@ -31,7 +31,7 @@ export function MangaGrid({ children, variant = 'volumes', className }: MangaGri
   }
 
   return (
-    <div className={cn('manga-grid', className)}>
+    <div className={cn('volume-grid', className)}>
       {children}
     </div>
   );

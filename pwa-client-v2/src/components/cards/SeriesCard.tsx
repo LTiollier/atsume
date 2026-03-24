@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Package } from 'lucide-react';
 
-import type { Series } from '@/types/manga';
+import type { Series } from '@/types/volume';
 
 // Hoisted fallback — identique sur chaque render (rendering-hoist-jsx)
 const coverFallback = (
@@ -88,7 +88,7 @@ export function SeriesCard({
         {/* Barre segmentée — masquée si total inconnu */}
         {hasTotal && (
           <div
-            className="manga-progress overflow-hidden"
+            className="volume-progress overflow-hidden"
             role="progressbar"
             aria-valuenow={Math.min(Math.round((possessedCount / totalVolumes!) * 100), 100)}
             aria-valuemin={0}

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { BookUp, Heart, Package } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import type { Manga } from '@/types/manga';
+import type { Volume } from '@/types/volume';
 
 // Static JSX hoisted outside component — never re-created (rendering-hoist-jsx)
 const bottomGradient = (
@@ -23,7 +23,7 @@ const coverFallback = (
 );
 
 interface VolumeCardProps {
-  manga: Manga;
+  volume: Volume;
   href: string;
   /** Passé depuis le parent qui dispose des données de progression de lecture */
   isRead?: boolean;
@@ -34,7 +34,7 @@ interface VolumeCardProps {
 }
 
 export function VolumeCard({
-  manga,
+  volume,
   href,
   isRead = false,
   selected = false,
@@ -43,14 +43,14 @@ export function VolumeCard({
   return (
     <Link
       href={href}
-      className={cn('manga-card block', selected && 'outline outline-2 outline-primary')}
-      aria-label={`${manga.title}${manga.number ? ` — tome ${manga.number}` : ''}`}
+      className={cn('volume-card block', selected && 'outline outline-2 outline-primary')}
+      aria-label={`${volume.title}${volume.number ? ` — tome ${volume.number}` : ''}`}
     >
       {/* Cover */}
-      {manga.cover_url ? (
+      {volume.cover_url ? (
         <Image
-          src={manga.cover_url}
-          alt={manga.title ?? `Tome ${manga.number}`}
+          src={volume.cover_url}
+          alt={volume.title ?? `Tome ${volume.number}`}
           fill
           sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
           className="object-cover"
@@ -84,7 +84,7 @@ export function VolumeCard({
       )}
 
       {/* Loaned badge — top right (priorité sur wishlist) */}
-      {manga.is_loaned && (
+      {volume.is_loaned && (
         <div
           aria-label="Prêté"
           className="absolute top-1.5 right-1.5 flex items-center justify-center w-[22px] h-[22px] rounded"
@@ -95,7 +95,7 @@ export function VolumeCard({
       )}
 
       {/* Wishlist badge — top right (si pas possédé ni prêté) */}
-      {manga.is_wishlisted && !manga.is_owned && !manga.is_loaned && (
+      {volume.is_wishlisted && !volume.is_owned && !volume.is_loaned && (
         <div
           aria-label="En wishlist"
           className="absolute top-1.5 right-1.5 flex items-center justify-center w-[22px] h-[22px] rounded"
@@ -106,13 +106,13 @@ export function VolumeCard({
       )}
 
       {/* Numéro de tome — positionné sur le gradient bas */}
-      {showNumber && manga.number && (
+      {showNumber && volume.number && (
         <div className="absolute bottom-0 left-0 right-0 px-1.5 pb-1.5">
           <span
             className="text-[11px] font-medium leading-none"
             style={{ color: 'var(--foreground)', fontFamily: 'var(--font-mono)' }}
           >
-            #{manga.number}
+            #{volume.number}
           </span>
         </div>
       )}

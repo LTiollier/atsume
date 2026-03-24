@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { BookOpen, Package2, Heart, CheckCircle2 } from 'lucide-react';
 
-import type { PlanningItem } from '@/types/manga';
+import type { PlanningItem } from '@/types/volume';
 import { useTogglePlanningWishlist } from '@/hooks/queries';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

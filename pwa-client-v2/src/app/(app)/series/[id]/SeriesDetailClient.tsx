@@ -9,10 +9,10 @@ import { ChevronLeft, Heart, Package } from 'lucide-react';
 import { useSeriesQuery, useToggleWishlist } from '@/hooks/queries';
 import { SeriesCard } from '@/components/cards/SeriesCard';
 import { BoxCard } from '@/components/cards/BoxCard';
-import { MangaGrid } from '@/components/cards/MangaGrid';
+import { VolumeGrid } from '@/components/cards/VolumeGrid';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { sectionVariants } from '@/lib/motion';
-import type { Edition, BoxSet } from '@/types/manga';
+import type { Edition, BoxSet } from '@/types/volume';
 
 // ─── Skeletons hoisted at module level (rendering-hoist-jsx) ─────────────────
 
@@ -251,7 +251,7 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
               >
                 Éditions ({editions.length})
               </h2>
-              <MangaGrid variant="series">
+              <VolumeGrid variant="series">
                 {editions.map(edition => (
                   <EditionCard
                     key={edition.id}
@@ -266,7 +266,7 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
                     isPending={toggleWishlist.isPending}
                   />
                 ))}
-              </MangaGrid>
+              </VolumeGrid>
             </motion.section>
           )}
 
@@ -284,7 +284,7 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
               >
                 Coffrets ({boxSets.length})
               </h2>
-              <MangaGrid variant="series">
+              <VolumeGrid variant="series">
                 {boxSets.map(boxSet => (
                   <BoxSetCard
                     key={boxSet.id}
@@ -292,7 +292,7 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
                     seriesId={seriesId}
                   />
                 ))}
-              </MangaGrid>
+              </VolumeGrid>
             </motion.section>
           )}
         </>

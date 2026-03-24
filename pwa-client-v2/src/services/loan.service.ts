@@ -1,6 +1,6 @@
 import api, { ApiResponse } from '@/lib/api';
-import { Loan } from '@/types/manga';
-import { LoanSchema } from '@/schemas/manga';
+import { Loan } from '@/types/volume';
+import { LoanSchema } from '@/schemas/volume';
 import { z } from 'zod';
 
 export const loanService = {

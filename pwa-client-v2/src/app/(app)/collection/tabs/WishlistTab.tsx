@@ -8,7 +8,7 @@ import { useWishlist, useRemoveFromWishlist } from '@/hooks/queries';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { StatusBadge } from '@/components/feedback/StatusBadge';
 import { CollectionStatBar } from '@/components/collection/CollectionStatBar';
-import type { WishlistItem, WishlistEditionItem, WishlistBoxItem } from '@/types/manga';
+import type { WishlistItem, WishlistEditionItem, WishlistBoxItem } from '@/types/volume';
 
 // ─── Skeletons hoisted at module level (rendering-hoist-jsx) ─────────────────
 

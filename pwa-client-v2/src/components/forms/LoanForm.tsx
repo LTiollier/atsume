@@ -75,7 +75,7 @@ export function LoanForm({
         );
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: queryKeys.loans }),
-          queryClient.invalidateQueries({ queryKey: queryKeys.mangas }),
+          queryClient.invalidateQueries({ queryKey: queryKeys.volumes }),
         ]);
         toast.success(`Prêté à ${data.borrower_name}`);
         onSuccess?.();

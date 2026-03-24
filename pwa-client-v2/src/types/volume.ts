@@ -21,7 +21,7 @@ export interface Box {
     is_wishlisted?: boolean;
     total_volumes?: number | null;
     series_id?: number | null;
-    volumes?: Manga[];
+    volumes?: Volume[];
     box_set?: BoxSet | null;
 }
 
@@ -47,12 +47,12 @@ export interface Edition {
     possessed_count?: number | null;
     possessed_numbers?: number[];
     cover_url?: string | null;
-    volumes?: Manga[];
+    volumes?: Volume[];
     series?: Series | null;
     is_wishlisted?: boolean;
 }
 
-export interface MangaSearchResult {
+export interface VolumeSearchResult {
     id: number | null;
     api_id: string | null;
     title: string;
@@ -71,8 +71,8 @@ export interface PaginationMeta {
     total: number;
 }
 
-export interface PaginatedSearchResult {
-    data: MangaSearchResult[];
+export interface PaginatedVolumeSearchResult {
+    data: VolumeSearchResult[];
     meta: PaginationMeta;
 }
 
@@ -111,7 +111,7 @@ export interface PaginatedSeriesSearchResult {
     meta: PaginationMeta;
 }
 
-export interface Manga extends MangaSearchResult {
+export interface Volume extends VolumeSearchResult {
     id: number;
     number: string | null;
     is_owned: boolean;
@@ -132,7 +132,7 @@ export interface Loan {
     returned_at: string | null;
     is_returned: boolean;
     notes: string | null;
-    loanable: Manga | Box | null;
+    loanable: Volume | Box | null;
 }
 
 export interface ReadingProgress {
@@ -143,7 +143,7 @@ export interface ReadingProgress {
 
 export interface GroupedSeries {
     series: Series;
-    volumes: Manga[];
+    volumes: Volume[];
 }
 
 export interface WishlistEditionItem extends Edition {

@@ -6,7 +6,7 @@ import { differenceInDays, format } from 'date-fns';
 import { useLoansQuery, useReturnLoan, useBulkReturnLoans } from '@/hooks/queries';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { CollectionStatBar } from '@/components/collection/CollectionStatBar';
-import type { Loan, Manga, Box } from '@/types/manga';
+import type { Loan, Volume, Box } from '@/types/volume';
 
 const OVERDUE_DAYS = 30;
 
@@ -134,7 +134,7 @@ export function LoansTab() {
     const seriesIds = new Set<number>();
     for (const loan of activeLoans) {
       if (loan.loanable_type === 'volume') {
-        const sid = (loan.loanable as Manga | null)?.series?.id;
+        const sid = (loan.loanable as Volume | null)?.series?.id;
         if (sid != null) seriesIds.add(sid);
       } else {
         const sid = (loan.loanable as Box | null)?.series_id;

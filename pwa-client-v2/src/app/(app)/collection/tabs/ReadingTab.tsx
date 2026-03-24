@@ -4,11 +4,11 @@ import { useMemo } from 'react';
 import Image from 'next/image';
 import { Package } from 'lucide-react';
 
-import { useMangas, useReadingProgressQuery, useBulkToggleReadingProgress } from '@/hooks/queries';
+import { useVolumes, useReadingProgressQuery, useBulkToggleReadingProgress } from '@/hooks/queries';
 import { useGroupedCollection } from '@/hooks/useGroupedCollection';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { CollectionStatBar } from '@/components/collection/CollectionStatBar';
-import type { Manga, Series } from '@/types/manga';
+import type { Volume, Series } from '@/types/volume';
 
 // ─── Skeletons hoisted at module level (rendering-hoist-jsx) ─────────────────
 
@@ -37,7 +37,7 @@ const progressSkeletons = (
 
 interface SeriesProgressRowProps {
   series: Series;
-  volumes: Manga[];
+  volumes: Volume[];
   /** Stable Set reference via useMemo in parent */
   readSet: Set<number>;
 }
@@ -115,14 +115,14 @@ function SeriesProgressRow({ series, volumes, readSet }: SeriesProgressRowProps)
           {readCount} / {total} lu{readCount > 1 ? 's' : ''}
         </p>
         <div
-          className="manga-progress mt-1.5"
+          className="volume-progress mt-1.5"
           role="progressbar"
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`${progress}% lus`}
         >
-          <div className="manga-progress__fill" style={{ width: `${progress}%` }} />
+          <div className="volume-progress__fill" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
@@ -158,13 +158,13 @@ function SeriesProgressRow({ series, volumes, readSet }: SeriesProgressRowProps)
 // ─── ReadingTab ───────────────────────────────────────────────────────────────
 
 export function ReadingTab() {
-  const { data: mangas = [], isLoading: mangasLoading } = useMangas();
+  const { data: volumes = [], isLoading: volumesLoading } = useVolumes();
   const { data: readingProgress = [], isLoading: progressLoading } = useReadingProgressQuery();
 
-  const isLoading = mangasLoading || progressLoading;
+  const isLoading = volumesLoading || progressLoading;
 
   // Memoized owned filter (rerender-memo)
-  const ownedMangas = useMemo(() => mangas.filter(m => m.is_owned), [mangas]);
+  const ownedVolumes = useMemo(() => volumes.filter(m => m.is_owned), [volumes]);
 
   // Set for O(1) volume_id lookup (js-set-map-lookups) — stable reference between renders
   const readSet = useMemo(
@@ -172,7 +172,7 @@ export function ReadingTab() {
     [readingProgress],
   );
 
-  const grouped = useGroupedCollection(ownedMangas);
+  const grouped = useGroupedCollection(ownedVolumes);
 
   // Volumes count across all acquired editions (at least 1 owned volume)
   // (rerender-derived-state-no-effect)
@@ -180,7 +180,7 @@ export function ReadingTab() {
     const now = new Date().toISOString();
     const acquiredEditions = new Map<number, { total: number, owned: number, futureOwned: number }>();
     
-    for (const m of ownedMangas) {
+    for (const m of ownedVolumes) {
       if (m.edition?.id != null) {
         const eid = m.edition.id;
         const isFuture = !!(m.published_date && m.published_date > now);
@@ -207,7 +207,7 @@ export function ReadingTab() {
     });
 
     return Math.max(0, totalVolumesAcrossEditions - readingProgress.length);
-  }, [ownedMangas, readingProgress.length]);
+  }, [ownedVolumes, readingProgress.length]);
 
   const completedSeriesCount = useMemo(
     () =>

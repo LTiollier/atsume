@@ -1,6 +1,6 @@
 import api, { ApiResponse } from '@/lib/api';
 import { User } from '@/types/auth';
-import { Manga, Series, Edition } from '@/types/manga';
+import { Volume, Series, Edition } from '@/types/volume';
 
 interface UpdateSettingsPayload {
     username: string | null;
@@ -46,10 +46,10 @@ export const userService = {
         api.get<ApiResponse<PublicProfile>>(`/users/${username}`).then(r => r.data.data),
 
     getPublicCollection: (username: string) =>
-        api.get<ApiResponse<Manga[]>>(`/users/${username}/collection`).then(r => r.data.data),
+        api.get<ApiResponse<Volume[]>>(`/users/${username}/collection`).then(r => r.data.data),
 
     getEditionVolumes: (editionId: string) =>
-        api.get<ApiResponse<Manga[]>>(`/editions/${editionId}/volumes`).then(r => r.data.data),
+        api.get<ApiResponse<Volume[]>>(`/editions/${editionId}/volumes`).then(r => r.data.data),
 
     getSeries: (seriesId: string) =>
         api.get<ApiResponse<Series>>(`/series/${seriesId}`).then(r => r.data.data),

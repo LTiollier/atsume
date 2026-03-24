@@ -1,43 +1,43 @@
 "use client";
 
 import { useMemo } from "react";
-import { Manga, GroupedSeries } from "@/types/manga";
+import { Volume, GroupedSeries } from "@/types/volume";
 
 /**
- * Groupe un tableau de Manga par série.
- * Les mangas sans série sont groupés sous une série synthétique.
+ * Groupe un tableau de Volume par série.
+ * Les volumes sans série sont groupés sous une série synthétique.
  *
  * Règle Vercel `rerender-memo` : les deux useMemo sont distincts pour éviter
  * de recalculer le groupement quand seul le filtre change.
  */
-export function useGroupedCollection(mangas: Manga[], searchQuery: string = ""): GroupedSeries[] {
-    const filteredMangas = useMemo(() =>
-        mangas.filter(manga =>
-            manga.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (manga.series?.title.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
-            (manga.authors?.some(author => author.toLowerCase().includes(searchQuery.toLowerCase())) ?? false)
+export function useGroupedCollection(volumes: Volume[], searchQuery: string = ""): GroupedSeries[] {
+    const filteredVolumes = useMemo(() =>
+        volumes.filter(volume =>
+            volume.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (volume.series?.title.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+            (volume.authors?.some(author => author.toLowerCase().includes(searchQuery.toLowerCase())) ?? false)
         ),
-        [mangas, searchQuery]
+        [volumes, searchQuery]
     );
 
     return useMemo(() => {
-        const grouped = filteredMangas.reduce((acc, manga) => {
-            const seriesId = manga.series?.id || 0;
+        const grouped = filteredVolumes.reduce((acc, volume) => {
+            const seriesId = volume.series?.id || 0;
             if (!acc[seriesId]) {
                 acc[seriesId] = {
-                    series: manga.series || {
+                    series: volume.series || {
                         id: 0,
-                        title: manga.title,
-                        authors: manga.authors,
-                        cover_url: manga.cover_url,
+                        title: volume.title,
+                        authors: volume.authors,
+                        cover_url: volume.cover_url,
                     },
                     volumes: [],
                 };
             }
-            acc[seriesId].volumes.push(manga);
+            acc[seriesId].volumes.push(volume);
             return acc;
         }, {} as Record<number, GroupedSeries>);
 
         return Object.values(grouped);
-    }, [filteredMangas]);
+    }, [filteredVolumes]);
 }

@@ -25,12 +25,12 @@ import { CollectionActionBar } from '@/components/collection/CollectionActionBar
 import { AddToCollectionBar } from '@/components/collection/AddToCollectionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { BoxItemCard } from '@/components/collection/BoxItemCard';
-import { MangaGrid } from '@/components/cards/MangaGrid';
+import { VolumeGrid } from '@/components/cards/VolumeGrid';
 import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { sectionVariants } from '@/lib/motion';
-import type { Box, Loan } from '@/types/manga';
+import type { Box, Loan } from '@/types/volume';
 
 interface BoxSetDetailClientProps {
   seriesId: number;
@@ -266,7 +266,7 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
             </div>
           </div>
 
-          <MangaGrid variant="series" className={isOwnedSelectMode || isAddMode ? 'pb-28' : undefined}>
+          <VolumeGrid variant="series" className={isOwnedSelectMode || isAddMode ? 'pb-28' : undefined}>
             {boxes.map(box => (
               <BoxItemCard
                 key={box.id}
@@ -287,7 +287,7 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
                 onAddToggle={isOwnedSelectMode ? undefined : handleNonOwnedBoxToggle}
               />
             ))}
-          </MangaGrid>
+          </VolumeGrid>
         </motion.section>
       )}
 

@@ -24,9 +24,9 @@ export const headerSkeleton = (
 
 // Shared grid skeleton — identical for Edition, Box, BoxSet (rendering-hoist-jsx)
 export const gridSkeleton = (
-  <div className="manga-grid" aria-busy aria-hidden>
+  <div className="volume-grid" aria-busy aria-hidden>
     {Array.from({ length: 12 }, (_, i) => (
-      <div key={i} className="manga-card skeleton" aria-hidden />
+      <div key={i} className="volume-card skeleton" aria-hidden />
     ))}
   </div>
 );
@@ -94,14 +94,14 @@ export function DetailHeader({
         {progress && (
           <>
             <div
-              className="manga-progress"
+              className="volume-progress"
               role="progressbar"
               aria-valuenow={progress.value}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label={progress.ariaLabel}
             >
-              <div className="manga-progress__fill" style={{ width: `${progress.value}%` }} />
+              <div className="volume-progress__fill" style={{ width: `${progress.value}%` }} />
             </div>
             <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
               {progress.label}

@@ -30,7 +30,7 @@ import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { sectionVariants } from '@/lib/motion';
-import type { Loan, Manga } from '@/types/manga';
+import type { Loan, Volume } from '@/types/volume';
 
 interface EditionDetailClientProps {
   seriesId: number;
@@ -54,7 +54,7 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
 
   // Derived during render (rerender-derived-state-no-effect)
   // Wrapped in useMemo to stabilize the reference for dependent memos (rerender-memo)
-  const volumes: Manga[] = useMemo(() => edition?.volumes ?? [], [edition?.volumes]);
+  const volumes: Volume[] = useMemo(() => edition?.volumes ?? [], [edition?.volumes]);
 
   // O(1) lookup sets (js-set-map-lookups)
   const readSet = useMemo(
@@ -101,13 +101,13 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
 
   // ── Add non-owned volumes to collection ──────────────────────────────────────
 
-  function parseVolumeNumber(manga: Manga): number | null {
-    const n = parseInt(manga.number ?? '');
+  function parseVolumeNumber(volume: Volume): number | null {
+    const n = parseInt( volume.number ?? '');
     return isNaN(n) ? null : n;
   }
 
-  function handleNonOwnedToggle(manga: Manga) {
-    const n = parseVolumeNumber(manga);
+  function handleNonOwnedToggle(volume: Volume) {
+    const n = parseVolumeNumber(volume);
     if (n === null) return;
     setSelectedNonOwnedNumbers(prev => {
       const next = new Set(prev);
@@ -327,17 +327,17 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
             </div>
           </div>
 
-          <div className={`manga-grid ${isOwnedSelectMode || isAddMode ? 'pb-28' : ''}`}>
-            {volumes.map(manga => (
+          <div className={`volume-grid ${isOwnedSelectMode || isAddMode ? 'pb-28' : ''}`}>
+            {volumes.map(volume => (
               <VolumeActionCard
-                key={manga.id}
-                manga={manga}
-                isRead={readSet.has(manga.id)}
-                isLoaned={loanedSet.has(manga.id)}
-                isSelected={selectedIds.has(manga.id)}
+                key={ volume.id}
+                volume={volume}
+                isRead={readSet.has( volume.id)}
+                isLoaned={loanedSet.has( volume.id)}
+                isSelected={selectedIds.has( volume.id)}
                 onToggle={handleToggle}
                 disabled={isAddMode}
-                isAddSelected={selectedNonOwnedNumbers.has(parseVolumeNumber(manga) ?? -1)}
+                isAddSelected={selectedNonOwnedNumbers.has(parseVolumeNumber(volume) ?? -1)}
                 onAddToggle={isOwnedSelectMode ? undefined : handleNonOwnedToggle}
               />
             ))}

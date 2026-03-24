@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { CheckCircle, Package } from 'lucide-react';
 
-import type { Manga } from '@/types/manga';
+import type { Volume } from '@/types/volume';
 
 // Hoisted static decorators (rendering-hoist-jsx)
 const bottomGradient = (
@@ -21,20 +21,20 @@ const coverFallback = (
 );
 
 export interface VolumeActionCardProps {
-  manga: Manga;
+  volume: Volume;
   isRead: boolean;
   isLoaned: boolean;
   isSelected?: boolean;
-  onToggle: (manga: Manga) => void;
+  onToggle: (volume: Volume) => void;
   isAddSelected?: boolean;
-  onAddToggle?: (manga: Manga) => void;
+  onAddToggle?: (volume: Volume) => void;
   /** Disable owned-item toggle (e.g. when add-to-collection mode is active) */
   disabled?: boolean;
 }
 
 // Defined outside any parent component (rerender-no-inline-components)
 export function VolumeActionCard({
-  manga,
+  volume,
   isRead,
   isLoaned,
   isSelected = false,
@@ -43,28 +43,28 @@ export function VolumeActionCard({
   onAddToggle,
   disabled = false,
 }: VolumeActionCardProps) {
-  const isOwned = manga.is_owned;
+  const isOwned = volume.is_owned;
   // Owned clickable unless disabled (add-mode active); non-owned clickable when onAddToggle provided (rerender-derived-state)
   const isClickable = (isOwned && !disabled) || (!isOwned && !!onAddToggle);
 
   function handleClick() {
-    if (isOwned && !disabled) onToggle(manga);
-    else if (!isOwned && onAddToggle) onAddToggle(manga);
+    if (isOwned && !disabled) onToggle(volume);
+    else if (!isOwned && onAddToggle) onAddToggle(volume);
   }
 
   return (
     <button
       type="button"
-      className="manga-card block w-full"
+      className="volume-card block w-full"
       style={{ background: 'none', border: 'none', padding: 0, cursor: isClickable ? 'pointer' : 'default' }}
       onClick={handleClick}
       aria-pressed={isClickable ? (isOwned ? isSelected : isAddSelected) : undefined}
-      aria-label={`${manga.title}${manga.number ? ` — tome ${manga.number}` : ''}${isLoaned ? ' — prêté' : ''}`}
+      aria-label={`${volume.title}${volume.number ? ` — tome ${volume.number}` : ''}${isLoaned ? ' — prêté' : ''}`}
     >
-      {manga.cover_url ? (
+      {volume.cover_url ? (
         <Image
-          src={manga.cover_url}
-          alt={manga.title ?? `Tome ${manga.number}`}
+          src={volume.cover_url}
+          alt={volume.title ?? `Tome ${volume.number}`}
           fill
           sizes="(max-width: 480px) 33vw, (max-width: 768px) 25vw, 16vw"
           className="object-cover"
@@ -129,13 +129,13 @@ export function VolumeActionCard({
       )}
 
       {/* Volume number */}
-      {manga.number && (
+      {volume.number && (
         <div className="absolute bottom-0 left-0 right-0 px-1.5 pb-1.5">
           <span
             className="text-[11px] font-medium leading-none"
             style={{ color: 'var(--foreground)', fontFamily: 'var(--font-mono)' }}
           >
-            #{manga.number}
+            #{volume.number}
           </span>
         </div>
       )}

@@ -16,7 +16,7 @@ import { sectionVariants } from '@/lib/motion';
 // ─── Hoisted static JSX (rendering-hoist-jsx) ─────────────────────────────────
 
 const skeletonGrid = (
-  <div className="manga-grid" aria-busy aria-hidden>
+  <div className="volume-grid" aria-busy aria-hidden>
     <SkeletonCard variant="series" count={8} />
   </div>
 );
@@ -77,10 +77,10 @@ export function PublicCollectionClient({ username }: PublicCollectionClientProps
 
   // Memoized owned filter separate from grouping — avoids regrouping when only
   // search changes (rerender-memo split via useGroupedCollection)
-  const ownedMangas = useMemo(() => collection.filter(m => m.is_owned), [collection]);
+  const ownedVolumes = useMemo(() => collection.filter(m => m.is_owned), [collection]);
 
   // useGroupedCollection has its own split useMemos internally
-  const grouped = useGroupedCollection(ownedMangas, deferredSearch);
+  const grouped = useGroupedCollection(ownedVolumes, deferredSearch);
 
   if (isLoading) {
     return (
@@ -129,7 +129,7 @@ export function PublicCollectionClient({ username }: PublicCollectionClientProps
             @{displayName}
           </p>
           <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-            {ownedMangas.length} volume{ownedMangas.length !== 1 ? 's' : ''}
+            {ownedVolumes.length} volume{ownedVolumes.length !== 1 ? 's' : ''}
           </p>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function PublicCollectionClient({ username }: PublicCollectionClientProps
           }
         />
       ) : (
-        <div className="manga-grid">
+        <div className="volume-grid">
           {seriesGroups.map(({ series, volumes }) => {
             // Cover: first volume with a cover URL, fallback to series cover
             const coverUrl =

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useDeferredValue } from 'react';
 
-import { useMangas, useReadingProgressQuery, useLoansQuery } from '@/hooks/queries';
+import { useVolumes, useReadingProgressQuery, useLoansQuery } from '@/hooks/queries';
 import { useGroupedCollection } from '@/hooks/useGroupedCollection';
 import { SeriesCard } from '@/components/cards/SeriesCard';
 import { SearchBar } from '@/components/forms/SearchBar';
@@ -11,18 +11,18 @@ import { EmptyState } from '@/components/feedback/EmptyState';
 import { CollectionStatBar, collectionStatBarSkeleton } from '@/components/collection/CollectionStatBar';
 
 export function LibraryTab() {
-  const { data: mangas = [], isLoading } = useMangas();
+  const { data: volumes = [], isLoading } = useVolumes();
   const { data: readingProgress = [] } = useReadingProgressQuery();
   const { data: loans = [] } = useLoansQuery();
   const [search, setSearch] = useState('');
 
   // Memoized owned filter — avoids recreating the array on every keystroke (rerender-memo)
-  const ownedMangas = useMemo(() => mangas.filter(m => m.is_owned), [mangas]);
+  const ownedVolumes = useMemo(() => volumes.filter(m => m.is_owned), [volumes]);
 
   // Series count — Set for O(1) dedup (js-set-map-lookups)
   const seriesCount = useMemo(
-    () => new Set(ownedMangas.map(m => m.series?.id).filter((id): id is number => id != null)).size,
-    [ownedMangas],
+    () => new Set(ownedVolumes.map(m => m.series?.id).filter((id): id is number => id != null)).size,
+    [ownedVolumes],
   );
 
   // O(1) lookups for read and loaned volume IDs (js-set-map-lookups)
@@ -42,13 +42,13 @@ export function LibraryTab() {
   // Deferred value — filtering does not block keystrokes on large collections
   // (rerender-use-deferred-value)
   const deferredSearch = useDeferredValue(search);
-  const grouped = useGroupedCollection(ownedMangas, deferredSearch);
+  const grouped = useGroupedCollection(ownedVolumes, deferredSearch);
 
   return (
     <div className="flex flex-col gap-4">
       {isLoading ? collectionStatBarSkeleton : (
         <CollectionStatBar items={[
-          { value: ownedMangas.length, label: 'Volumes' },
+          { value: ownedVolumes.length, label: 'Volumes' },
           { value: seriesCount, label: 'Séries' },
         ]} />
       )}
@@ -59,7 +59,7 @@ export function LibraryTab() {
       />
 
       {isLoading ? (
-        <div className="manga-grid">
+        <div className="volume-grid">
           <SkeletonCard variant="series" count={8} />
         </div>
       ) : grouped.filter(gs => gs.series.id > 0).length === 0 ? (
@@ -68,7 +68,7 @@ export function LibraryTab() {
           action={!search ? { label: 'Scanner', href: '/scan' } : undefined}
         />
       ) : (
-        <div className="manga-grid">
+        <div className="volume-grid">
           {grouped
             // Series id=0 = orphan volumes with no dedicated page
             .filter(gs => gs.series.id > 0)

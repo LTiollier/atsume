@@ -10,13 +10,13 @@ import { toast } from 'sonner';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { userService } from '@/services/user.service';
-import { useMangas, useLoansQuery, useReadingProgressQuery } from '@/hooks/queries';
+import { useVolumes, useLoansQuery, useReadingProgressQuery } from '@/hooks/queries';
 import { StatGrid } from '@/components/dashboard/StatGrid';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { VolumeCard } from '@/components/cards/VolumeCard';
 import { SkeletonCard } from '@/components/feedback/SkeletonCard';
 import { sectionVariants } from '@/lib/motion';
-import type { Manga } from '@/types/manga';
+import type { Volume } from '@/types/volume';
 
 const OVERDUE_DAYS = 30;
 const RECENT_COUNT = 8;
@@ -47,8 +47,8 @@ const recentSkeletons = (
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function getMangaHref(manga: Manga): string {
-  const { series, edition } = manga;
+function getVolumeHref(volume: Volume): string {
+  const { series, edition } = volume;
   if (series?.id && edition?.id) return `/series/${series.id}/edition/${edition.id}`;
   return '/collection';
 }
@@ -61,11 +61,11 @@ export function DashboardClient() {
   const router = useRouter();
 
   // 3 parallel queries — React Query fires them simultaneously (async-parallel)
-  const { data: mangas = [], isLoading: mangasLoading } = useMangas();
+  const { data: volumes = [], isLoading: volumesLoading } = useVolumes();
   const { data: loans = [], isLoading: loansLoading } = useLoansQuery();
   const { data: readingProgress = [], isLoading: progressLoading } = useReadingProgressQuery();
 
-  const statsLoading = mangasLoading || loansLoading || progressLoading;
+  const statsLoading = volumesLoading || loansLoading || progressLoading;
 
   // Check for verification success
   useEffect(() => {
@@ -87,7 +87,7 @@ export function DashboardClient() {
 
   // Derived stats during render — no useEffect (rerender-derived-state-no-effect)
   const stats = useMemo(() => {
-    const owned = mangas.filter(m => m.is_owned);
+    const owned = volumes.filter(m => m.is_owned);
     // Set for O(1) lookup on unique series (js-set-map-lookups)
     const seriesIds = new Set(owned.map(m => m.series?.id).filter((id): id is number => id != null));
     return {
@@ -96,7 +96,7 @@ export function DashboardClient() {
       totalRead: readingProgress.length,
       activeLoans: loans.filter(l => !l.is_returned).length,
     };
-  }, [mangas, loans, readingProgress]);
+  }, [volumes, loans, readingProgress]);
 
   // Overdue loans — active for >= OVERDUE_DAYS
   const overdueCount = useMemo(
@@ -110,9 +110,9 @@ export function DashboardClient() {
   );
 
   // Recent additions — first RECENT_COUNT owned volumes (API returns newest first)
-  const recentMangas = useMemo(
-    () => mangas.filter(m => m.is_owned).slice(0, RECENT_COUNT),
-    [mangas],
+  const recentVolumes = useMemo(
+    () => volumes.filter(m => m.is_owned).slice(0, RECENT_COUNT),
+    [volumes],
   );
 
   const firstName = user?.name?.split(' ')[0] ?? 'Collector';
@@ -187,7 +187,7 @@ export function DashboardClient() {
       </motion.section>
 
       {/* Recent additions */}
-      {(mangasLoading || recentMangas.length > 0) && (
+      {(volumesLoading || recentVolumes.length > 0) && (
         <motion.section
           variants={sectionVariants}
           initial="initial"
@@ -215,13 +215,13 @@ export function DashboardClient() {
            * while keeping the first item indented
            */}
           <div className="overflow-x-auto -mx-4 px-4">
-            {mangasLoading ? (
+            {volumesLoading ? (
               recentSkeletons
             ) : (
               <div className="flex gap-3 pb-1">
-                {recentMangas.map(manga => (
-                  <div key={manga.id} className="shrink-0 w-[72px]">
-                    <VolumeCard manga={manga} href={getMangaHref(manga)} />
+                {recentVolumes.map(volume => (
+                  <div key={ volume.id} className="shrink-0 w-[72px]">
+                    <VolumeCard volume={volume} href={getVolumeHref(volume)} />
                   </div>
                 ))}
               </div>

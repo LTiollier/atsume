@@ -6,7 +6,7 @@ import { CalendarDays, RefreshCw } from 'lucide-react';
 import { usePlanningQuery } from '@/hooks/queries';
 import { PlanningCard, PlanningCardSkeleton } from '@/components/cards/PlanningCard';
 import { EmptyState } from '@/components/feedback/EmptyState';
-import type { PlanningItem } from '@/types/manga';
+import type { PlanningItem } from '@/types/volume';
 
 // ─── MonthDivider ─────────────────────────────────────────────────────────────
 

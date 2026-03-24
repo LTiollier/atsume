@@ -16,7 +16,7 @@ import {
 import { toast } from 'sonner';
 
 import { useOffline } from '@/contexts/OfflineContext';
-import { mangaService } from '@/services/manga.service';
+import { volumeService } from '@/services/volume.service';
 import { getApiErrorMessage } from '@/lib/error';
 import { sectionVariants, fadeInVariants } from '@/lib/motion';
 
@@ -154,7 +154,7 @@ export function ScanClient() {
     toast.success(`Code scanné`);
 
     try {
-      const result = await mangaService.searchByIsbn(isbn);
+      const result = await volumeService.searchByIsbn(isbn);
       setItems(prev =>
         prev.map(item =>
           item.isbn === isbn
@@ -185,7 +185,7 @@ export function ScanClient() {
     if (items.length === 0 || isSubmitting) return;
     setIsSubmitting(true);
     try {
-      await mangaService.scanBulk(items.map(i => i.isbn));
+      await volumeService.scanBulk(items.map(i => i.isbn));
       const n = items.length;
       toast.success(
         `${n} manga${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''} à votre collection`,

@@ -1,6 +1,6 @@
 import api from '@/lib/api';
-import { PlanningResponse } from '@/types/manga';
-import { PlanningResponseSchema } from '@/schemas/manga';
+import { PlanningResponse } from '@/types/volume';
+import { PlanningResponseSchema } from '@/schemas/volume';
 
 export const planningService = {
     getPage: (cursor?: string): Promise<PlanningResponse> =>

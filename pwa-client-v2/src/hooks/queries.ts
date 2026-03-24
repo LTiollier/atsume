@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, useInfiniteQuery, InfiniteData } from "@tanstack/react-query";
-import { mangaService } from "@/services/manga.service";
+import { volumeService } from "@/services/volume.service";
 import { loanService } from "@/services/loan.service";
 import { wishlistService } from "@/services/wishlist.service";
 import { readingProgressService } from "@/services/readingProgress.service";
 import { userService } from "@/services/user.service";
 import { planningService } from "@/services/planning.service";
-import { Loan, Manga, Series, PlanningResponse } from "@/types/manga";
+import { Loan, Volume, Series, PlanningResponse } from "@/types/volume";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Query Keys ────────────────────────────────────────────────────────────────
 
 export const queryKeys = {
-    mangas: ["mangas"] as const,
+    volumes: ["volumes"] as const,
     loans: ["loans"] as const,
     wishlist: ["wishlist"] as const,
     readingProgress: ["readingProgress"] as const,
@@ -33,17 +33,17 @@ export const queryKeys = {
  * `initialData` optionnel permet d'hydrater depuis un Server Component :
  * ```tsx
  * // Dans un Server Component :
- * const mangas = await mangaService.getCollection();
+ * const volumes = await volumeService.getCollection();
  * // Dans le Client Island :
- * const { data } = useMangas(mangas);
+ * const { data } = useVolumes(volumes);
  * ```
  * Règle Vercel `async-waterfalls` : les Server Components fetchent en parallèle
  * et passent initialData aux hooks client — zéro waterfall côté client.
  */
-export function useMangas(initialData?: Manga[]) {
+export function useVolumes(initialData?: Volume[]) {
     return useQuery({
-        queryKey: queryKeys.mangas,
-        queryFn: mangaService.getCollection,
+        queryKey: queryKeys.volumes,
+        queryFn: volumeService.getCollection,
         initialData,
     });
 }
@@ -51,7 +51,7 @@ export function useMangas(initialData?: Manga[]) {
 export function useSeriesQuery(id: number) {
     return useQuery({
         queryKey: queryKeys.series(id),
-        queryFn: () => mangaService.getSeries(id),
+        queryFn: () => volumeService.getSeries(id),
         enabled: id > 0,
     });
 }
@@ -59,7 +59,7 @@ export function useSeriesQuery(id: number) {
 export function useEditionQuery(id: number) {
     return useQuery({
         queryKey: queryKeys.edition(id),
-        queryFn: () => mangaService.getEdition(id),
+        queryFn: () => volumeService.getEdition(id),
         enabled: id > 0,
     });
 }
@@ -67,7 +67,7 @@ export function useEditionQuery(id: number) {
 export function useBoxQuery(id: number) {
     return useQuery({
         queryKey: queryKeys.box(id),
-        queryFn: () => mangaService.getBox(id),
+        queryFn: () => volumeService.getBox(id),
         enabled: id > 0,
     });
 }
@@ -76,7 +76,7 @@ export function useBoxQuery(id: number) {
 export function useSearchQuery(query: string, page: number) {
     return useQuery({
         queryKey: queryKeys.search(query, page),
-        queryFn: () => mangaService.search(query, page),
+        queryFn: () => volumeService.search(query, page),
         enabled: query.length > 0,
         staleTime: 5 * 60 * 1000,
         placeholderData: keepPreviousData, // smooth pagination — old data visible while fetching next page
@@ -86,7 +86,7 @@ export function useSearchQuery(query: string, page: number) {
 export function useBoxSetQuery(id: number) {
     return useQuery({
         queryKey: queryKeys.boxSet(id),
-        queryFn: () => mangaService.getBoxSet(id),
+        queryFn: () => volumeService.getBoxSet(id),
         enabled: id > 0,
     });
 }
@@ -185,7 +185,7 @@ export function useCreateLoan() {
         onSuccess: () => {
             toast.success('Prêt enregistré');
             queryClient.invalidateQueries({ queryKey: queryKeys.loans });
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
         onError: () => {
             toast.error('Erreur lors de la création du prêt');
@@ -201,7 +201,7 @@ export function useBulkCreateLoan() {
         onSuccess: (_, { volumeIds }) => {
             toast.success(`${volumeIds.length} volume${volumeIds.length > 1 ? 's' : ''} prêté${volumeIds.length > 1 ? 's' : ''}`);
             queryClient.invalidateQueries({ queryKey: queryKeys.loans });
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
         onError: () => {
             toast.error('Erreur lors du prêt');
@@ -280,9 +280,9 @@ export function useRemoveFromWishlist() {
 export function useAddToCollection() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (apiId: string) => mangaService.addToCollection(apiId),
+        mutationFn: (apiId: string) => volumeService.addToCollection(apiId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
     });
 }
@@ -291,9 +291,9 @@ export function useAddBulkToCollection() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ editionId, numbers }: { editionId: number; numbers: number[] }) =>
-            mangaService.addBulk(editionId, numbers),
+            volumeService.addBulk(editionId, numbers),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
     });
 }
@@ -302,10 +302,10 @@ export function useBulkRemoveVolumesFromCollection() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (volumeIds: number[]) =>
-            mangaService.bulkRemoveVolumes(volumeIds),
+            volumeService.bulkRemoveVolumes(volumeIds),
         onSuccess: (_, ids) => {
             toast.success(`${ids.length} tome${ids.length > 1 ? 's' : ''} retiré${ids.length > 1 ? 's' : ''} de la collection`);
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
         onError: () => {
             toast.error("Erreur lors du retrait de la collection");
@@ -316,9 +316,9 @@ export function useBulkRemoveVolumesFromCollection() {
 export function useAddBoxToCollection() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (boxId: number) => mangaService.addBoxToCollection(boxId),
+        mutationFn: (boxId: number) => volumeService.addBoxToCollection(boxId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
     });
 }
@@ -327,10 +327,10 @@ export function useBulkRemoveBoxesFromCollection() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (boxIds: number[]) =>
-            Promise.all(boxIds.map(id => mangaService.removeBoxFromCollection(id))),
+            Promise.all(boxIds.map(id => volumeService.removeBoxFromCollection(id))),
         onSuccess: (_, ids) => {
             toast.success(`${ids.length} boîte${ids.length > 1 ? 's' : ''} retirée${ids.length > 1 ? 's' : ''} de la collection`);
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
         onError: () => {
             toast.error("Erreur lors du retrait de la collection");
@@ -570,7 +570,7 @@ export function useImportMangaCollec() {
         mutationFn: (url: string) => userService.importMangaCollec(url),
         onSuccess: (result) => {
             toast.success(result.message);
-            queryClient.invalidateQueries({ queryKey: queryKeys.mangas });
+            queryClient.invalidateQueries({ queryKey: queryKeys.volumes });
         },
     });
 }

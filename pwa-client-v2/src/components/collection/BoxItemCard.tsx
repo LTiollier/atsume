@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { CheckCircle, Heart, Package2 } from 'lucide-react';
 
-import type { Box } from '@/types/manga';
+import type { Box } from '@/types/volume';
 
 // Package2 badge — same on every box card (rendering-hoist-jsx)
 const boxBadge = (

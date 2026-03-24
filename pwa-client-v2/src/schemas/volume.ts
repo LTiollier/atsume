@@ -20,7 +20,7 @@ export const BoxSchema: z.ZodType<any> = z.lazy(() => z.object({
     is_owned: z.boolean().nullable().default(null),
     is_wishlisted: z.boolean().optional().default(false),
     series_id: z.number().nullable().optional().default(null),
-    volumes: z.array(MangaSchema).optional().default([]),
+    volumes: z.array(VolumeSchema).optional().default([]),
     box_set: BoxSetSchema.optional().nullable().default(null),
 }));
 
@@ -59,10 +59,10 @@ export const EditionSchema: z.ZodType<any> = z.lazy(() => z.object({
     possessed_numbers: z.array(z.number()).optional().default([]),
     cover_url: z.string().optional().nullable().default(null),
     series: SeriesSchema.optional().nullable().default(null),
-    volumes: z.array(MangaSchema).optional().default([]),
+    volumes: z.array(VolumeSchema).optional().default([]),
 }));
 
-export const MangaSearchResultSchema = z.object({
+export const VolumeSearchResultSchema = z.object({
     id: z.number().nullable().default(null),
     api_id: z.string().nullable().default(null),
     title: z.string(),
@@ -81,8 +81,8 @@ export const PaginationMetaSchema = z.object({
     total: z.number(),
 });
 
-export const PaginatedSearchResultSchema = z.object({
-    data: z.array(MangaSearchResultSchema),
+export const PaginatedVolumeSearchResultSchema = z.object({
+    data: z.array(VolumeSearchResultSchema),
     meta: PaginationMetaSchema,
 });
 
@@ -121,7 +121,7 @@ export const PaginatedSeriesSearchResultSchema = z.object({
 });
 
  
-export const MangaSchema: z.ZodType<any> = z.lazy(() => MangaSearchResultSchema.extend({
+export const VolumeSchema: z.ZodType<any> = z.lazy(() => VolumeSearchResultSchema.extend({
     id: z.number(),
     number: z.string().nullable().default(null),
     is_owned: z.boolean().default(false),
@@ -142,7 +142,7 @@ export const LoanSchema = z.object({
     returned_at: z.string().nullable().default(null),
     is_returned: z.boolean().default(false),
     notes: z.string().nullable().default(null),
-    loanable: z.union([MangaSchema, BoxSchema]).nullable().default(null),
+    loanable: z.union([VolumeSchema, BoxSchema]).nullable().default(null),
 });
 
 export const WishlistItemSchema = z.union([
@@ -156,9 +156,9 @@ export const ReadingProgressSchema = z.object({
     read_at: z.string(),
 });
 
-export type ValidatedManga = z.infer<typeof MangaSchema>;
+export type ValidatedVolume = z.infer<typeof VolumeSchema>;
 export type ValidatedLoan = z.infer<typeof LoanSchema>;
-export type ValidatedMangaSearchResult = z.infer<typeof MangaSearchResultSchema>;
+export type ValidatedVolumeSearchResult = z.infer<typeof VolumeSearchResultSchema>;
 
 // ─── Planning ─────────────────────────────────────────────────────────────────
 

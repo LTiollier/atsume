@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  * (see Phase 5 note in REDESIGN.md — API_URL Docker).
  *
  * Target architecture once infrastructure is ready:
- *   const [mangas, loans] = await Promise.all([getCollection(), getLoansCached()]);
+ *   const [volumes, loans] = await Promise.all([getCollection(), getLoansCached()]);
  *   → pass as initialData to DashboardClient → 0 loading state
  */
 export default function DashboardPage() {

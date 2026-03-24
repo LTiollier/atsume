@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 // Hoisted — le rendu d'un skeleton individuel ne change jamais (rendering-hoist-jsx)
 const volumeSkeleton = (
-  <div className="manga-card skeleton" aria-hidden />
+  <div className="volume-card skeleton" aria-hidden />
 );
 
 const seriesSkeleton = (
@@ -24,11 +24,11 @@ const seriesSkeleton = (
 
 interface SkeletonCardProps {
   /**
-   * 'volume' (défaut) — même ratio que VolumeCard (2:3, manga-card class)
+   * 'volume' (défaut) — même ratio que VolumeCard (2:3, volume-card class)
    * 'series' — cover 2:3 + placeholders titre/compteur/progressbar
    */
   variant?: 'volume' | 'series';
-  /** Nombre de skeletons à afficher — utile dans MangaGrid */
+  /** Nombre de skeletons à afficher — utile dans VolumeGrid */
   count?: number;
   className?: string;
 }

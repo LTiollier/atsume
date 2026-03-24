@@ -1,6 +1,6 @@
 import api, { ApiResponse } from '@/lib/api';
-import { ReadingProgress } from '@/types/manga';
-import { ReadingProgressSchema } from '@/schemas/manga';
+import { ReadingProgress } from '@/types/volume';
+import { ReadingProgressSchema } from '@/schemas/volume';
 import { z } from 'zod';
 
 export const readingProgressService = {

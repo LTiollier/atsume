@@ -30,7 +30,7 @@ import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { sectionVariants } from '@/lib/motion';
-import type { Loan, Manga } from '@/types/manga';
+import type { Loan, Volume } from '@/types/volume';
 
 interface BoxDetailClientProps {
   seriesId: number;
@@ -54,7 +54,7 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
 
   // Derived during render (rerender-derived-state-no-effect)
   // Wrapped in useMemo to stabilize the reference for dependent memos (rerender-memo)
-  const volumes: Manga[] = useMemo(() => box?.volumes ?? [], [box?.volumes]);
+  const volumes: Volume[] = useMemo(() => box?.volumes ?? [], [box?.volumes]);
 
   // O(1) lookup sets (js-set-map-lookups)
   const readSet = useMemo(
@@ -107,13 +107,13 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
 
   // ── Add non-owned volumes to collection ──────────────────────────────────────
 
-  function parseVolumeNumber(manga: Manga): number | null {
-    const n = parseInt(manga.number ?? '');
+  function parseVolumeNumber(volume: Volume): number | null {
+    const n = parseInt( volume.number ?? '');
     return isNaN(n) ? null : n;
   }
 
-  function handleNonOwnedToggle(manga: Manga) {
-    const n = parseVolumeNumber(manga);
+  function handleNonOwnedToggle(volume: Volume) {
+    const n = parseVolumeNumber(volume);
     if (n === null) return;
     setSelectedNonOwnedNumbers(prev => {
       const next = new Set(prev);
@@ -125,9 +125,9 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
   function handleAddAll() {
     // Group non-owned volumes by edition — in practice a single edition per box
     const byEdition = new Map<number, number[]>();
-    for (const manga of nonOwnedVolumes) {
-      const editionId = manga.edition?.id;
-      const n = parseVolumeNumber(manga);
+    for (const volume of nonOwnedVolumes) {
+      const editionId =  volume.edition?.id;
+      const n = parseVolumeNumber(volume);
       if (editionId == null || n === null) continue;
       const group = byEdition.get(editionId) ?? [];
       group.push(n);
@@ -147,9 +147,9 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
 
   function handleAddSelected() {
     const byEdition = new Map<number, number[]>();
-    for (const manga of nonOwnedVolumes) {
-      const editionId = manga.edition?.id;
-      const n = parseVolumeNumber(manga);
+    for (const volume of nonOwnedVolumes) {
+      const editionId =  volume.edition?.id;
+      const n = parseVolumeNumber(volume);
       if (editionId == null || n === null || !selectedNonOwnedNumbers.has(n)) continue;
       const group = byEdition.get(editionId) ?? [];
       group.push(n);
@@ -349,17 +349,17 @@ export function BoxDetailClient({ seriesId, boxId }: BoxDetailClientProps) {
             </div>
           </div>
 
-          <div className={`manga-grid ${isOwnedSelectMode || isAddMode ? 'pb-28' : ''}`}>
-            {volumes.map(manga => (
+          <div className={`volume-grid ${isOwnedSelectMode || isAddMode ? 'pb-28' : ''}`}>
+            {volumes.map(volume => (
               <VolumeActionCard
-                key={manga.id}
-                manga={manga}
-                isRead={readSet.has(manga.id)}
-                isLoaned={loanedSet.has(manga.id)}
-                isSelected={selectedIds.has(manga.id)}
+                key={ volume.id}
+                volume={volume}
+                isRead={readSet.has( volume.id)}
+                isLoaned={loanedSet.has( volume.id)}
+                isSelected={selectedIds.has( volume.id)}
                 onToggle={handleToggle}
                 disabled={isAddMode}
-                isAddSelected={selectedNonOwnedNumbers.has(parseVolumeNumber(manga) ?? -1)}
+                isAddSelected={selectedNonOwnedNumbers.has(parseVolumeNumber(volume) ?? -1)}
                 onAddToggle={isOwnedSelectMode ? undefined : handleNonOwnedToggle}
               />
             ))}

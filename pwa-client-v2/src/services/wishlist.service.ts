@@ -1,6 +1,6 @@
 import api, { ApiResponse } from '@/lib/api';
-import { WishlistItem } from '@/types/manga';
-import { WishlistItemSchema } from '@/schemas/manga';
+import { WishlistItem } from '@/types/volume';
+import { WishlistItemSchema } from '@/schemas/volume';
 import { z } from 'zod';
 
 export const wishlistService = {

@@ -29,13 +29,13 @@ import {
   useToggleWishlist,
   queryKeys,
 } from '@/hooks/queries';
-import { MangaGrid } from '@/components/cards/MangaGrid';
+import { VolumeGrid } from '@/components/cards/VolumeGrid';
 import { useAuth } from '@/contexts/AuthContext';
 import { sectionVariants } from '@/lib/motion';
 import { getApiErrorMessage } from '@/lib/error';
 import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
-import type { Manga, Box, SeriesSearchResult, SearchEdition, SearchBoxSet, PaginatedSeriesSearchResult } from '@/types/manga';
+import type { Volume, Box, SeriesSearchResult, SearchEdition, SearchBoxSet, PaginatedSeriesSearchResult } from '@/types/volume';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -100,9 +100,9 @@ const volumeCoverFallback = (
 );
 
 const gridSkeleton = (
-  <div className="manga-grid" aria-busy aria-hidden>
+  <div className="volume-grid" aria-busy aria-hidden>
     {Array.from({ length: 12 }, (_, i) => (
-      <div key={i} className="manga-card skeleton" aria-hidden />
+      <div key={i} className="volume-card skeleton" aria-hidden />
     ))}
   </div>
 );
@@ -123,7 +123,7 @@ const headerSkeleton = (
 );
 
 const resultsGridSkeleton = (
-  <div className="manga-grid" aria-busy aria-hidden>
+  <div className="volume-grid" aria-busy aria-hidden>
     {Array.from({ length: 10 }, (_, i) => (
       <div key={i} className="flex flex-col gap-2">
         <div
@@ -220,7 +220,7 @@ function SearchSeriesCard({ series, onClick }: SearchSeriesCardProps) {
         )}
         {hasTotal && (
           <div
-            className="manga-progress overflow-hidden"
+            className="volume-progress overflow-hidden"
             role="progressbar"
             aria-valuenow={Math.min(Math.round((possessed / total) * 100), 100)}
             aria-valuemin={0}
@@ -303,7 +303,7 @@ function SearchEditionCard({ edition, onClick }: SearchEditionCardProps) {
         )}
         {hasTotal && (
           <div
-            className="manga-progress overflow-hidden"
+            className="volume-progress overflow-hidden"
             role="progressbar"
             aria-valuenow={Math.min(Math.round((possessed / total) * 100), 100)}
             aria-valuemin={0}
@@ -485,7 +485,7 @@ function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: S
           >
             Éditions ({series.editions.length})
           </h3>
-          <MangaGrid variant="series">
+          <VolumeGrid variant="series">
             {series.editions.map(edition => (
               <div key={edition.id} className="relative">
                 <SearchEditionCard edition={edition} onClick={onEditionClick} />
@@ -498,7 +498,7 @@ function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: S
                 )}
               </div>
             ))}
-          </MangaGrid>
+          </VolumeGrid>
         </motion.section>
       )}
 
@@ -510,7 +510,7 @@ function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: S
           >
             Coffrets ({series.box_sets.length})
           </h3>
-          <MangaGrid variant="series">
+          <VolumeGrid variant="series">
             {series.box_sets.map(bs => (
               <div key={bs.id} className="relative">
                 <SearchBoxSetCard boxSet={bs} onClick={onBoxSetClick} />
@@ -523,7 +523,7 @@ function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: S
                 )}
               </div>
             ))}
-          </MangaGrid>
+          </VolumeGrid>
         </motion.section>
       )}
 
@@ -539,28 +539,28 @@ function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: S
 // ─── SearchVolumeCard — mirrors VolumeActionCard + multiselect (rerender-no-inline-components)
 
 interface SearchVolumeCardProps {
-  manga: Manga;
+  volume: Volume;
   isSelected: boolean;
-  onToggle: (manga: Manga) => void;
+  onToggle: (volume: Volume) => void;
 }
 
-function SearchVolumeCard({ manga, isSelected, onToggle }: SearchVolumeCardProps) {
-  const isNonOwned = !manga.is_owned;
+function SearchVolumeCard({ volume, isSelected, onToggle }: SearchVolumeCardProps) {
+  const isNonOwned = ! volume.is_owned;
   const isInteractive = isNonOwned;
 
   return (
     <button
       type="button"
-      className="manga-card block w-full"
+      className="volume-card block w-full"
       style={{ background: 'none', border: 'none', padding: 0, cursor: isInteractive ? 'pointer' : 'default' }}
-      onClick={() => { if (isInteractive) onToggle(manga); }}
-      aria-label={`${manga.title}${manga.number ? ` — tome ${manga.number}` : ''}`}
+      onClick={() => { if (isInteractive) onToggle(volume); }}
+      aria-label={`${ volume.title}${ volume.number ? ` — tome ${ volume.number}` : ''}`}
       aria-pressed={isSelected}
     >
-      {manga.cover_url ? (
+      { volume.cover_url ? (
         <Image
-          src={manga.cover_url}
-          alt={manga.title ?? `Tome ${manga.number}`}
+          src={ volume.cover_url}
+          alt={ volume.title ?? `Tome ${ volume.number}`}
           fill
           sizes="(max-width: 480px) 33vw, (max-width: 768px) 25vw, 16vw"
           className="object-cover"
@@ -592,13 +592,13 @@ function SearchVolumeCard({ manga, isSelected, onToggle }: SearchVolumeCardProps
       )}
 
       {/* Volume number */}
-      {manga.number && (
+      { volume.number && (
         <div className="absolute bottom-0 left-0 right-0 px-1.5 pb-1.5">
           <span
             className="text-[11px] font-medium leading-none"
             style={{ color: 'var(--foreground)', fontFamily: 'var(--font-mono)' }}
           >
-            #{manga.number}
+            #{ volume.number}
           </span>
         </div>
       )}
@@ -753,7 +753,7 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
 
   const [selectedNumbers, setSelectedNumbers] = useState<ReadonlySet<number>>(() => new Set());
 
-  const volumes: Manga[] = fullEdition?.volumes ?? [];
+  const volumes: Volume[] = fullEdition?.volumes ?? [];
   const nonOwnedVolumes = volumes.filter(v => !v.is_owned);
 
   const possessedCount = fullEdition?.possessed_count ?? edition.possessed_count ?? 0;
@@ -764,13 +764,13 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
       : null;
   const isAllSelected = nonOwnedVolumes.length > 0 && selectedNumbers.size === nonOwnedVolumes.length;
 
-  function parseNumber(manga: Manga): number | null {
-    const n = parseInt(manga.number ?? '');
+  function parseNumber(volume: Volume): number | null {
+    const n = parseInt( volume.number ?? '');
     return isNaN(n) ? null : n;
   }
 
-  function handleToggle(manga: Manga) {
-    const n = parseNumber(manga);
+  function handleToggle(volume: Volume) {
+    const n = parseNumber(volume);
     if (n === null) return;
     setSelectedNumbers(prev => {
       const next = new Set(prev);
@@ -869,14 +869,14 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
             {progress !== null && (
               <>
                 <div
-                  className="manga-progress"
+                  className="volume-progress"
                   role="progressbar"
                   aria-valuenow={progress}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-label={`${possessedCount} volumes sur ${totalVolumes} possédés`}
                 >
-                  <div className="manga-progress__fill" style={{ width: `${progress}%` }} />
+                  <div className="volume-progress__fill" style={{ width: `${progress}%` }} />
                 </div>
                 <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
                   {possessedCount} / {totalVolumes} vol. possédés
@@ -930,12 +930,12 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
             )}
           </div>
 
-          <div className={`manga-grid ${selectedNumbers.size > 0 ? 'pb-28' : ''}`}>
-            {volumes.map(manga => (
+          <div className={`volume-grid ${selectedNumbers.size > 0 ? 'pb-28' : ''}`}>
+            {volumes.map(volume => (
               <SearchVolumeCard
-                key={manga.id}
-                manga={manga}
-                isSelected={selectedNumbers.has(parseNumber(manga) ?? -1)}
+                key={ volume.id}
+                volume={volume}
+                isSelected={selectedNumbers.has(parseNumber(volume) ?? -1)}
                 onToggle={handleToggle}
               />
             ))}
@@ -1086,14 +1086,14 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
             {progress !== null && (
               <>
                 <div
-                  className="manga-progress"
+                  className="volume-progress"
                   role="progressbar"
                   aria-valuenow={progress}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-label={`${ownedCount} boîtes sur ${boxes.length} possédées`}
                 >
-                  <div className="manga-progress__fill" style={{ width: `${progress}%` }} />
+                  <div className="volume-progress__fill" style={{ width: `${progress}%` }} />
                 </div>
                 <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
                   {ownedCount} / {boxes.length} boîte{boxes.length > 1 ? 's' : ''} possédée{ownedCount > 1 ? 's' : ''}
@@ -1156,7 +1156,7 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
             )}
           </div>
 
-          <MangaGrid variant="series" className={selectedBoxIds.size > 0 ? 'pb-28' : undefined}>
+          <VolumeGrid variant="series" className={selectedBoxIds.size > 0 ? 'pb-28' : undefined}>
             {boxes.map(box => (
               <SearchBoxCard
                 key={box.id}
@@ -1165,7 +1165,7 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
                 onToggle={handleToggle}
               />
             ))}
-          </MangaGrid>
+          </VolumeGrid>
         </section>
       ) : null}
 
@@ -1352,7 +1352,7 @@ export function SearchClient() {
               </p>
             )}
 
-            <div className="manga-grid">
+            <div className="volume-grid">
               {results.map(series => (
                 <SearchSeriesCard
                   key={series.api_id ?? series.id}
