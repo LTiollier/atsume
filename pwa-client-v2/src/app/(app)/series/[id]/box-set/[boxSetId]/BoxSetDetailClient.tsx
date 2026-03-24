@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { BookUp, Loader2, Package2, Plus } from 'lucide-react';
+import { Package2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -66,7 +66,7 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
     [loans],
   );
 
-  const { selectedIds, handleToggle, toggleSelectAll, selectMany, clearSelection, isAllSelected } = useMultiselect(ownedBoxes);
+  const { selectedIds, handleToggle, toggleSelectAll, clearSelection, isAllSelected } = useMultiselect(ownedBoxes);
   const { isLoanOpen, borrowerName, setBorrowerName, openLoanSheet, closeLoanSheet } = useLoanSheet();
 
   // Non-owned selection — add to collection (rerender-lazy-state-init)
@@ -89,17 +89,6 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
     });
   }
 
-  async function handleAddAllBoxes() {
-    if (nonOwnedBoxes.length === 0) return;
-    try {
-      await Promise.all(nonOwnedBoxes.map(b => addBox.mutateAsync(b.id)));
-      toast.success(`${nonOwnedBoxes.length} coffret${nonOwnedBoxes.length > 1 ? 's' : ''} ajouté${nonOwnedBoxes.length > 1 ? 's' : ''}`);
-      queryClient.invalidateQueries({ queryKey: queryKeys.boxSet(boxSetId) });
-    } catch (err) {
-      toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
-    }
-  }
-
   async function handleAddSelectedBoxes() {
     const ids = [...selectedNonOwnedBoxIds];
     if (ids.length === 0) return;
@@ -111,12 +100,6 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
     }
-  }
-
-  // Tout prêter — pre-selects non-loaned owned boxes then opens sheet
-  function handleBulkLoanAll() {
-    selectMany(ownedBoxes.filter(b => !loanedSet.has(b.id)));
-    openLoanSheet();
   }
 
   function handleConfirmLoan() {
@@ -219,48 +202,13 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
             </h2>
             <div className="flex items-center gap-3">
               {ownedBoxes.length > 0 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={toggleSelectAll}
-                    className="text-xs font-medium transition-opacity hover:opacity-70"
-                    style={{ color: 'var(--muted-foreground)' }}
-                  >
-                    {isAllSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => confirm({
-                      title: 'Tout prêter ?',
-                      description: `Voulez-vous prêter tous les coffrets disponibles (${ownedBoxes.filter(v => !loanedSet.has(v.id)).length}) de ce lot ?`,
-                      onConfirm: handleBulkLoanAll,
-                      confirmLabel: 'Prêter tout',
-                    })}
-                    className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
-                    style={{ color: 'var(--primary)' }}
-                  >
-                    <BookUp size={11} aria-hidden />
-                    Tout prêter
-                  </button>
-                </>
-              )}
-              {nonOwnedBoxes.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => confirm({
-                    title: 'Ajouter tout ?',
-                    description: `Voulez-vous ajouter les ${nonOwnedBoxes.length} coffrets manquants à votre collection ?`,
-                    onConfirm: handleAddAllBoxes,
-                    confirmLabel: 'Ajouter tout',
-                  })}
-                  disabled={addBox.isPending}
-                  className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
-                  style={{ color: 'var(--primary)' }}
+                  onClick={toggleSelectAll}
+                  className="text-xs font-medium transition-opacity hover:opacity-70"
+                  style={{ color: 'var(--muted-foreground)' }}
                 >
-                  {addBox.isPending
-                    ? <Loader2 size={11} className="animate-spin" aria-hidden />
-                    : <Plus size={11} aria-hidden />}
-                  Ajouter tout
+                  {isAllSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
                 </button>
               )}
             </div>

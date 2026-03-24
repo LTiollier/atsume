@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { BookMarked, BookUp, Loader2, Package, Plus } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -73,9 +73,7 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
 
   const ownedVolumes = useMemo(() => volumes.filter(v => v.is_owned), [volumes]);
   const nonOwnedVolumes = useMemo(() => volumes.filter(v => !v.is_owned), [volumes]);
-  const allRead = ownedVolumes.length > 0 && ownedVolumes.every(v => readSet.has(v.id));
-
-  const { selectedIds, handleToggle, toggleSelectAll, selectMany, clearSelection, isAllSelected } = useMultiselect(ownedVolumes);
+  const { selectedIds, handleToggle, toggleSelectAll, clearSelection, isAllSelected } = useMultiselect(ownedVolumes);
 
   // Non-owned selection — add to collection (rerender-lazy-state-init)
   const [selectedNonOwnedNumbers, setSelectedNonOwnedNumbers] = useState<ReadonlySet<number>>(() => new Set());
@@ -116,20 +114,6 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
     });
   }
 
-  function handleAddAll() {
-    const numbers = nonOwnedVolumes.map(parseVolumeNumber).filter((n): n is number => n !== null);
-    if (numbers.length === 0) return;
-    addBulk.mutate({ editionId, numbers }, {
-      onSuccess: () => {
-        toast.success(`${numbers.length} tome${numbers.length > 1 ? 's' : ''} ajouté${numbers.length > 1 ? 's' : ''}`);
-        invalidateEdition();
-      },
-      onError: err => {
-        toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
-      },
-    });
-  }
-
   function handleAddSelected() {
     const numbers = [...selectedNonOwnedNumbers].sort((a, b) => a - b);
     if (numbers.length === 0) return;
@@ -141,20 +125,6 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
       },
       onError: err => toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout")),
     });
-  }
-
-  // Tout marquer — acts on ALL owned volumes
-  function handleBulkReadToggleAll() {
-    const targetIds = allRead
-      ? ownedVolumes.map(v => v.id)
-      : ownedVolumes.filter(v => !readSet.has(v.id)).map(v => v.id);
-    if (targetIds.length > 0) bulkToggle(targetIds);
-  }
-
-  // Tout prêter — pre-selects non-loaned owned volumes then opens sheet
-  function handleBulkLoanAll() {
-    selectMany(ownedVolumes.filter(v => !loanedSet.has(v.id)));
-    openLoanSheet();
   }
 
   // Marquer — toggle on current selection
@@ -263,65 +233,13 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
             </h2>
             <div className="flex items-center gap-3">
               {ownedVolumes.length > 0 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={toggleSelectAll}
-                    className="text-xs font-medium transition-opacity hover:opacity-70"
-                    style={{ color: 'var(--muted-foreground)' }}
-                  >
-                    {isAllSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => confirm({
-                      title: allRead ? 'Tout démarquer ?' : 'Tout marquer comme lu ?',
-                      description: allRead 
-                        ? `Voulez-vous marquer les ${ownedVolumes.length} tomes de cette édition comme non lus ?`
-                        : `Voulez-vous marquer les ${ownedVolumes.length} tomes de cette édition comme lus ?`,
-                      onConfirm: handleBulkReadToggleAll,
-                      confirmLabel: allRead ? 'Démarquer tout' : 'Marquer tout',
-                    })}
-                    disabled={togglePending}
-                    className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
-                    style={{ color: 'var(--primary)' }}
-                  >
-                    <BookMarked size={11} aria-hidden />
-                    {allRead ? 'Tout démarquer' : 'Tout marquer'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => confirm({
-                      title: 'Tout prêter ?',
-                      description: `Voulez-vous prêter tous les tomes disponibles (${ownedVolumes.filter(v => !loanedSet.has(v.id)).length}) de cette édition ?`,
-                      onConfirm: handleBulkLoanAll,
-                      confirmLabel: 'Prêter tout',
-                    })}
-                    className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
-                    style={{ color: 'var(--primary)' }}
-                  >
-                    <BookUp size={11} aria-hidden />
-                    Tout prêter
-                  </button>
-                </>
-              )}
-              {nonOwnedVolumes.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => confirm({
-                    title: 'Ajouter tout ?',
-                    description: `Voulez-vous ajouter les ${nonOwnedVolumes.length} tomes manquants à votre collection ?`,
-                    onConfirm: handleAddAll,
-                    confirmLabel: 'Ajouter tout',
-                  })}
-                  disabled={addBulk.isPending}
-                  className="flex items-center gap-1 text-xs font-medium transition-opacity disabled:opacity-50 hover:opacity-80"
-                  style={{ color: 'var(--primary)' }}
+                  onClick={toggleSelectAll}
+                  className="text-xs font-medium transition-opacity hover:opacity-70"
+                  style={{ color: 'var(--muted-foreground)' }}
                 >
-                  {addBulk.isPending
-                    ? <Loader2 size={11} className="animate-spin" aria-hidden />
-                    : <Plus size={11} aria-hidden />}
-                  Ajouter tout
+                  {isAllSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
                 </button>
               )}
             </div>
