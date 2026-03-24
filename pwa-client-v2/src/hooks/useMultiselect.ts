@@ -5,14 +5,14 @@ interface SelectableItem {
 }
 
 /**
- * Generic multiselect over owned items.
+ * Generic multiselect over a list of items (owned or all).
  * Functional setState keeps callbacks referentially stable against stale closures.
  * (rerender-functional-setstate)
  */
-export function useMultiselect<T extends SelectableItem>(ownedItems: T[]) {
+export function useMultiselect<T extends SelectableItem>(items: T[]) {
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(() => new Set());
 
-  const isAllSelected = ownedItems.length > 0 && selectedIds.size === ownedItems.length;
+  const isAllSelected = items.length > 0 && selectedIds.size === items.length;
 
   function handleToggle(item: T) {
     setSelectedIds(prev => {
@@ -25,12 +25,12 @@ export function useMultiselect<T extends SelectableItem>(ownedItems: T[]) {
   function toggleSelectAll() {
     setSelectedIds(prev => {
       if (isAllSelected) return new Set();
-      return new Set(ownedItems.map(i => i.id));
+      return new Set(items.map(i => i.id));
     });
   }
 
-  function selectMany(items: T[]) {
-    setSelectedIds(new Set(items.map(i => i.id)));
+  function selectMany(subset: T[]) {
+    setSelectedIds(new Set(subset.map(i => i.id)));
   }
 
   function clearSelection() {

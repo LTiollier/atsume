@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -21,8 +21,7 @@ import { useMultiselect } from '@/hooks/useMultiselect';
 import { useLoanSheet } from '@/hooks/useLoanSheet';
 import { BackNav } from '@/components/collection/BackNav';
 import { DetailHeader, gridSkeleton } from '@/components/collection/DetailHeader';
-import { CollectionActionBar } from '@/components/collection/CollectionActionBar';
-import { AddToCollectionBar } from '@/components/collection/AddToCollectionBar';
+import { UnifiedActionBar } from '@/components/collection/UnifiedActionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { BoxItemCard } from '@/components/collection/BoxItemCard';
 import { VolumeGrid } from '@/components/cards/VolumeGrid';
@@ -51,9 +50,9 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
   // Derived during render — no useEffect (rerender-derived-state-no-effect)
   // Wrapped in useMemo to stabilize the reference for dependent memos (rerender-memo)
   const boxes: Box[] = useMemo(() => boxSet?.boxes ?? [], [boxSet?.boxes]);
-  const ownedBoxes = useMemo(() => boxes.filter(b => b.is_owned), [boxes]);
   const nonOwnedBoxes = useMemo(() => boxes.filter(b => !b.is_owned), [boxes]);
-  const ownedCount = ownedBoxes.length;
+  const ownedSet = useMemo(() => new Set(boxes.filter(b => b.is_owned).map(b => b.id)), [boxes]);
+  const ownedCount = ownedSet.size;
   const progressValue = boxes.length > 0 ? Math.round((ownedCount / boxes.length) * 100) : null;
 
   // O(1) loaned lookup (js-set-map-lookups)
@@ -66,46 +65,73 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
     [loans],
   );
 
-  const { selectedIds, handleToggle, toggleSelectAll, clearSelection, isAllSelected } = useMultiselect(ownedBoxes);
+  // Unified selection over all boxes (rerender-memo)
+  const { selectedIds, handleToggle, selectMany, clearSelection } = useMultiselect(boxes);
+
+  // Derived owned/non-owned from unified selection (rerender-derived-state)
+  const selectedOwned = useMemo(
+    () => [...selectedIds].filter(id => ownedSet.has(id)),
+    [selectedIds, ownedSet],
+  );
+  const selectedNonOwned = useMemo(
+    () => [...selectedIds].filter(id => !ownedSet.has(id)),
+    [selectedIds, ownedSet],
+  );
+
   const { isLoanOpen, borrowerName, setBorrowerName, openLoanSheet, closeLoanSheet } = useLoanSheet();
-
-  // Non-owned selection — add to collection (rerender-lazy-state-init)
-  const [selectedNonOwnedBoxIds, setSelectedNonOwnedBoxIds] = useState<ReadonlySet<number>>(() => new Set());
-
-  // Derived mode booleans — prevent cross-mode clicks (rerender-derived-state)
-  const isAddMode = selectedNonOwnedBoxIds.size > 0;
-  const isOwnedSelectMode = selectedIds.size > 0;
-
-  // Dialog management
   const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
 
-  // ── Add non-owned boxes to collection ────────────────────────────────────────
+  // ── 3-state select-all cycle ─────────────────────────────────────────────────
 
-  function handleNonOwnedBoxToggle(box: Box) {
-    setSelectedNonOwnedBoxIds(prev => {
-      const next = new Set(prev);
-      if (next.has(box.id)) next.delete(box.id); else next.add(box.id);
-      return next;
-    });
+  function handleSelectAll() {
+    if (selectedIds.size === 0) {
+      selectMany(boxes);
+    } else if (selectedIds.size === boxes.length) {
+      selectMany(nonOwnedBoxes);
+    } else {
+      clearSelection();
+    }
   }
 
-  async function handleAddSelectedBoxes() {
-    const ids = [...selectedNonOwnedBoxIds];
-    if (ids.length === 0) return;
+  const selectAllLabel =
+    selectedIds.size === 0 ? 'Tout sélectionner'
+    : selectedIds.size === boxes.length ? 'Seulement les manquants'
+    : 'Tout désélectionner';
+
+  // ── Actions ──────────────────────────────────────────────────────────────────
+
+  async function handleAddSelected(nonOwnedIds: number[]) {
+    if (nonOwnedIds.length === 0) return;
     try {
-      await Promise.all(ids.map(id => addBox.mutateAsync(id)));
-      toast.success(`${ids.length} coffret${ids.length > 1 ? 's' : ''} ajouté${ids.length > 1 ? 's' : ''}`);
-      setSelectedNonOwnedBoxIds(new Set());
+      await Promise.all(nonOwnedIds.map(id => addBox.mutateAsync(id)));
+      toast.success(`${nonOwnedIds.length} coffret${nonOwnedIds.length > 1 ? 's' : ''} ajouté${nonOwnedIds.length > 1 ? 's' : ''}`);
+      clearSelection();
       queryClient.invalidateQueries({ queryKey: queryKeys.boxSet(boxSetId) });
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout"));
     }
   }
 
+  async function handleBulkWishlist(nonOwnedIds: number[]) {
+    const toAdd = nonOwnedIds.filter(id => {
+      const box = boxes.find(b => b.id === id);
+      return box && !box.is_wishlisted;
+    });
+    if (toAdd.length === 0) return;
+    try {
+      await Promise.all(
+        toAdd.map(id => toggleWishlist.mutateAsync({ id, type: 'box', isCurrentlyWishlisted: false, boxSetId })),
+      );
+      queryClient.invalidateQueries({ queryKey: queryKeys.boxSet(boxSetId) });
+    } catch {
+      // error handled by mutation
+    }
+  }
+
   function handleConfirmLoan() {
-    if (!borrowerName.trim() || selectedIds.size === 0) return;
+    if (!borrowerName.trim() || selectedOwned.length === 0) return;
     bulkCreateBoxLoan.mutate(
-      { boxIds: [...selectedIds], borrowerName: borrowerName.trim() },
+      { boxIds: selectedOwned, borrowerName: borrowerName.trim() },
       {
         onSuccess: () => {
           closeLoanSheet();
@@ -115,10 +141,8 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
     );
   }
 
-  function handleRemoveSelected() {
-    const ids = [...selectedIds];
+  function handleRemoveSelected(ids: number[]) {
     if (ids.length === 0) return;
-
     confirm({
       title: 'Retirer de la collection ?',
       description: `Voulez-vous retirer les ${ids.length} coffret${ids.length > 1 ? 's' : ''} sélectionné${ids.length > 1 ? 's' : ''} de votre collection ?`,
@@ -135,7 +159,6 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
     });
   }
 
-  // Pluriel accord boîtes pour le progress label
   const boxCountLabel = `${ownedCount} / ${boxes.length} boîte${boxes.length > 1 ? 's' : ''} possédée${ownedCount > 1 ? 's' : ''}`;
 
   return (
@@ -200,21 +223,19 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
                 ? `${selectedIds.size} sélectionné${selectedIds.size > 1 ? 'es' : 'e'}`
                 : `Boîtes (${boxes.length})`}
             </h2>
-            <div className="flex items-center gap-3">
-              {ownedBoxes.length > 0 && (
-                <button
-                  type="button"
-                  onClick={toggleSelectAll}
-                  className="text-xs font-medium transition-opacity hover:opacity-70"
-                  style={{ color: 'var(--muted-foreground)' }}
-                >
-                  {isAllSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
-                </button>
-              )}
-            </div>
+            {boxes.length > 0 && (
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="text-xs font-medium transition-opacity hover:opacity-70 cursor-pointer"
+                style={{ color: 'var(--muted-foreground)' }}
+              >
+                {selectAllLabel}
+              </button>
+            )}
           </div>
 
-          <VolumeGrid variant="series" className={isOwnedSelectMode || isAddMode ? 'pb-28' : undefined}>
+          <VolumeGrid variant="series" className={selectedIds.size > 0 ? 'pb-28' : undefined}>
             {boxes.map(box => (
               <BoxItemCard
                 key={box.id}
@@ -222,7 +243,6 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
                 isLoaned={loanedSet.has(box.id)}
                 isSelected={selectedIds.has(box.id)}
                 onToggle={handleToggle}
-                disabled={isAddMode}
                 isWishlisted={box.is_wishlisted ?? false}
                 onToggleWishlist={() => toggleWishlist.mutate({
                   id: box.id,
@@ -231,35 +251,31 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
                   boxSetId,
                 })}
                 wishlistPending={toggleWishlist.isPending}
-                isAddSelected={selectedNonOwnedBoxIds.has(box.id)}
-                onAddToggle={isOwnedSelectMode ? undefined : handleNonOwnedBoxToggle}
               />
             ))}
           </VolumeGrid>
         </motion.section>
       )}
 
-      <AddToCollectionBar
-        count={selectedNonOwnedBoxIds.size}
-        isPending={addBox.isPending}
-        label={`Ajouter ${selectedNonOwnedBoxIds.size} coffret${selectedNonOwnedBoxIds.size > 1 ? 's' : ''}`}
-        onConfirm={handleAddSelectedBoxes}
-      />
-
-      {/* CollectionActionBar — no onMarkRead (boxes have no read state) */}
-      <CollectionActionBar
-        count={selectedIds.size}
-        onLoan={openLoanSheet}
+      <UnifiedActionBar
+        variant="boxset"
+        ownedSelected={selectedOwned}
+        ownedSelectedUnread={[]}
+        nonOwnedSelected={selectedNonOwned}
+        onAdd={handleAddSelected}
+        onLoan={() => openLoanSheet()}
         onRemove={handleRemoveSelected}
+        onWishlist={handleBulkWishlist}
+        addPending={addBox.isPending}
         removePending={bulkRemove.isPending}
-        itemLabel="sélectionnée"
+        loanPending={bulkCreateBoxLoan.isPending}
       />
 
       <LoanSheet
         open={isLoanOpen}
         onClose={closeLoanSheet}
-        title={`Prêter ${selectedIds.size} boîte${selectedIds.size > 1 ? 's' : ''}`}
-        question={`À qui prêtez-vous ${selectedIds.size > 1 ? 'ces boîtes' : 'cette boîte'} ?`}
+        title={`Prêter ${selectedOwned.length} boîte${selectedOwned.length > 1 ? 's' : ''}`}
+        question={`À qui prêtez-vous ${selectedOwned.length > 1 ? 'ces boîtes' : 'cette boîte'} ?`}
         borrowerName={borrowerName}
         onBorrowerNameChange={setBorrowerName}
         onConfirm={handleConfirmLoan}

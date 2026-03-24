@@ -21,10 +21,6 @@ export interface VolumeActionCardProps {
   isLoaned: boolean;
   isSelected?: boolean;
   onToggle: (volume: Volume) => void;
-  isAddSelected?: boolean;
-  onAddToggle?: (volume: Volume) => void;
-  /** Disable owned-item toggle (e.g. when add-to-collection mode is active) */
-  disabled?: boolean;
 }
 
 // Defined outside any parent component (rerender-no-inline-components)
@@ -34,26 +30,14 @@ export function VolumeActionCard({
   isLoaned,
   isSelected = false,
   onToggle,
-  isAddSelected = false,
-  onAddToggle,
-  disabled = false,
 }: VolumeActionCardProps) {
-  const isOwned = volume.is_owned;
-  // Owned clickable unless disabled (add-mode active); non-owned clickable when onAddToggle provided (rerender-derived-state)
-  const isClickable = (isOwned && !disabled) || (!isOwned && !!onAddToggle);
-
-  function handleClick() {
-    if (isOwned && !disabled) { onToggle(volume); }
-    else if (!isOwned && onAddToggle) { onAddToggle(volume); }
-  }
-
   return (
     <button
       type="button"
       className="volume-card block w-full"
-      style={{ background: 'none', border: 'none', padding: 0, cursor: isClickable ? 'pointer' : 'default' }}
-      onClick={handleClick}
-      aria-pressed={isClickable ? (isOwned ? isSelected : isAddSelected) : undefined}
+      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+      onClick={() => onToggle(volume)}
+      aria-pressed={isSelected}
       aria-label={`${volume.title}${volume.number ? ` — tome ${volume.number}` : ''}${isLoaned ? ' — prêté' : ''}`}
     >
       {volume.cover_url ? (
@@ -63,12 +47,12 @@ export function VolumeActionCard({
           fill
           sizes="(max-width: 480px) 33vw, (max-width: 768px) 25vw, 16vw"
           className="object-cover"
-          style={!isOwned && !isAddSelected ? { filter: 'grayscale(35%) brightness(0.6)' } : undefined}
+          style={!volume.is_owned && !isSelected ? { filter: 'grayscale(35%) brightness(0.6)' } : undefined}
         />
       ) : (
         <div
           className="absolute inset-0 flex items-center justify-center"
-          style={!isOwned && !isAddSelected ? { opacity: 0.5 } : undefined}
+          style={!volume.is_owned && !isSelected ? { opacity: 0.5 } : undefined}
         >
           <Package size={24} aria-hidden style={{ color: 'var(--muted-foreground)' }} />
         </div>
@@ -76,8 +60,8 @@ export function VolumeActionCard({
 
       {bottomGradient}
 
-      {/* Selected overlay — owned (read/loan) or non-owned (add to collection) */}
-      {(isSelected || isAddSelected) && (
+      {/* Selected overlay */}
+      {isSelected && (
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none flex items-center justify-center"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -22,8 +22,7 @@ import { useMultiselect } from '@/hooks/useMultiselect';
 import { useLoanSheet } from '@/hooks/useLoanSheet';
 import { BackNav } from '@/components/collection/BackNav';
 import { DetailHeader, gridSkeleton } from '@/components/collection/DetailHeader';
-import { CollectionActionBar } from '@/components/collection/CollectionActionBar';
-import { AddToCollectionBar } from '@/components/collection/AddToCollectionBar';
+import { UnifiedActionBar } from '@/components/collection/UnifiedActionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { VolumeActionCard } from '@/components/collection/VolumeActionCard';
 import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
@@ -71,23 +70,32 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
     [loans],
   );
 
-  const ownedVolumes = useMemo(() => volumes.filter(v => v.is_owned), [volumes]);
+  const ownedSet = useMemo(() => new Set(volumes.filter(v => v.is_owned).map(v => v.id)), [volumes]);
   const nonOwnedVolumes = useMemo(() => volumes.filter(v => !v.is_owned), [volumes]);
-  const { selectedIds, handleToggle, toggleSelectAll, clearSelection, isAllSelected } = useMultiselect(ownedVolumes);
 
-  // Non-owned selection — add to collection (rerender-lazy-state-init)
-  const [selectedNonOwnedNumbers, setSelectedNonOwnedNumbers] = useState<ReadonlySet<number>>(() => new Set());
+  // Unified selection over all volumes (rerender-memo)
+  const { selectedIds, handleToggle, selectMany, clearSelection } = useMultiselect(volumes);
 
-  // Derived mode booleans — prevent cross-mode clicks (rerender-derived-state)
-  const isAddMode = selectedNonOwnedNumbers.size > 0;
-  const isOwnedSelectMode = selectedIds.size > 0;
+  // Derived owned/non-owned from unified selection (rerender-derived-state)
+  const selectedOwned = useMemo(
+    () => [...selectedIds].filter(id => ownedSet.has(id)),
+    [selectedIds, ownedSet],
+  );
+  const selectedNonOwned = useMemo(
+    () => [...selectedIds].filter(id => !ownedSet.has(id)),
+    [selectedIds, ownedSet],
+  );
+
+  const ownedSelectedUnread = useMemo(
+    () => selectedOwned.filter(id => !readSet.has(id)),
+    [selectedOwned, readSet],
+  );
+
   const { isLoanOpen, borrowerName, setBorrowerName, openLoanSheet, closeLoanSheet } = useLoanSheet();
-
-  // Dialog management
   const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
 
   // Progress for header
-  const possessedCount = edition?.possessed_count ?? ownedVolumes.length;
+  const possessedCount = edition?.possessed_count ?? ownedSet.size;
   const totalVolumes = edition?.total_volumes ?? null;
   const progressValue = totalVolumes && totalVolumes > 0
     ? Math.round((possessedCount / totalVolumes) * 100)
@@ -97,48 +105,55 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
     queryClient.invalidateQueries({ queryKey: queryKeys.edition(editionId) });
   }
 
-  // ── Add non-owned volumes to collection ──────────────────────────────────────
+  // ── 3-state select-all cycle ─────────────────────────────────────────────────
+
+  function handleSelectAll() {
+    if (selectedIds.size === 0) {
+      selectMany(volumes);
+    } else if (selectedIds.size === volumes.length) {
+      selectMany(nonOwnedVolumes);
+    } else {
+      clearSelection();
+    }
+  }
+
+  const selectAllLabel =
+    selectedIds.size === 0 ? 'Tout sélectionner'
+    : selectedIds.size === volumes.length ? 'Seulement les manquants'
+    : 'Tout désélectionner';
+
+  // ── Actions ──────────────────────────────────────────────────────────────────
 
   function parseVolumeNumber(volume: Volume): number | null {
-    const n = parseInt( volume.number ?? '');
+    const n = parseInt(volume.number ?? '');
     return isNaN(n) ? null : n;
   }
 
-  function handleNonOwnedToggle(volume: Volume) {
-    const n = parseVolumeNumber(volume);
-    if (n === null) return;
-    setSelectedNonOwnedNumbers(prev => {
-      const next = new Set(prev);
-      if (next.has(n)) next.delete(n); else next.add(n);
-      return next;
-    });
-  }
-
-  function handleAddSelected() {
-    const numbers = [...selectedNonOwnedNumbers].sort((a, b) => a - b);
+  function handleAddSelected(nonOwnedIds: number[]) {
+    const numbers = nonOwnedIds
+      .map(id => volumes.find(v => v.id === id))
+      .map(v => (v ? parseVolumeNumber(v) : null))
+      .filter((n): n is number => n !== null)
+      .sort((a, b) => a - b);
     if (numbers.length === 0) return;
     addBulk.mutate({ editionId, numbers }, {
       onSuccess: () => {
         toast.success(`${numbers.length} tome${numbers.length > 1 ? 's' : ''} ajouté${numbers.length > 1 ? 's' : ''}`);
-        setSelectedNonOwnedNumbers(new Set());
+        clearSelection();
         invalidateEdition();
       },
       onError: err => toast.error(getApiErrorMessage(err, "Erreur lors de l'ajout")),
     });
   }
 
-  // Marquer — toggle on current selection
-  function handleMarkSelected() {
-    const ids = [...selectedIds];
+  function handleMarkSelected(ids: number[]) {
     if (ids.length === 0) return;
     bulkToggle(ids);
     clearSelection();
   }
 
-  function handleRemoveSelected() {
-    const ids = [...selectedIds];
+  function handleRemoveSelected(ids: number[]) {
     if (ids.length === 0) return;
-
     confirm({
       title: 'Retirer de la collection ?',
       description: `Voulez-vous retirer les ${ids.length} tome${ids.length > 1 ? 's' : ''} sélectionné${ids.length > 1 ? 's' : ''} de votre collection ?`,
@@ -156,9 +171,9 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
   }
 
   function handleConfirmLoan() {
-    if (!borrowerName.trim() || selectedIds.size === 0) return;
+    if (!borrowerName.trim() || selectedOwned.length === 0) return;
     bulkCreateLoan.mutate(
-      { volumeIds: [...selectedIds], borrowerName: borrowerName.trim() },
+      { volumeIds: selectedOwned, borrowerName: borrowerName.trim() },
       {
         onSuccess: () => {
           closeLoanSheet();
@@ -231,60 +246,53 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
                 ? `${selectedIds.size} sélectionné${selectedIds.size > 1 ? 's' : ''}`
                 : `Volumes (${volumes.length})`}
             </h2>
-            <div className="flex items-center gap-3">
-              {ownedVolumes.length > 0 && (
-                <button
-                  type="button"
-                  onClick={toggleSelectAll}
-                  className="text-xs font-medium transition-opacity hover:opacity-70"
-                  style={{ color: 'var(--muted-foreground)' }}
-                >
-                  {isAllSelected ? 'Tout désélectionner' : 'Tout sélectionner'}
-                </button>
-              )}
-            </div>
+            {volumes.length > 0 && (
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="text-xs font-medium transition-opacity hover:opacity-70 cursor-pointer"
+                style={{ color: 'var(--muted-foreground)' }}
+              >
+                {selectAllLabel}
+              </button>
+            )}
           </div>
 
-          <div className={`volume-grid ${isOwnedSelectMode || isAddMode ? 'pb-28' : ''}`}>
+          <div className={`volume-grid ${selectedIds.size > 0 ? 'pb-28' : ''}`}>
             {volumes.map(volume => (
               <VolumeActionCard
-                key={ volume.id}
+                key={volume.id}
                 volume={volume}
-                isRead={readSet.has( volume.id)}
-                isLoaned={loanedSet.has( volume.id)}
-                isSelected={selectedIds.has( volume.id)}
+                isRead={readSet.has(volume.id)}
+                isLoaned={loanedSet.has(volume.id)}
+                isSelected={selectedIds.has(volume.id)}
                 onToggle={handleToggle}
-                disabled={isAddMode}
-                isAddSelected={selectedNonOwnedNumbers.has(parseVolumeNumber(volume) ?? -1)}
-                onAddToggle={isOwnedSelectMode ? undefined : handleNonOwnedToggle}
               />
             ))}
           </div>
         </motion.section>
       )}
 
-      <AddToCollectionBar
-        count={selectedNonOwnedNumbers.size}
-        isPending={addBulk.isPending}
-        label={`Ajouter ${selectedNonOwnedNumbers.size} tome${selectedNonOwnedNumbers.size > 1 ? 's' : ''}`}
-        onConfirm={handleAddSelected}
-      />
-
-
-      <CollectionActionBar
-        count={selectedIds.size}
+      <UnifiedActionBar
+        variant="edition"
+        ownedSelected={selectedOwned}
+        nonOwnedSelected={selectedNonOwned}
+        onAdd={handleAddSelected}
         onMarkRead={handleMarkSelected}
-        onLoan={openLoanSheet}
+        ownedSelectedUnread={ownedSelectedUnread}
+        onLoan={() => openLoanSheet()}
         onRemove={handleRemoveSelected}
-        removePending={bulkRemove.isPending}
+        addPending={addBulk.isPending}
         markPending={togglePending}
+        removePending={bulkRemove.isPending}
+        loanPending={bulkCreateLoan.isPending}
       />
 
       <LoanSheet
         open={isLoanOpen}
         onClose={closeLoanSheet}
-        title={`Prêter ${selectedIds.size} volume${selectedIds.size > 1 ? 's' : ''}`}
-        question={`À qui prêtez-vous ${selectedIds.size > 1 ? 'ces volumes' : 'ce volume'} ?`}
+        title={`Prêter ${selectedOwned.length} volume${selectedOwned.length > 1 ? 's' : ''}`}
+        question={`À qui prêtez-vous ${selectedOwned.length > 1 ? 'ces volumes' : 'ce volume'} ?`}
         borrowerName={borrowerName}
         onBorrowerNameChange={setBorrowerName}
         onConfirm={handleConfirmLoan}

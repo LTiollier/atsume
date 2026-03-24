@@ -32,10 +32,6 @@ export interface BoxItemCardProps {
   isWishlisted?: boolean;
   onToggleWishlist?: () => void;
   wishlistPending?: boolean;
-  isAddSelected?: boolean;
-  onAddToggle?: (box: Box) => void;
-  /** Disable owned-item toggle (e.g. when add-to-collection mode is active) */
-  disabled?: boolean;
 }
 
 /**
@@ -43,7 +39,7 @@ export interface BoxItemCardProps {
  * Mirror of VolumeActionCard for boxes — same overlay rules, three differences:
  * - No read dot top-left
  * - Package2 badge top-left
- * - Wishlist button top-right when not owned
+ * - Wishlist button top-right when not owned (per-card, independent of selection)
  *
  * Uses a wrapper <div> instead of a single <button> to avoid nested interactive elements.
  * (rerender-no-inline-components)
@@ -56,28 +52,17 @@ export function BoxItemCard({
   isWishlisted = false,
   onToggleWishlist,
   wishlistPending = false,
-  isAddSelected = false,
-  onAddToggle,
-  disabled = false,
 }: BoxItemCardProps) {
-  const isOwned = box.is_owned ?? false;
-  // Owned clickable unless disabled (add-mode active); non-owned clickable when onAddToggle provided (rerender-derived-state)
-  const isClickable = (isOwned && !disabled) || (!isOwned && !!onAddToggle);
   const metaLine = getBoxMetaLine(box);
-
-  function handleClick() {
-    if (isOwned && !disabled) onToggle(box);
-    else if (!isOwned && onAddToggle) onAddToggle(box);
-  }
 
   return (
     <div className="relative group">
       <button
         type="button"
         className="flex flex-col gap-2 text-left w-full"
-        onClick={handleClick}
-        style={{ cursor: isClickable ? 'pointer' : 'default' }}
-        aria-pressed={isClickable ? (isOwned ? isSelected : isAddSelected) : undefined}
+        onClick={() => onToggle(box)}
+        style={{ cursor: 'pointer' }}
+        aria-pressed={isSelected}
         aria-label={`${box.title}${isLoaned ? ' — prêté' : ''}`}
       >
         <div
@@ -100,8 +85,8 @@ export function BoxItemCard({
 
           {boxBadge}
 
-          {/* Non-owned overlay — hidden when add-selected */}
-          {!isOwned && !isAddSelected && (
+          {/* Non-owned overlay — hidden when selected */}
+          {!(box.is_owned ?? false) && !isSelected && (
             <div
               aria-hidden
               className="absolute inset-0 pointer-events-none"
@@ -118,8 +103,8 @@ export function BoxItemCard({
             />
           )}
 
-          {/* Selected overlay — owned (loan) or non-owned (add to collection) */}
-          {(isSelected || isAddSelected) && (
+          {/* Selected overlay */}
+          {isSelected && (
             <div
               aria-hidden
               className="absolute inset-0 pointer-events-none flex items-center justify-center"
@@ -158,7 +143,7 @@ export function BoxItemCard({
       </button>
 
       {/* Wishlist button — only for non-owned boxes, outside the card button to avoid nesting */}
-      {!isOwned && onToggleWishlist && (
+      {!(box.is_owned ?? false) && onToggleWishlist && (
         <button
           type="button"
           onClick={onToggleWishlist}
