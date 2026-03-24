@@ -36,6 +36,8 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
             return;
         }
 
+        Log::info("Starting import for series {$this->seriesApiId}");
+
         $executed = RateLimiter::attempt(
             'mangacollec-api',
             2,
@@ -45,10 +47,12 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
                     if ($detail !== null) {
                         $importService->import($this->seriesApiId, $detail);
                     }
-                } catch (Exception $e) {
+                } catch (\Throwable $e) {
                     Log::error("Failed to import series {$this->seriesApiId} in job", [
                         'error' => $e->getMessage(),
+                        'class' => get_class($e),
                         'series_id' => $this->seriesApiId,
+                        'stack' => $e->getTraceAsString(),
                     ]);
                     throw $e;
                 }
