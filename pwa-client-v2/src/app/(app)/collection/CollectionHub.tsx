@@ -9,13 +9,15 @@ import { LibraryTab } from './tabs/LibraryTab';
 import { LoansTab } from './tabs/LoansTab';
 import { WishlistTab } from './tabs/WishlistTab';
 import { ReadingTab } from './tabs/ReadingTab';
+import { CompletionTab } from './tabs/CompletionTab';
 
 // Hoisted — never recreated (rendering-hoist-jsx + js-index-maps)
 const TABS = [
-  { id: 'library',  label: 'Bibliothèque' },
-  { id: 'loans',    label: 'Prêts'        },
-  { id: 'wishlist', label: 'Envies'       },
-  { id: 'read',     label: 'Lu'           },
+  { id: 'library',    label: 'Bibliothèque' },
+  { id: 'loans',      label: 'Prêts'        },
+  { id: 'wishlist',   label: 'Envies'       },
+  { id: 'read',       label: 'Lu'           },
+  { id: 'completion', label: 'Compléter'    },
 ] as const;
 
 type TabId = typeof TABS[number]['id'];
@@ -98,10 +100,11 @@ export function CollectionHub({ defaultTab }: CollectionHubProps) {
           variants={tabContentVariants}
           className="px-4 pt-5 pb-4"
         >
-          {activeTab === 'library'  && <LibraryTab />}
-          {activeTab === 'loans'    && <LoansTab />}
-          {activeTab === 'wishlist' && <WishlistTab />}
-          {activeTab === 'read'     && <ReadingTab />}
+          {activeTab === 'library'    && <LibraryTab />}
+          {activeTab === 'loans'      && <LoansTab />}
+          {activeTab === 'wishlist'   && <WishlistTab />}
+          {activeTab === 'read'       && <ReadingTab />}
+          {activeTab === 'completion' && <CompletionTab />}
         </motion.div>
       </AnimatePresence>
     </div>

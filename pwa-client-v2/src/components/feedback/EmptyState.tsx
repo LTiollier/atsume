@@ -5,6 +5,7 @@ import {
   BookUp,
   Search,
   BookMarked,
+  CheckCircle2,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -39,6 +40,11 @@ const CONTEXT_CONFIG: Record<
     icon: BookMarked,
     title: 'Aucune progression enregistrée',
     description: 'Marquez vos volumes comme lus depuis votre collection.',
+  },
+  completion: {
+    icon: CheckCircle2,
+    title: 'Toutes vos séries sont complètes !',
+    description: 'Aucun tome manquant dans vos éditions.',
   },
 };
 
