@@ -10,6 +10,7 @@ use App\Http\Api\Resources\WishlistItemResource;
 use App\Manga\Application\Actions\AddToWishlistAction;
 use App\Manga\Application\Actions\ListWishlistAction;
 use App\Manga\Application\Actions\RemoveVolumeFromWishlistAction;
+use App\Manga\Application\Actions\WishlistStatsAction;
 use App\Manga\Application\DTOs\AddToWishlistDTO;
 use App\Manga\Infrastructure\Services\WishlistAuthorizationService;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,13 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class WishlistController
 {
+    public function stats(Request $request, WishlistStatsAction $action): JsonResponse
+    {
+        $totalVolumes = $action->execute((int) auth()->id());
+
+        return response()->json(['data' => ['total_volumes' => $totalVolumes]]);
+    }
+
     public function index(Request $request, ListWishlistAction $action): AnonymousResourceCollection
     {
         $wishlist = $action->execute((int) auth()->id());

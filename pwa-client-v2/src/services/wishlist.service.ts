@@ -8,6 +8,10 @@ export const wishlistService = {
         api.get<ApiResponse<WishlistItem[]>>('/wishlist')
             .then(r => z.array(WishlistItemSchema).parse(r.data.data) as WishlistItem[]),
 
+    getStats: () =>
+        api.get<{ data: { total_volumes: number } }>('/wishlist/stats')
+            .then(r => r.data.data),
+
     add: (id: number, type: 'edition' | 'box') =>
         api.post('/wishlist', { wishlist_id: id, wishlist_type: type }),
 

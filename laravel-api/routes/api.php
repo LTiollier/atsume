@@ -113,6 +113,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // Wishlist
     Route::prefix('/wishlist')->group(function () {
         Route::get('/', [WishlistController::class, 'index']);
+        Route::get('/stats', [WishlistController::class, 'stats']);
         Route::post('/', [WishlistController::class, 'store']);
         Route::delete('/{id}', [WishlistController::class, 'destroy']);
     });

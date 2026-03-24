@@ -262,6 +262,13 @@ export function useWishlist() {
     });
 }
 
+export function useWishlistStats() {
+    return useQuery({
+        queryKey: [...queryKeys.wishlist, 'stats'],
+        queryFn: wishlistService.getStats,
+    });
+}
+
 export function useRemoveFromWishlist() {
     const queryClient = useQueryClient();
     return useMutation({

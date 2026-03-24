@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Package } from 'lucide-react';
 
-import { useWishlist, useRemoveFromWishlist } from '@/hooks/queries';
+import { useWishlist, useWishlistStats, useRemoveFromWishlist } from '@/hooks/queries';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { StatusBadge } from '@/components/feedback/StatusBadge';
 import { CollectionStatBar } from '@/components/collection/CollectionStatBar';
@@ -164,12 +164,16 @@ function WishlistRow({ item }: { item: WishlistItem }) {
 
 export function WishlistTab() {
   const { data: items = [], isLoading } = useWishlist();
+  const { data: stats } = useWishlistStats();
 
   if (isLoading) return wishlistSkeletons;
 
   return (
     <div className="flex flex-col gap-0">
-      <CollectionStatBar items={[{ value: items.length, label: 'En wishlist' }]} />
+      <CollectionStatBar items={[
+        { value: items.length, label: 'En envies' },
+        { value: stats?.total_volumes ?? '—', label: 'Tomes total' },
+      ]} />
       {items.length === 0 ? (
         <EmptyState context="wishlist" action={{ label: 'Rechercher', href: '/search' }} />
       ) : (

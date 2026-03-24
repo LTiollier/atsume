@@ -14,7 +14,7 @@ import { ReadingTab } from './tabs/ReadingTab';
 const TABS = [
   { id: 'library',  label: 'Bibliothèque' },
   { id: 'loans',    label: 'Prêts'        },
-  { id: 'wishlist', label: 'Wishlist'     },
+  { id: 'wishlist', label: 'Envies'       },
   { id: 'read',     label: 'Lu'           },
 ] as const;
 

@@ -12,6 +12,7 @@ use App\Manga\Infrastructure\EloquentModels\Edition as EloquentEdition;
 use App\Manga\Infrastructure\Mappers\BoxMapper;
 use App\Manga\Infrastructure\Mappers\EditionMapper;
 use App\User\Infrastructure\EloquentModels\User as EloquentUser;
+use Illuminate\Support\Facades\DB;
 
 final class EloquentWishlistRepository implements WishlistRepositoryInterface
 {
@@ -66,5 +67,28 @@ final class EloquentWishlistRepository implements WishlistRepositoryInterface
             ->all();
 
         return array_merge($editions, $boxes);
+    }
+
+    public function countTotalVolumesByUserId(int $userId): int
+    {
+        // Volumes des éditions en wishlist UNION volumes des coffrets en wishlist → dédoublonnage automatique
+        $editionVolumes = DB::table('volumes')
+            ->select('volumes.id as volume_id')
+            ->join('wishlist_items', 'wishlist_items.wishlistable_id', '=', 'volumes.edition_id')
+            ->where('wishlist_items.wishlistable_type', 'edition')
+            ->where('wishlist_items.user_id', $userId);
+
+        $boxVolumes = DB::table('box_volumes')
+            ->select('box_volumes.volume_id')
+            ->join('wishlist_items', 'wishlist_items.wishlistable_id', '=', 'box_volumes.box_id')
+            ->where('wishlist_items.wishlistable_type', 'box')
+            ->where('wishlist_items.user_id', $userId);
+
+        // L'alias explicite évite l'alias vide "" rejeté par PostgreSQL
+        $union = $editionVolumes->union($boxVolumes);
+
+        return (int) DB::table(DB::raw('('.$union->toSql().') as unique_volumes'))
+            ->mergeBindings($union)
+            ->count();
     }
 }

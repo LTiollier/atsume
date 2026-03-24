@@ -19,4 +19,6 @@ interface WishlistRepositoryInterface
      * @return array<Edition|Box>
      */
     public function findWishlistByUserId(int $userId): array;
+
+    public function countTotalVolumesByUserId(int $userId): int;
 }
