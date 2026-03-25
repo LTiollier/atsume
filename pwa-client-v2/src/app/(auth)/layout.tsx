@@ -19,7 +19,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             className="text-xl font-bold tracking-tight"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}
           >
-            Volume<span style={{ color: 'var(--primary)' }}>store</span>
+            Atsume
           </span>
         </div>
 
