@@ -54,6 +54,7 @@ export const EditionSchema: z.ZodType<any> = z.lazy(() => z.object({
     publisher: z.string().nullable().default(null),
     language: z.string().nullable().default("fr"),
     total_volumes: z.number().nullable().default(null),
+    released_volumes: z.number().nullable().default(null),
     possessed_count: z.number().nullable().default(null),
     is_wishlisted: z.boolean().optional().default(false),
     possessed_numbers: z.array(z.number()).optional().default([]),

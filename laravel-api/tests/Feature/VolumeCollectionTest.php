@@ -193,6 +193,77 @@ test('cannot remove volumes if at least one is not owned by user', function () {
     expect($user->volumes()->where('volume_id', $ownedVolume->id)->exists())->toBeTrue();
 });
 
+test('edition in collection includes released_volumes count', function () {
+    $user = User::factory()->create();
+    $series = Series::factory()->create();
+    $edition = Edition::factory()->create(['series_id' => $series->id, 'total_volumes' => 3]);
+
+    $released1 = Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => now()->subMonths(6)->toDateString()]);
+    $released2 = Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => now()->subDays(1)->toDateString()]);
+    Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => now()->addMonths(3)->toDateString()]);
+
+    $user->volumes()->attach($released1->id);
+
+    actingAs($user);
+
+    getJson('/api/volumes')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.edition.released_volumes', 2);
+});
+
+test('edition released_volumes counts null published_date as released', function () {
+    $user = User::factory()->create();
+    $series = Series::factory()->create();
+    $edition = Edition::factory()->create(['series_id' => $series->id, 'total_volumes' => 2]);
+
+    $withDate = Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => now()->subMonth()->toDateString()]);
+    Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => null]);
+
+    $user->volumes()->attach($withDate->id);
+
+    actingAs($user);
+
+    getJson('/api/volumes')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.edition.released_volumes', 2);
+});
+
+test('edition released_volumes equals total_volumes when all are released', function () {
+    $user = User::factory()->create();
+    $series = Series::factory()->create();
+    $edition = Edition::factory()->create(['series_id' => $series->id, 'total_volumes' => 3]);
+
+    $volumes = Volume::factory()->count(3)->create([
+        'edition_id' => $edition->id,
+        'published_date' => now()->subWeek()->toDateString(),
+    ]);
+
+    $user->volumes()->attach($volumes->first()->id);
+
+    actingAs($user);
+
+    getJson('/api/volumes')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.edition.released_volumes', 3);
+});
+
+test('edition released_volumes is zero when all volumes are future', function () {
+    $user = User::factory()->create();
+    $series = Series::factory()->create();
+    $edition = Edition::factory()->create(['series_id' => $series->id, 'total_volumes' => 2]);
+
+    $futureVolume = Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => now()->addYear()->toDateString()]);
+    Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => now()->addMonths(6)->toDateString()]);
+
+    $user->volumes()->attach($futureVolume->id);
+
+    actingAs($user);
+
+    getJson('/api/volumes')
+        ->assertSuccessful()
+        ->assertJsonPath('data.0.edition.released_volumes', 0);
+});
+
 test('can remove series from collection', function () {
     $user = User::factory()->create();
     $series = Series::factory()->create();

@@ -193,7 +193,13 @@ final class EloquentVolumeRepository implements VolumeRepositoryInterface
         // in a single additional query, avoiding N+1 on is_owned / is_loaned / loaned_to.
         $eloquentVolumes = $user->volumes()
             ->with([
-                'edition.series',
+                'edition' => function ($query): void {
+                    $query->with('series')
+                        ->withCount(['volumes as released_volumes_count' => function ($q): void {
+                            $q->whereNull('published_date')
+                                ->orWhere('published_date', '<=', now()->toDateString());
+                        }]);
+                },
                 'loans' => fn ($q) => $q->where('user_id', $userId)->whereNull('returned_at'),
             ])
             ->orderBy('sort_order', 'asc')

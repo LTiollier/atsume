@@ -44,6 +44,7 @@ export interface Edition {
     publisher: string | null;
     language: string | null;
     total_volumes: number | null;
+    released_volumes: number | null;
     possessed_count?: number | null;
     possessed_numbers?: number[];
     cover_url?: string | null;

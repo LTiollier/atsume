@@ -17,6 +17,7 @@ final class Edition
         private readonly ?string $publisher,
         private readonly ?string $language,
         private readonly ?int $total_volumes,
+        private readonly ?int $released_volumes = null,
         private readonly bool $is_finished = false,
         private readonly ?int $possessed_count = null,
         private readonly array $possessed_numbers = [],
@@ -75,6 +76,11 @@ final class Edition
     public function getTotalVolumes(): ?int
     {
         return $this->total_volumes;
+    }
+
+    public function getReleasedVolumes(): ?int
+    {
+        return $this->released_volumes;
     }
 
     public function isFinished(): bool

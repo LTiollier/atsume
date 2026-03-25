@@ -25,6 +25,7 @@ final class EditionResource extends JsonResource
             'publisher' => $this->resource->getPublisher(),
             'language' => $this->resource->getLanguage(),
             'total_volumes' => $this->resource->getTotalVolumes(),
+            'released_volumes' => $this->resource->getReleasedVolumes(),
             'possessed_count' => $this->resource->getPossessedCount(),
             'is_wishlisted' => $this->resource->isWishlisted(),
             'cover_url' => $this->resource->getCoverUrl(),

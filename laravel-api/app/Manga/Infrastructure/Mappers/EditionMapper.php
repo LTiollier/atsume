@@ -47,6 +47,7 @@ class EditionMapper
             publisher: $eloquent->publisher,
             language: $eloquent->language,
             total_volumes: $eloquent->total_volumes,
+            released_volumes: isset($eloquent->released_volumes_count) ? (int) $eloquent->released_volumes_count : null,
             is_finished: (bool) $eloquent->is_finished,
             possessed_count: isset($eloquent->possessed_volumes_count) ? (int) $eloquent->possessed_volumes_count : null,
             possessed_numbers: $possessed_numbers,

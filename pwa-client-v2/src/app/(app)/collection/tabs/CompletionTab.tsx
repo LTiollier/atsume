@@ -7,6 +7,7 @@ import { Package, ChevronDown, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useVolumes } from '@/hooks/queries';
+import { isFutureDate } from '@/lib/utils';
 import { CollectionStatBar, collectionStatBarSkeleton } from '@/components/collection/CollectionStatBar';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { SearchBar } from '@/components/forms/SearchBar';
@@ -333,52 +334,61 @@ export function CompletionTab() {
     });
   }
 
-  // Only owned volumes (rerender-memo)
-  const ownedVolumes = useMemo(() => volumes.filter(v => v.is_owned), [volumes]);
-
   // Build incomplete editions — two-pass: collect then compute gaps (js-index-maps)
+  // Uses the full volumes list (owned + non-owned) so future volumes the user hasn't
+  // pre-ordered are still detected and excluded from the effective total.
   const incompleteEditions = useMemo<IncompleteEdition[]>(() => {
-    // Pass 1: group owned volumes by edition
+    // Pass 1: group volumes by edition, tracking released-owned vs any-unreleased
     const editionMap = new Map<number, {
       edition: Edition;
       series: Series;
-      ownedCount: number;
-      ownedNumbers: Set<number>;
+      releasedOwnedCount: number;
+      unreleasedCount: number;   // any volume (owned or not) with a future published_date
+      ownedNumbers: Set<number>; // only released + owned
       coverUrl: string | null;
     }>();
 
-    for (const v of ownedVolumes) {
+    for (const v of volumes) {
       if (!v.edition || !v.series || v.edition.total_volumes == null) continue;
       const eid = v.edition.id;
+      const unreleased = isFutureDate(v.published_date);
       const parsedNum = v.number != null ? parseInt(v.number, 10) : NaN;
       const entry = editionMap.get(eid);
       if (!entry) {
         editionMap.set(eid, {
           edition: v.edition,
           series: v.series,
-          ownedCount: 1,
-          ownedNumbers: new Set(isNaN(parsedNum) ? [] : [parsedNum]),
+          releasedOwnedCount: !unreleased && v.is_owned ? 1 : 0,
+          unreleasedCount: unreleased ? 1 : 0,
+          ownedNumbers: new Set(!unreleased && v.is_owned && !isNaN(parsedNum) ? [parsedNum] : []),
           coverUrl: v.cover_url ?? null,
         });
       } else {
-        entry.ownedCount++;
-        if (!isNaN(parsedNum)) entry.ownedNumbers.add(parsedNum);
+        if (unreleased) {
+          entry.unreleasedCount++;
+        } else if (v.is_owned) {
+          entry.releasedOwnedCount++;
+          if (!isNaN(parsedNum)) entry.ownedNumbers.add(parsedNum);
+        }
         if (!entry.coverUrl && v.cover_url) entry.coverUrl = v.cover_url;
       }
     }
 
     // Pass 2: compute missing count and specific numbers per edition
+    // Use released_volumes from the API when available (server-computed, accurate).
+    // Fall back to total_volumes - unreleasedCount (client-side heuristic for pre-ordered volumes).
     const result: IncompleteEdition[] = [];
-    editionMap.forEach(({ edition, series, ownedCount, ownedNumbers, coverUrl }) => {
-      const total = edition.total_volumes!;
-      const missing = total - ownedCount;
+    editionMap.forEach(({ edition, series, releasedOwnedCount, unreleasedCount, ownedNumbers, coverUrl }) => {
+      const effectiveTotal = edition.released_volumes ?? (edition.total_volumes! - unreleasedCount);
+      if (effectiveTotal <= 0) return;
+      const missing = effectiveTotal - releasedOwnedCount;
       if (missing <= 0) return;
 
-      // Specific numbers only trustworthy when all owned volumes had parseable numbers
-      const hasNumberData = ownedNumbers.size === ownedCount;
+      // Specific numbers only trustworthy when all released owned volumes had parseable numbers
+      const hasNumberData = ownedNumbers.size === releasedOwnedCount;
       const missingNumbers: number[] = [];
       if (hasNumberData) {
-        for (let n = 1; n <= total; n++) {
+        for (let n = 1; n <= effectiveTotal; n++) {
           if (!ownedNumbers.has(n)) missingNumbers.push(n);
         }
       }
@@ -387,8 +397,8 @@ export function CompletionTab() {
         editionId: edition.id,
         editionName: edition.name,
         series,
-        ownedCount,
-        totalVolumes: total,
+        ownedCount: releasedOwnedCount,
+        totalVolumes: effectiveTotal,
         missingCount: missing,
         missingNumbers,
         hasNumberData,
@@ -397,7 +407,7 @@ export function CompletionTab() {
     });
 
     return result;
-  }, [ownedVolumes]);
+  }, [volumes]);
 
   // Sort — separate memo so stats don't recompute on sort change (rerender-split-combined-hooks)
   const sortedEditions = useMemo(() => {
