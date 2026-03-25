@@ -29,6 +29,7 @@ const PUBLIC_PREFIXES = [
     '/_next/',
     '/api/',
     '/favicon',
+    '/logo.png',
     '/icons/',
     '/manifest',
     '/sw.js',
@@ -66,13 +67,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: [
-        /*
-         * Matcher sur toutes les routes sauf :
-         * - _next/static (fichiers statiques)
-         * - _next/image (optimisation images)
-         * - favicon.ico
-         */
-        '/((?!_next/static|_next/image|favicon.ico).*)',
-    ],
+    matcher: ['/((?!_next).*)'],
 };

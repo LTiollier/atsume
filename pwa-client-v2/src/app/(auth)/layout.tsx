@@ -1,20 +1,19 @@
-import { BookOpen } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 safe-area-top safe-area-bottom">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3">
-          <div
-            className="w-11 h-11 flex items-center justify-center"
-            style={{
-              background: 'var(--primary)',
-              color: 'var(--primary-foreground)',
-              borderRadius: 'calc(var(--radius) * 2)',
-            }}
-          >
-            <BookOpen size={22} aria-hidden />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Atsume"
+            width={64}
+            height={64}
+            priority
+            unoptimized
+            style={{ borderRadius: 'calc(var(--radius) * 2)' }}
+          />
           <span
             className="text-xl font-bold tracking-tight"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}

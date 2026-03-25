@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -21,16 +22,15 @@ export function SidebarNav() {
     >
       {/* Brand */}
       <div className="flex items-center gap-3 px-5 h-16 shrink-0">
-        <div
-          className="flex items-center justify-center w-8 h-8 rounded text-xs font-bold"
-          style={{
-            background: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            fontFamily: 'var(--font-display)',
-          }}
-        >
-          MS
-        </div>
+        <Image
+          src="/logo.png"
+          alt="Atsume"
+          width={32}
+          height={32}
+          priority
+          unoptimized
+          style={{ borderRadius: 'calc(var(--radius) * 1.5)' }}
+        />
         <span
           className="text-sm font-semibold tracking-wide"
           style={{ fontFamily: 'var(--font-display)', color: 'var(--sidebar-foreground)' }}
