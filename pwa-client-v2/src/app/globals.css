@@ -60,6 +60,7 @@
 
     /* Sortie à venir — neutre fixe, indépendant de la palette */
     --color-upcoming:          oklch(68% 0.12 260);  /* Bleu-lavande */
+
   }
 
   /* ============================================
@@ -555,6 +556,34 @@
     padding-top: max(0px, env(safe-area-inset-top));
   }
 
+}
+
+/* ============================================
+   LAST VOLUME GLOW — shimmer one-shot au montage
+   Lit → éclat bright → glow statique stable.
+   prefers-reduced-motion → saute directement au
+   state final (forwards) grâce au bloc global.
+   ============================================ */
+@keyframes last-volume-glow-in {
+  0%   {
+    box-shadow:
+      0 0 0 2px color-mix(in oklch, var(--primary) 0%, transparent),
+      0 0 0  0px color-mix(in oklch, var(--primary) 0%, transparent);
+  }
+  35%  {
+    box-shadow:
+      0 0 0 2px var(--primary),
+      0 0 22px 6px color-mix(in oklch, var(--primary) 55%, transparent);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px var(--primary),
+      0 0 10px 2px color-mix(in oklch, var(--primary) 30%, transparent);
+  }
+}
+
+.volume-card--last-volume {
+  animation: last-volume-glow-in 750ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ============================================

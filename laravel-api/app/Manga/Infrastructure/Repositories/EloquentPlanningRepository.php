@@ -92,7 +92,9 @@ final class EloquentPlanningRepository implements PlanningRepositoryInterface
                 e.name AS edition_title,
                 EXISTS(SELECT 1 FROM user_volumes uv WHERE uv.volume_id = v.id AND uv.user_id = ?) AS is_owned,
                 EXISTS(SELECT 1 FROM wishlist_items wi WHERE wi.wishlistable_id = v.edition_id AND wi.wishlistable_type = 'edition' AND wi.user_id = ?) AS is_wishlisted,
-                CASE WHEN e.last_volume_number IS NOT NULL AND CAST(v.number AS UNSIGNED) = e.last_volume_number THEN 1 ELSE 0 END AS is_last_volume
+                CASE WHEN e.last_volume_number IS NOT NULL AND v.number ~ '^[0-9]+$'
+                     THEN CASE WHEN v.number::int = e.last_volume_number THEN 1 ELSE 0 END
+                     ELSE 0 END AS is_last_volume
             FROM volumes v
             JOIN editions e ON e.id = v.edition_id
             JOIN series s ON s.id = e.series_id

@@ -111,3 +111,47 @@ test('it paginates results with cursor', function () {
     expect($secondPage->getItems())->toHaveCount(2)
         ->and($secondPage->hasMore())->toBeFalse();
 });
+
+test('it marks volume as last when its number matches edition last_volume_number', function () {
+    $user = User::factory()->create();
+    $series = Series::factory()->create();
+    $edition = Edition::factory()->create(['series_id' => $series->id, 'last_volume_number' => 3]);
+
+    $ownedVolume = Volume::factory()->create(['edition_id' => $edition->id, 'published_date' => '2020-01-01']);
+    $user->volumes()->attach($ownedVolume->id);
+
+    $lastVolume = Volume::factory()->create([
+        'edition_id' => $edition->id,
+        'number' => '3',
+        'published_date' => '2026-05-01',
+    ]);
+
+    $notLastVolume = Volume::factory()->create([
+        'edition_id' => $edition->id,
+        'number' => '2',
+        'published_date' => '2026-04-01',
+    ]);
+
+    $repository = new EloquentPlanningRepository;
+    $result = $repository->findPlanning(makeDTO((int) $user->id));
+
+    $items = collect($result->getItems())->keyBy(fn ($item) => $item->getId());
+
+    expect($items->get($lastVolume->id)->isLastVolume())->toBeTrue()
+        ->and($items->get($notLastVolume->id)->isLastVolume())->toBeFalse();
+});
+
+test('it marks box as not last volume', function () {
+    $user = User::factory()->create();
+    $series = Series::factory()->create();
+    $boxSet = EloquentBoxSet::create(['series_id' => $series->id, 'title' => 'Box Set']);
+    $ownedBox = EloquentBox::create(['box_set_id' => $boxSet->id, 'title' => 'Box 1', 'release_date' => '2020-01-01']);
+    $user->boxes()->attach($ownedBox->id);
+
+    EloquentBox::create(['box_set_id' => $boxSet->id, 'title' => 'Box 2', 'release_date' => '2026-04-01']);
+
+    $repository = new EloquentPlanningRepository;
+    $result = $repository->findPlanning(makeDTO((int) $user->id));
+
+    expect($result->getItems()[0]->isLastVolume())->toBeFalse();
+});

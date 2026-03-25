@@ -18,6 +18,7 @@ test('planning item returns correct values', function () {
         editionTitle: 'Edition Originale',
         isOwned: false,
         isWishlisted: true,
+        isLastVolume: true,
     );
 
     expect($item->getId())->toBe(42)
@@ -31,7 +32,27 @@ test('planning item returns correct values', function () {
         ->and($item->getEditionId())->toBe(3)
         ->and($item->getEditionTitle())->toBe('Edition Originale')
         ->and($item->isOwned())->toBeFalse()
-        ->and($item->isWishlisted())->toBeTrue();
+        ->and($item->isWishlisted())->toBeTrue()
+        ->and($item->isLastVolume())->toBeTrue();
+});
+
+test('planning item is not last volume by default', function () {
+    $item = new PlanningItem(
+        id: 1,
+        type: 'volume',
+        title: 'Naruto T1',
+        number: '1',
+        coverUrl: null,
+        releaseDate: '2026-04-01',
+        seriesId: 1,
+        seriesTitle: 'Naruto',
+        editionId: 1,
+        editionTitle: 'Standard',
+        isOwned: false,
+        isWishlisted: false,
+    );
+
+    expect($item->isLastVolume())->toBeFalse();
 });
 
 test('planning item box type has null edition', function () {

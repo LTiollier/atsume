@@ -35,6 +35,7 @@ final class PlanningItemResource extends JsonResource
             ] : null,
             'is_owned' => $this->resource->isOwned(),
             'is_wishlisted' => $this->resource->isWishlisted(),
+            'is_last_volume' => $this->resource->isLastVolume(),
         ];
     }
 }

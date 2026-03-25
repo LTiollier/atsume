@@ -184,6 +184,7 @@ export const PlanningItemSchema = z.object({
     edition: PlanningItemEditionSchema.nullable().default(null),
     is_owned: z.boolean().default(false),
     is_wishlisted: z.boolean().default(false),
+    is_last_volume: z.boolean().default(false),
 });
 
 export const PlanningMetaSchema = z.object({

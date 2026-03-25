@@ -6,6 +6,16 @@ import { cn, formatShortDate, isFutureDate } from '@/lib/utils';
 import type { Volume } from '@/types/volume';
 
 // Static JSX hoisted outside component — never re-created (rendering-hoist-jsx)
+const lastVolumeBadge = (
+  <div
+    className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold leading-none uppercase tracking-wide z-10"
+    style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
+    aria-hidden
+  >
+    FIN
+  </div>
+);
+
 const bottomGradient = (
   <div
     aria-hidden
@@ -25,6 +35,8 @@ interface VolumeCardProps {
   selected?: boolean;
   /** Afficher le numéro de tome en bas de la cover */
   showNumber?: boolean;
+  /** Dernier tome de l'édition — glow ambré + badge FIN */
+  isLastVolume?: boolean;
 }
 
 export function VolumeCard({
@@ -33,14 +45,19 @@ export function VolumeCard({
   isRead = false,
   selected = false,
   showNumber = true,
+  isLastVolume = false,
 }: VolumeCardProps) {
   const isOwned = volume.is_owned;
 
   return (
     <Link
       href={href}
-      className={cn('volume-card block', selected && 'outline outline-2 outline-primary')}
-      aria-label={`${volume.title}${volume.number ? ` — tome ${volume.number}` : ''}`}
+      className={cn(
+        'volume-card block',
+        selected && 'outline outline-2 outline-primary',
+        isLastVolume && 'volume-card--last-volume',
+      )}
+      aria-label={`${volume.title}${volume.number ? ` — tome ${volume.number}` : ''}${isLastVolume ? ' — dernier tome de l\'édition' : ''}`}
     >
       {/* Cover */}
       {volume.cover_url ? (
@@ -63,6 +80,9 @@ export function VolumeCard({
 
       {/* Gradient bas — toujours actif pour le relief visuel */}
       {bottomGradient}
+
+      {/* Badge dernier tome — top left */}
+      {isLastVolume && lastVolumeBadge}
 
       {/* Overlay selection */}
       {selected && (

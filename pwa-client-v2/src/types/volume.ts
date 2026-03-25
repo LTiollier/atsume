@@ -180,6 +180,7 @@ export interface PlanningItem {
     edition: PlanningItemEdition | null;
     is_owned: boolean;
     is_wishlisted: boolean;
+    is_last_volume: boolean;
 }
 
 export interface PlanningMeta {
