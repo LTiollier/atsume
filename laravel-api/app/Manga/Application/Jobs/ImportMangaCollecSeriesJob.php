@@ -6,23 +6,33 @@ namespace App\Manga\Application\Jobs;
 
 use App\Manga\Infrastructure\Services\MangaCollecScraperService;
 use App\Manga\Infrastructure\Services\MangaCollecSeriesImportService;
+use DateTime;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\RateLimiter;
 use Throwable;
 
 final class ImportMangaCollecSeriesJob implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
+    public int $maxExceptions = 3;
 
-    public int $backoff = 60;
+    public function retryUntil(): DateTime
+    {
+        return now()->addHours(2);
+    }
+
+    /** @return array<int, RateLimited> */
+    public function middleware(): array
+    {
+        return [new RateLimited('mangacollec-api')];
+    }
 
     public function __construct(
         private readonly string $seriesApiId,
@@ -38,30 +48,19 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
 
         Log::info("Starting import for series {$this->seriesApiId}");
 
-        $executed = RateLimiter::attempt(
-            'mangacollec-api',
-            2,
-            function () use ($scraperService, $importService) {
-                try {
-                    $detail = $scraperService->getSeriesDetail($this->seriesApiId);
-                    if ($detail !== null) {
-                        $importService->import($this->seriesApiId, $detail);
-                    }
-                } catch (Throwable $e) {
-                    Log::error("Failed to import series {$this->seriesApiId} in job", [
-                        'error' => $e->getMessage(),
-                        'class' => get_class($e),
-                        'series_id' => $this->seriesApiId,
-                        'stack' => $e->getTraceAsString(),
-                    ]);
-                    throw $e;
-                }
-            },
-            1 // limit window in seconds
-        );
-
-        if (! $executed) {
-            $this->release(5);
+        try {
+            $detail = $scraperService->getSeriesDetail($this->seriesApiId);
+            if ($detail !== null) {
+                $importService->import($this->seriesApiId, $detail);
+            }
+        } catch (Throwable $e) {
+            Log::error("Failed to import series {$this->seriesApiId} in job", [
+                'error' => $e->getMessage(),
+                'class' => get_class($e),
+                'series_id' => $this->seriesApiId,
+                'stack' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
     }
 }
