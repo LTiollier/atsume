@@ -14,8 +14,8 @@ import type { Edition, Series } from '@/types/volume';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-// ≤ this value → chips always visible (no accordion)
-const INLINE_THRESHOLD = 4;
+// ≤ this value (total volumes) → grid always visible (no accordion)
+const GRID_INLINE_MAX_VOLUMES = 20;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -75,41 +75,78 @@ const completionSkeletons = (
   </>
 );
 
-// ─── MissingChips (rerender-no-inline-components) ────────────────────────────
+// ─── VolumeGrid (rerender-no-inline-components) ───────────────────────────────
+// Shows all volumes (1 → totalVolumes) as a 10-column grid.
+// Owned volumes → primary colour chip. Missing → muted grey chip.
+// Falls back to a plain count when number data is unreliable.
 
-interface MissingChipsProps {
-  numbers: number[];
+interface VolumeGridProps {
+  totalVolumes: number;
+  missingNumbers: number[];
   hasData: boolean;
-  count: number;
+  missingCount: number;
   /** When provided, shows a "Voir l'édition" link at the end (accordion path only). */
   editionHref?: string;
 }
 
-function MissingChips({ numbers, hasData, count, editionHref }: MissingChipsProps) {
+function VolumeGrid({ totalVolumes, missingNumbers, hasData, missingCount, editionHref }: VolumeGridProps) {
+  // O(1) membership check — built once per render (missingNumbers rarely changes)
+  const missingSet = useMemo(() => new Set(missingNumbers), [missingNumbers]);
+
   return (
     <div className="pb-3 pl-[52px]">
-      <div className="flex flex-wrap gap-1.5">
-        {hasData && numbers.length > 0 ? (
-          numbers.map(n => (
-            <span
-              key={n}
-              className="text-xs font-medium px-2 py-0.5 tabular-nums"
-              style={{
-                color: 'var(--primary)',
-                background: 'color-mix(in oklch, var(--primary) 12%, transparent)',
-                borderRadius: 'var(--radius)',
-                border: '1px solid color-mix(in oklch, var(--primary) 25%, transparent)',
-              }}
-            >
-              T.{n}
-            </span>
-          ))
-        ) : (
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-            {count} tome{count > 1 ? 's' : ''} manquant{count > 1 ? 's' : ''}
-          </span>
-        )}
-      </div>
+      {hasData ? (
+        <div
+          role="list"
+          aria-label="Tomes de l'édition"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(10, minmax(0, 1fr))',
+            gap: '3px',
+          }}
+        >
+          {Array.from({ length: totalVolumes }, (_, i) => {
+            const n = i + 1;
+            const owned = !missingSet.has(n);
+            return (
+              <span
+                key={n}
+                role="listitem"
+                aria-label={`Tome ${n} – ${owned ? 'possédé' : 'manquant'}`}
+                className="text-center tabular-nums"
+                style={
+                  owned
+                    ? {
+                        fontSize: '10px',
+                        fontWeight: 500,
+                        padding: '2px 1px',
+                        color: 'var(--primary)',
+                        background: 'color-mix(in oklch, var(--primary) 12%, transparent)',
+                        borderRadius: 'calc(var(--radius) * 0.5)',
+                        border: '1px solid color-mix(in oklch, var(--primary) 25%, transparent)',
+                      }
+                    : {
+                        fontSize: '10px',
+                        fontWeight: 400,
+                        padding: '2px 1px',
+                        color: 'var(--muted-foreground)',
+                        background: 'var(--muted)',
+                        borderRadius: 'calc(var(--radius) * 0.5)',
+                        border: '1px solid var(--border)',
+                        opacity: 0.5,
+                      }
+                }
+              >
+                {n}
+              </span>
+            );
+          })}
+        </div>
+      ) : (
+        <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+          {missingCount} tome{missingCount > 1 ? 's' : ''} manquant{missingCount > 1 ? 's' : ''}
+        </span>
+      )}
       {editionHref && (
         <Link
           href={editionHref}
@@ -217,11 +254,12 @@ interface EditionRowProps {
 }
 
 function EditionRow({ item, isOpen, onToggle }: EditionRowProps) {
-  const isInline = item.missingCount <= INLINE_THRESHOLD;
+  // Short series (≤ GRID_INLINE_MAX_VOLUMES total) → grid always visible, row links to edition page.
+  // Long series (One Piece, etc.) → accordion so the page doesn't fill with grids.
+  const isInline = item.totalVolumes <= GRID_INLINE_MAX_VOLUMES;
   const href = `/series/${item.series.id}/edition/${item.editionId}`;
 
   if (isInline) {
-    // ≤ INLINE_THRESHOLD → chips always visible, row navigates to edition page
     return (
       <div className="border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
         <Link
@@ -230,17 +268,17 @@ function EditionRow({ item, isOpen, onToggle }: EditionRowProps) {
         >
           <EditionRowHeader item={item} showChevron={false} isOpen={false} />
         </Link>
-        <MissingChips
-          numbers={item.missingNumbers}
+        <VolumeGrid
+          totalVolumes={item.totalVolumes}
+          missingNumbers={item.missingNumbers}
           hasData={item.hasNumberData}
-          count={item.missingCount}
+          missingCount={item.missingCount}
         />
       </div>
     );
   }
 
-  // > INLINE_THRESHOLD → accordion, chips hidden by default
-  // editionHref passed so the expanded content shows a "Voir l'édition" link
+  // Long series → accordion; editionHref shows a "Voir l'édition" link inside the expanded grid
   // (the toggle button itself can't also be a link)
   return (
     <div className="border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
@@ -249,7 +287,7 @@ function EditionRow({ item, isOpen, onToggle }: EditionRowProps) {
         onClick={onToggle}
         className="flex items-center gap-3 py-3 w-full text-left"
         aria-expanded={isOpen}
-        aria-label={`${item.series.title} \u2014 ${isOpen ? 'masquer' : 'voir'} les tomes manquants`}
+        aria-label={`${item.series.title} \u2014 ${isOpen ? 'masquer' : 'voir'} la grille des tomes`}
       >
         <EditionRowHeader item={item} showChevron={true} isOpen={isOpen} />
       </button>
@@ -262,10 +300,11 @@ function EditionRow({ item, isOpen, onToggle }: EditionRowProps) {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             style={{ overflow: 'hidden' }}
           >
-            <MissingChips
-              numbers={item.missingNumbers}
+            <VolumeGrid
+              totalVolumes={item.totalVolumes}
+              missingNumbers={item.missingNumbers}
               hasData={item.hasNumberData}
-              count={item.missingCount}
+              missingCount={item.missingCount}
               editionHref={href}
             />
           </motion.div>
