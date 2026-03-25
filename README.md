@@ -22,8 +22,8 @@ L'environnement de développement complet est géré via **Docker Compose**.
 ### 1. Cloner le dépôt et lancer les conteneurs
 
 ```bash
-git clone git@github.com:LTiollier/mangatheque.git
-cd mangatheque
+git clone git@github.com:LTiollier/atsume.git
+cd atsume
 docker compose up -d
 ```
 

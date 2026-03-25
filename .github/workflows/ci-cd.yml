@@ -142,4 +142,4 @@ jobs:
       - name: Deploy Vercel
         uses: 'vercel/repository-dispatch/actions/status@v1'
         with:
-          name: "Vercel - mangatheque: deploy-backend"
+          name: "Vercel - atsume: deploy-backend"
