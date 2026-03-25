@@ -146,8 +146,14 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
   const toggleWishlist = useToggleWishlist();
 
   // Derived during render — no useEffect (rerender-derived-state-no-effect)
-  const editions: Edition[] = series?.editions ?? [];
-  const boxSets: BoxSet[] = series?.box_sets ?? [];
+  const editions: Edition[] = [...(series?.editions ?? [])].sort(
+    (a, b) => (b.possessed_count ?? 0) - (a.possessed_count ?? 0),
+  );
+  const boxSets: BoxSet[] = [...(series?.box_sets ?? [])].sort(
+    (a, b) =>
+      b.boxes.filter(box => box.is_owned).length -
+      a.boxes.filter(box => box.is_owned).length,
+  );
   const hasContent = editions.length > 0 || boxSets.length > 0;
   const authorsLabel = series?.authors?.join(', ') ?? null;
 
