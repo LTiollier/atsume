@@ -1,0 +1,304 @@
+/* =====================================================
+   Atsume Mail Theme — Void/Oni (dark)
+   All colours are sRGB hex, no CSS variables (email clients).
+   Primary defaults to Oni crimson (#c8392b).
+   Per-user palette overrides are injected inline via <head>.
+   ===================================================== */
+
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #0d0d10;
+    color: #f0efeb;
+    height: 100%;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p,
+ul,
+ol,
+blockquote {
+    line-height: 1.4;
+    text-align: left;
+}
+
+a {
+    color: #c8392b;
+}
+
+a img {
+    border: none;
+}
+
+/* Typography */
+
+h1 {
+    color: #f0efeb;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+h2 {
+    color: #f0efeb;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+h3 {
+    color: #f0efeb;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+p {
+    color: #f0efeb;
+    font-size: 16px;
+    line-height: 1.5em;
+    margin-top: 0;
+    text-align: left;
+}
+
+p.sub {
+    font-size: 12px;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Layout */
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #0d0d10;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.content {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Header */
+
+.header {
+    padding: 28px 0 20px;
+    text-align: center;
+}
+
+.header a {
+    color: #f0efeb;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+/* Body */
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #0d0d10;
+    border-bottom: 1px solid #0d0d10;
+    border-top: 1px solid #0d0d10;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    background-color: #131318;
+    border-color: #22222c;
+    border-radius: 4px;
+    border-width: 1px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.60);
+    margin: 0 auto;
+    padding: 0;
+    width: 570px;
+}
+
+.inner-body a {
+    word-break: break-all;
+}
+
+/* Subcopy */
+
+.subcopy {
+    border-top: 1px solid #22222c;
+    margin-top: 25px;
+    padding-top: 25px;
+}
+
+.subcopy p {
+    color: #7e7d78;
+    font-size: 14px;
+}
+
+/* Footer */
+
+.footer {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    width: 570px;
+}
+
+.footer p {
+    color: #636268;
+    font-size: 12px;
+    text-align: center;
+}
+
+.footer a {
+    color: #636268;
+    text-decoration: underline;
+}
+
+/* Tables */
+
+.table table {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 30px auto;
+    width: 100%;
+}
+
+.table th {
+    border-bottom: 1px solid #22222c;
+    color: #f0efeb;
+    margin: 0;
+    padding-bottom: 8px;
+}
+
+.table td {
+    color: #c8c7c2;
+    font-size: 15px;
+    line-height: 18px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 32px;
+}
+
+/* Buttons */
+
+.action {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 30px auto;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+    float: unset;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    border-radius: 4px;
+    color: #160403;
+    display: inline-block;
+    overflow: hidden;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* Primary — Oni crimson (default; overridden per-user via inline <style>) */
+.button-blue,
+.button-primary {
+    background-color: #c8392b;
+    border-bottom: 8px solid #c8392b;
+    border-left: 18px solid #c8392b;
+    border-right: 18px solid #c8392b;
+    border-top: 8px solid #c8392b;
+    color: #160403 !important;
+}
+
+.button-green,
+.button-success {
+    background-color: #39a970;
+    border-bottom: 8px solid #39a970;
+    border-left: 18px solid #39a970;
+    border-right: 18px solid #39a970;
+    border-top: 8px solid #39a970;
+    color: #041509;
+}
+
+.button-red,
+.button-error {
+    background-color: #c5422e;
+    border-bottom: 8px solid #c5422e;
+    border-left: 18px solid #c5422e;
+    border-right: 18px solid #c5422e;
+    border-top: 8px solid #c5422e;
+    color: #160403;
+}
+
+/* Panels */
+
+.panel {
+    border-left: #c8392b solid 4px;
+    margin: 21px 0;
+}
+
+.panel-content {
+    background-color: #181820;
+    color: #c8c7c2;
+    padding: 16px;
+}
+
+.panel-content p {
+    color: #c8c7c2;
+}
+
+.panel-item {
+    padding: 0;
+}
+
+.panel-item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Utilities */
+
+.break-all {
+    word-break: break-all;
+}

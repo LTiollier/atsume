@@ -53,6 +53,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
@@ -167,12 +168,25 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('mangacollec-api', fn () => Limit::perSecond(2));
 
-        ResetPassword::createUrlUsing(function (mixed $notifiable, string $token) {
+        ResetPassword::toMailUsing(function (mixed $notifiable, string $token) {
             /** @var User $notifiable */
             /** @var string $frontendUrl */
             $frontendUrl = config('app.frontend_url');
+            $url = $frontendUrl.'/reset-password?token='.$token.'&email='.$notifiable->getEmailForPasswordReset();
 
-            return $frontendUrl.'/reset-password?token='.$token.'&email='.$notifiable->getEmailForPasswordReset();
+            /** @var int $expire */
+            $expire = config('auth.passwords.'.config('auth.defaults.passwords').'.expire', 60);
+
+            $mail = (new MailMessage)
+                ->subject(__('Reset Password Notification'))
+                ->line(__('You are receiving this email because we received a password reset request for your account.'))
+                ->action(__('Reset Password'), $url)
+                ->line(__('This password reset link will expire in :count minutes.', ['count' => $expire]))
+                ->line(__('If you did not request a password reset, no further action is required.'));
+
+            $mail->viewData['primaryColor'] = self::paletteHex($notifiable->palette ?? 'oni');
+
+            return $mail;
         });
 
         VerifyEmail::createUrlUsing(function (User $notifiable) {
@@ -185,18 +199,28 @@ class AppServiceProvider extends ServiceProvider
             /** @var int $expire */
             $expire = config('auth.verification.expire', 60);
 
-            // Generate the backend signed URL to extract its parameters
             $temporarySignedUrl = URL::temporarySignedRoute(
                 'verification.verify',
                 now()->addMinutes($expire),
                 ['id' => $id, 'hash' => $hash]
             );
 
-            // Extract query parameters from the signed backend URL
             $urlParts = parse_url($temporarySignedUrl);
             $queryString = $urlParts['query'] ?? '';
 
             return $frontendUrl."/verify-email/{$id}/{$hash}?{$queryString}";
+        });
+
+        VerifyEmail::toMailUsing(function (User $notifiable, string $verificationUrl) {
+            $mail = (new MailMessage)
+                ->subject(__('Verify Email Address'))
+                ->line(__('Please click the button below to verify your email address.'))
+                ->action(__('Verify Email Address'), $verificationUrl)
+                ->line(__('If you did not create an account, no further action is required.'));
+
+            $mail->viewData['primaryColor'] = self::paletteHex($notifiable->palette ?? 'oni');
+
+            return $mail;
         });
 
         if ($this->app->runningInConsole()) {
@@ -220,5 +244,22 @@ class AppServiceProvider extends ServiceProvider
 
             return $factoryName;
         });
+    }
+
+    /**
+     * Returns the hex primary colour for a given palette slug.
+     * Used to inject per-user palette overrides into transactional emails.
+     */
+    public static function paletteHex(string $palette): string
+    {
+        return match ($palette) {
+            'kitsune' => '#cf7c17',  // Orange brûlé   oklch(68% 0.22 45°)
+            'kaminari' => '#c2b214',  // Jaune or        oklch(82% 0.20 90°)
+            'matcha' => '#76b030',  // Vert lime       oklch(76% 0.18 135°)
+            'sakura' => '#d02874',  // Rose néon       oklch(65% 0.26 345°)
+            'katana' => '#1a9ec0',  // Cyan acier      oklch(70% 0.22 200°)
+            'mangaka' => '#e4e4f0',  // Argent          oklch(91% 0.005 250°)
+            default => '#c8392b',  // Oni — rouge sang oklch(62% 0.24 18°)
+        };
     }
 }
