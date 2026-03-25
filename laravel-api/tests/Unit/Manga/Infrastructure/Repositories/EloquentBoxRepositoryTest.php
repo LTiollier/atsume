@@ -131,7 +131,7 @@ test('attachVolumes attaches volumes to a box', function () {
     expect($box->volumes->contains($volume2))->toBeTrue();
 });
 
-test('attachVolumes does not create duplicates', function () {
+test('attachVolumes does not create duplicates when called twice', function () {
     $series = EloquentSeries::create(['title' => 'Test Series', 'authors' => 'Author']);
     $boxSet = EloquentBoxSet::create(['series_id' => $series->id, 'title' => 'Test BoxSet']);
     $box = EloquentBox::create(['box_set_id' => $boxSet->id, 'title' => 'Test Box', 'is_empty' => false]);
@@ -142,6 +142,21 @@ test('attachVolumes does not create duplicates', function () {
     $repo = new EloquentBoxRepository;
     $repo->attachVolumes($box->id, [$volume->id]);
     $repo->attachVolumes($box->id, [$volume->id]);
+
+    $box->refresh();
+    expect($box->volumes)->toHaveCount(1);
+});
+
+test('attachVolumes does not throw unique constraint violation when volumeIds array contains duplicates', function () {
+    $series = EloquentSeries::create(['title' => 'Test Series', 'authors' => 'Author']);
+    $boxSet = EloquentBoxSet::create(['series_id' => $series->id, 'title' => 'Test BoxSet']);
+    $box = EloquentBox::create(['box_set_id' => $boxSet->id, 'title' => 'Test Box', 'is_empty' => false]);
+
+    $edition = EloquentEdition::create(['series_id' => $series->id, 'name' => 'Standard', 'language' => 'fr']);
+    $volume = EloquentVolume::create(['edition_id' => $edition->id, 'title' => 'Vol 1', 'number' => 1]);
+
+    $repo = new EloquentBoxRepository;
+    $repo->attachVolumes($box->id, [$volume->id, $volume->id]);
 
     $box->refresh();
     expect($box->volumes)->toHaveCount(1);

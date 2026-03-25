@@ -103,7 +103,7 @@ final class EloquentBoxRepository implements BoxRepositoryInterface
         /** @var EloquentBox|null $box */
         $box = EloquentBox::find($boxId);
         if ($box) {
-            $box->volumes()->syncWithoutDetaching($volumeIds);
+            $box->volumes()->syncWithoutDetaching(array_unique($volumeIds));
         }
     }
 
