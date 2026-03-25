@@ -119,6 +119,30 @@ it('rejects invalid theme', function () {
         ->assertJsonValidationErrors(['theme']);
 });
 
+it('accepts iro as a valid theme', function () {
+    $user = User::factory()->create([
+        'theme' => 'void',
+        'palette' => 'oni',
+    ]);
+
+    $response = $this->actingAs($user)->patchJson('/api/user/settings', [
+        'username' => $user->username,
+        'is_public' => false,
+        'theme' => 'iro',
+        'palette' => 'oni',
+    ]);
+
+    $response->assertOk()
+        ->assertJson([
+            'data' => ['theme' => 'iro'],
+        ]);
+
+    $this->assertDatabaseHas('users', [
+        'id' => $user->id,
+        'theme' => 'iro',
+    ]);
+});
+
 it('rejects invalid palette', function () {
     $user = User::factory()->create();
 

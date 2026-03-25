@@ -25,7 +25,7 @@ import {
 /* Types                                              */
 /* -------------------------------------------------- */
 
-export type Theme = 'void' | 'light';
+export type Theme = 'void' | 'light' | 'iro';
 
 export interface ThemeContextValue {
   theme: Theme;
@@ -39,7 +39,7 @@ export interface ThemeContextValue {
 
 const STORAGE_KEY = 'atsume-theme:v1';
 const DEFAULT_THEME: Theme = 'void';
-export const THEMES: readonly Theme[] = ['void', 'light'] as const;
+export const THEMES: readonly Theme[] = ['void', 'light', 'iro'] as const;
 
 /* -------------------------------------------------- */
 /* External store (singleton module-level)            */

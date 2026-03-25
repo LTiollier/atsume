@@ -179,6 +179,10 @@
     --color-loaned:   oklch(72% 0.20 55);   /* Ambre — différencié du crimson */
     --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
     --color-owned:    oklch(62% 0.18 215);  /* Bleu-cyan */
+
+    /* Complémentaire — teal froid (18° + 180°) */
+    --complementary:             oklch(62% 0.18 198);
+    --complementary-foreground:  oklch(10% 0.015 198);
   }
 
   /* ============================================
@@ -203,6 +207,10 @@
     --color-loaned:   oklch(68% 0.22 45);   /* = primary orange */
     --color-wishlist: oklch(65% 0.22 300);
     --color-owned:    oklch(62% 0.18 215);
+
+    /* Complémentaire — bleu cobalt (45° + 180°) */
+    --complementary:             oklch(62% 0.18 225);
+    --complementary-foreground:  oklch(10% 0.015 225);
   }
 
 
@@ -228,6 +236,10 @@
     --color-loaned:   oklch(82% 0.20 90);   /* = primary yellow */
     --color-wishlist: oklch(65% 0.26 290);
     --color-owned:    oklch(68% 0.20 220);
+
+    /* Complémentaire — violet électrique (90° + 180°) */
+    --complementary:             oklch(65% 0.20 270);
+    --complementary-foreground:  oklch(10% 0.015 270);
   }
 
   /* ============================================
@@ -252,6 +264,10 @@
     --color-loaned:   oklch(72% 0.20 55);
     --color-wishlist: oklch(65% 0.22 295);
     --color-owned:    oklch(65% 0.20 215);
+
+    /* Complémentaire — magenta baie (135° + 180°) */
+    --complementary:             oklch(62% 0.22 315);
+    --complementary-foreground:  oklch(10% 0.015 315);
   }
 
   /* ============================================
@@ -276,6 +292,10 @@
     --color-loaned:   oklch(65% 0 0);
     --color-wishlist: oklch(85% 0 0);
     --color-owned:    oklch(91% 0.005 250); /* = primary */
+
+    /* Complémentaire — or ambré (250° + 180° → 70°) */
+    --complementary:             oklch(70% 0.16 70);
+    --complementary-foreground:  oklch(10% 0.015 70);
   }
 
   /* ============================================
@@ -301,6 +321,10 @@
     --color-loaned:   oklch(72% 0.20 55);   /* Ambre */
     --color-wishlist: oklch(65% 0.26 345);  /* = primary rose */
     --color-owned:    oklch(68% 0.20 220);  /* Teal */
+
+    /* Complémentaire — vert menthe (345° + 180° → 165°) */
+    --complementary:             oklch(65% 0.18 165);
+    --complementary-foreground:  oklch(10% 0.015 165);
   }
 
   /* ============================================
@@ -326,6 +350,61 @@
     --color-loaned:   oklch(72% 0.20 55);   /* Ambre */
     --color-wishlist: oklch(65% 0.22 300);  /* Rose-violet */
     --color-owned:    oklch(70% 0.22 200);  /* = primary cyan */
+
+    /* Complémentaire — rouge corail (200° + 180° → 20°) */
+    --complementary:             oklch(62% 0.20 20);
+    --complementary-foreground:  oklch(10% 0.015 20);
+  }
+
+  /* ============================================
+     THÈME IRO (色) — Indigo profond, surface unique
+     Fond : oklch(28% 0.065 265) — indigo/violet sombre
+     Indépendant de la palette — chaque couleur primaire
+     ressort comme accent lumineux sur ce fond.
+     Inspiration : Music Streaming / Theater / Spotify.
+     ============================================ */
+  .theme-iro {
+    /* ============================================
+       Surface : indigo profond hue 265°
+       Indépendant de la palette — la couleur primaire
+       ressort sur ce fond comme accent lumineux.
+       Inspiration : Music Streaming / Theater / Spotify.
+       Contraste foreground/fond : ~14:1 AAA ✅
+       Contraste muted-foreground/fond : ~4.8:1 AA ✅
+       ============================================ */
+
+    --background:              oklch(28%  0.065 265);
+    --foreground:              oklch(93%  0.006 60);
+
+    --card:                    oklch(33%  0.058 265);
+    --card-foreground:         oklch(93%  0.006 60);
+
+    --popover:                 oklch(35%  0.055 268);
+    --popover-foreground:      oklch(93%  0.006 60);
+
+    --secondary:               oklch(38%  0.050 270);
+    --secondary-foreground:    oklch(90%  0.006 60);
+
+    /* Muted — contraste ~4.8:1 AA ✅ */
+    --muted:                   oklch(31%  0.060 265);
+    --muted-foreground:        oklch(78%  0.010 265);
+
+    --border:                  oklch(40%  0.052 268);
+    --input:                   oklch(37%  0.055 268);
+
+    /* Sidebar — légèrement plus sombre et plus saturé */
+    --sidebar-background:      oklch(23%  0.070 260);
+    --sidebar-foreground:      oklch(88%  0.006 60);
+    --sidebar-accent:          oklch(30%  0.062 265);
+    --sidebar-accent-foreground: oklch(88% 0.006 60);
+    --sidebar-border:          oklch(35%  0.056 268);
+
+    /* Ombres portées sur fond indigo */
+    --shadow-xs:    0 1px 2px  oklch(0% 0 0 / 0.45);
+    --shadow-sm:    0 2px 8px  oklch(0% 0 0 / 0.45);
+    --shadow-md:    0 4px 20px oklch(0% 0 0 / 0.55);
+    --shadow-lg:    0 16px 60px oklch(0% 0 0 / 0.70);
+    --shadow-sheet: 0 -8px 40px oklch(0% 0 0 / 0.55);
   }
 
   /* ============================================

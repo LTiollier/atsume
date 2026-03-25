@@ -1,6 +1,6 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Palette, Sun } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { useTheme, type Theme } from '@/contexts/ThemeContext';
@@ -28,6 +28,13 @@ const BUTTONS: ReadonlyArray<{
     icon: Sun,
     bg: 'oklch(97% 0.004 80)',    /* blanc chaud — représente le fond Light */
     fg: 'oklch(12% 0.012 250)',
+  },
+  {
+    key: 'iro',
+    label: 'Iro',
+    icon: Palette,
+    bg: 'oklch(22% 0.050 250)',   /* anthracite coloré — représente le fond Iro */
+    fg: 'oklch(93% 0.006 60)',
   },
 ];
 

@@ -26,7 +26,7 @@ class UpdateUserSettingsRequest extends FormRequest
         return [
             'username' => ['nullable', 'string', 'max:50', 'alpha_dash', 'unique:users,username,'.$user->id],
             'is_public' => ['required', 'boolean'],
-            'theme' => ['required', 'string', 'in:void,light'],
+            'theme' => ['required', 'string', 'in:void,light,iro'],
             'palette' => ['required', 'string', 'in:oni,kitsune,kaminari,matcha,sakura,katana,mangaka'],
         ];
     }
