@@ -26,6 +26,6 @@ class MangaCollecImportController
 
         $action->execute($dto);
 
-        return response()->json(['message' => 'Import started in background.'], 202);
+        return response()->json(['message' => 'Import lancé en arrière-plan.'], 202);
     }
 }

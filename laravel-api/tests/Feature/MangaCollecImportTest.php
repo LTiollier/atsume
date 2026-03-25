@@ -51,7 +51,7 @@ test('successfully dispatches import job', function () {
     ]);
 
     $response->assertStatus(202)
-        ->assertJson(['message' => 'Import started in background.']);
+        ->assertJson(['message' => 'Import lancé en arrière-plan.']);
 
     Queue::assertPushed(MangaCollecImportJob::class, function ($job) use ($user) {
         return $job->dto->username === 'xutech' && $job->dto->userId === $user->id;
