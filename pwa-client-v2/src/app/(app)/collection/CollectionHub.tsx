@@ -52,7 +52,7 @@ export function CollectionHub({ defaultTab }: CollectionHubProps) {
         <div
           role="tablist"
           aria-label="Sections de la collection"
-          className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden"
+          className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden px-2"
           style={{ scrollbarWidth: 'none' }}
         >
           {TABS.map(tab => {
@@ -65,7 +65,7 @@ export function CollectionHub({ defaultTab }: CollectionHubProps) {
                 aria-controls={`tabpanel-${tab.id}`}
                 type="button"
                 onClick={() => switchTab(tab.id)}
-                className="relative flex-1 py-3 text-sm font-medium whitespace-nowrap transition-colors min-w-[80px]"
+                className="relative flex-1 py-3 text-sm font-medium whitespace-nowrap transition-colors min-w-[80px] text-center"
                 style={{
                   color: isActive ? 'var(--primary)' : 'var(--muted-foreground)',
                   fontFamily: 'var(--font-body)',

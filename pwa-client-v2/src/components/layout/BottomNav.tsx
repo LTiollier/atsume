@@ -18,11 +18,11 @@ export function BottomNav() {
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         borderTop: '1px solid color-mix(in oklch, var(--border) 40%, transparent)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       <div
         className="flex items-center justify-around h-16 px-2"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         {NAV_ITEMS.map((item) => {
           const isActive =
