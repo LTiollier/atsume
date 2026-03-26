@@ -512,6 +512,16 @@
     font-family: var(--font-body);
     font-size: 15px;
     line-height: 1.6;
+    /* PWA native feel — prevent pull-to-refresh & bounce overscroll */
+    overscroll-behavior: none;
+    /* Remove iOS tap flash on interactive elements */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Disable text selection on interactive elements (native app feel) */
+  button, a, [role="button"], [role="tab"], [role="switch"] {
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
