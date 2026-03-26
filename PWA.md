@@ -143,15 +143,15 @@
 
 ## 7. Manifest — Champs Complémentaires
 
-- [ ] **Ajouter `screenshots`** pour enrichir la UI d'installation (Android Chrome) :
+- [x] **Ajouter `screenshots`** pour enrichir la UI d'installation (Android Chrome) :
   ```json
   "screenshots": [
     { "src": "/screenshots/mobile-collection.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow" }
   ]
   ```
-- [ ] **Vérifier `start_url`** : utiliser `/?source=pwa` pour tracker les lancements depuis l'app installée dans les analytics
-- [ ] **Vérifier `scope`** : doit être `/` pour couvrir toutes les routes
-- [ ] **Ajouter `id`** dans le manifest (identifiant stable pour éviter les réinstallations en cas de changement de `start_url`) :
+- [x] **Vérifier `start_url`** : utiliser `/?source=pwa` pour tracker les lancements depuis l'app installée dans les analytics
+- [x] **Vérifier `scope`** : doit être `/` pour couvrir toutes les routes
+- [x] **Ajouter `id`** dans le manifest (identifiant stable pour éviter les réinstallations en cas de changement de `start_url`) :
   ```json
   "id": "atsume-pwa"
   ```
