@@ -6,20 +6,44 @@ Une application de gestion de collection de mangas complète ("mobile-first"), p
 
 Ce projet est découpé en deux parties principales :
 
-- **Backend (`/laravel-api`) :** Une API RESTful robuste sous **Laravel 12** structurée selon les principes du **Domain-Driven Design (DDD)** et testée de bout en bout avec **PestPHP**.
-- **Frontend (`/pwa-client`) :** Une application cliente développée en **Next.js** (React) avec **Tailwind CSS** et **shadcn/ui**. PWA-ready pour une utilisation mobile optimale (Scan de codes-barres, mode hors ligne).
+- **Backend (`/laravel-api`) :** API RESTful sous **Laravel 12**, structurée en **Domain-Driven Design (DDD)**, testée avec **PestPHP**, base de données **PostgreSQL** via Supabase, authentification **Laravel Sanctum**.
+- **Frontend (`/pwa-client-v2`) :** Application **Next.js 16** (React 19) + **TypeScript**, **Tailwind CSS v4**, **shadcn/ui**, **Framer Motion**, **Three.js**. PWA-ready (Service Worker, mode hors ligne, scan de codes-barres).
+
+## Stack technique
+
+| Couche | Technologies |
+|---|---|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS v4, shadcn/ui |
+| Animations | Framer Motion, Three.js |
+| Backend | Laravel 12, PHP, DDD |
+| Base de données | PostgreSQL (Supabase) |
+| Auth | Laravel Sanctum |
+| PWA | Service Worker, caching offline, installation native |
+| Qualité | PestPHP, PHPStan (niveau 9), Laravel Pint, ESLint, TypeScript strict |
+| CI/CD | GitHub Actions, Vercel (frontend) |
+
+## Pages frontend
+
+| Route | Description |
+|---|---|
+| `/collection` | Hub principal — collection de l'utilisateur |
+| `/series/[id]` | Détail d'une série et ses volumes |
+| `/scan` | Scanner de codes-barres pour ajouter un volume |
+| `/search` | Recherche de mangas |
+| `/planning` | Planning de lecture |
+| `/settings` | Paramètres utilisateur |
+| `/login`, `/register` | Authentification |
+| `/user/[username]` | Profil public d'un utilisateur |
 
 ## Documentation
 
-- **[Documentation Métier (DOC_METIER.md)](DOC_METIER.md) :** Détaille les règles, les entités et les fonctionnalités clés de l'application.
-- **[Règles d'Architecture (AGENTS.md)](AGENTS.md) :** Décrit la stack technique et les directives de développement strictes.
-- **[Suivi des Tâches (TASKS.md)](TASKS.md) :** Suivi de l'avancement du projet phase par phase.
+- **[Architecture & règles (AGENTS.md)](AGENTS.md)** — Stack technique, DDD, directives strictes de développement
+- **[API (API.md)](API.md)** — Documentation des endpoints REST
+- **[Animations (ANIMATIONS.md)](ANIMATIONS.md)** — Propositions d'effets Three.js UX
 
-## Démarrage Rapide
+## Démarrage rapide
 
-L'environnement de développement complet est géré via **Docker Compose**. 
-
-### 1. Cloner le dépôt et lancer les conteneurs
+L'environnement complet tourne via **Docker Compose**.
 
 ```bash
 git clone git@github.com:LTiollier/atsume.git
@@ -27,19 +51,17 @@ cd atsume
 docker compose up -d
 ```
 
-### 2. Accéder à l'application
+- API Backend : `http://localhost:8000/api`
+- Frontend : `http://localhost:3000`
 
-- L'API Backend (Laravel) est accessible sur : `http://localhost:8000/api`
-- Le Client Frontend (Next.js) est accessible sur : `http://localhost:3000`
+## Tests & qualité
 
-## Tests Intégrés
+```bash
+# Backend (Pest)
+docker compose exec backend ./vendor/bin/pest
 
-- **Backend :** Exécuter les tests via Pest.
-  ```bash
-  docker compose exec backend ./vendor/bin/pest
-  ```
-- **Frontend :** Les tests et le typage sont gérés via ESLint et TypeScript.
-  ```bash
-  npm run lint
-  npm run typecheck
-  ```
+# Frontend (TypeScript + ESLint)
+cd pwa-client-v2
+npm run typecheck
+npm run lint
+```
