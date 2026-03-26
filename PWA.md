@@ -93,9 +93,9 @@
 
 - [x] Toast "Vous êtes hors ligne" (persistant, icône WifiOff) — **existant**
 - [x] Toast "Vous êtes de nouveau en ligne" — **existant**
-- [ ] **Vérifier le comportement du toast offline** : s'assurer qu'il ne disparaît pas tant que la connexion n'est pas rétablie (`duration: Infinity` ou toast contrôlé par `id`)
-- [ ] **Vérifier que le toast online** dismiss bien le toast offline (dismiss par `id` avec Sonner)
-- [ ] **Tester les edge cases** : connexion instable (offline/online en boucle rapide) → pas de spam de toasts
+- [x] **Vérifier le comportement du toast offline** : s'assurer qu'il ne disparaît pas tant que la connexion n'est pas rétablie (`duration: Infinity` ou toast contrôlé par `id`)
+- [x] **Vérifier que le toast online** dismiss bien le toast offline (dismiss par `id` avec Sonner)
+- [x] **Tester les edge cases** : connexion instable (offline/online en boucle rapide) → pas de spam de toasts
 
 ---
 
