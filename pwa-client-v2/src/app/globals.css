@@ -701,6 +701,13 @@
    Les animations Framer Motion sont dans lib/motion.ts.
    Seuls les fallbacks CSS sont ici.
    ============================================ */
+/* Toast positioning — above BottomNav on mobile, normal on desktop */
+@media (max-width: 1023px) {
+  [data-sonner-toaster][data-y-position="bottom"] {
+    --offset: calc(64px + env(safe-area-inset-bottom, 0px) + 8px) !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

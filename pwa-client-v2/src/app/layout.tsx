@@ -97,7 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <AuthProvider>
               <OfflineProvider>
                 {children}
-                <Toaster position="top-center" richColors />
+                <Toaster position="bottom-center" richColors />
               </OfflineProvider>
             </AuthProvider>
           </PaletteProvider>

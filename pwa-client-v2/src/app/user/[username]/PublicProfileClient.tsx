@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 import { BookOpen, Library, UserX, ChevronRight } from 'lucide-react';
 
 import { usePublicProfileQuery, usePublicCollectionQuery } from '@/hooks/queries';
-import { StatGrid } from '@/components/dashboard/StatGrid';
-import { StatCard } from '@/components/dashboard/StatCard';
+import { StatGrid } from '@/components/profile/StatGrid';
+import { StatCard } from '@/components/profile/StatCard';
 import { sectionVariants } from '@/lib/motion';
 
 // ─── Hoisted static JSX (rendering-hoist-jsx) ─────────────────────────────────
