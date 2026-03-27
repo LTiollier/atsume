@@ -21,7 +21,8 @@ final class EloquentSeriesRepository implements SeriesRepositoryInterface
             $query->with([
                 'editions' => function ($q) use ($userId) {
                     $q->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
-                        $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
+                        $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))
+                            ->where(fn ($q) => $q->whereNull('published_date')->orWhere('published_date', '<=', now()->toDateString()));
                     }]);
                     $q->withExists(['wishlistedBy as is_wishlisted' => function ($u) use ($userId) {
                         $u->where('users.id', $userId);
@@ -88,7 +89,7 @@ final class EloquentSeriesRepository implements SeriesRepositoryInterface
         if ($userId !== null) {
             $baseQuery->with([
                 'editions' => function ($q) use ($userId) {
-                    $q->withCount(['volumes as possessed_volumes_count' => fn ($v) => $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))]);
+                    $q->withCount(['volumes as possessed_volumes_count' => fn ($v) => $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))->where(fn ($q) => $q->whereNull('published_date')->orWhere('published_date', '<=', now()->toDateString()))]);
                     $q->withExists(['wishlistedBy as is_wishlisted' => fn ($u) => $u->where('users.id', $userId)]);
                     $q->with('firstVolume');
                 },

@@ -19,7 +19,8 @@ final class EloquentEditionRepository implements EditionRepositoryInterface
 
         if ($userId) {
             $query->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
-                $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
+                $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))
+                    ->where(fn ($q) => $q->whereNull('published_date')->orWhere('published_date', '<=', now()->toDateString()));
             }]);
             $query->with(['volumes' => function ($q) use ($userId) {
                 $q->withExists(['users as is_owned' => function ($u) use ($userId) {
@@ -58,7 +59,8 @@ final class EloquentEditionRepository implements EditionRepositoryInterface
 
         if ($userId) {
             $query->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
-                $v->whereHas('users', fn ($u) => $u->where('users.id', $userId));
+                $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))
+                    ->where(fn ($q) => $q->whereNull('published_date')->orWhere('published_date', '<=', now()->toDateString()));
             }]);
             $query->withExists(['wishlistedBy as is_wishlisted' => function ($u) use ($userId) {
                 $u->where('users.id', $userId);
