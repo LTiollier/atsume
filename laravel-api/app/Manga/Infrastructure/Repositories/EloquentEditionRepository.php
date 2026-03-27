@@ -16,6 +16,7 @@ final class EloquentEditionRepository implements EditionRepositoryInterface
     {
         $query = EloquentEdition::query();
         $query->with('series');
+        $query->withReleasedVolumesCount();
 
         if ($userId) {
             $query->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
@@ -45,7 +46,10 @@ final class EloquentEditionRepository implements EditionRepositoryInterface
 
     public function findByNameAndSeries(string $name, int $seriesId): ?Edition
     {
-        $eloquent = EloquentEdition::where('name', $name)->where('series_id', $seriesId)->first();
+        $eloquent = EloquentEdition::where('name', $name)
+            ->where('series_id', $seriesId)
+            ->withReleasedVolumesCount()
+            ->first();
 
         return $eloquent ? $this->toDomain($eloquent) : null;
     }
@@ -55,7 +59,9 @@ final class EloquentEditionRepository implements EditionRepositoryInterface
      */
     public function findBySeriesId(int $seriesId, ?int $userId = null): array
     {
-        $query = EloquentEdition::where('series_id', $seriesId)->with('firstVolume');
+        $query = EloquentEdition::where('series_id', $seriesId)
+            ->with('firstVolume')
+            ->withReleasedVolumesCount();
 
         if ($userId) {
             $query->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {

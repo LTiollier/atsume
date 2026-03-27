@@ -20,6 +20,7 @@ final class EloquentSeriesRepository implements SeriesRepositoryInterface
         if ($userId) {
             $query->with([
                 'editions' => function ($q) use ($userId) {
+                    $q->withReleasedVolumesCount();
                     $q->withCount(['volumes as possessed_volumes_count' => function ($v) use ($userId) {
                         $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))
                             ->where(fn ($q) => $q->whereNull('published_date')->orWhere('published_date', '<=', now()->toDateString()));
@@ -52,7 +53,10 @@ final class EloquentSeriesRepository implements SeriesRepositoryInterface
                 },
             ]);
         } else {
-            $query->with(['editions', 'boxSets.boxes']);
+            $query->with([
+                'editions' => fn ($q) => $q->withReleasedVolumesCount(),
+                'boxSets.boxes',
+            ]);
         }
 
         $eloquent = $query->find($id);
@@ -89,6 +93,7 @@ final class EloquentSeriesRepository implements SeriesRepositoryInterface
         if ($userId !== null) {
             $baseQuery->with([
                 'editions' => function ($q) use ($userId) {
+                    $q->withReleasedVolumesCount();
                     $q->withCount(['volumes as possessed_volumes_count' => fn ($v) => $v->whereHas('users', fn ($u) => $u->where('users.id', $userId))->where(fn ($q) => $q->whereNull('published_date')->orWhere('published_date', '<=', now()->toDateString()))]);
                     $q->withExists(['wishlistedBy as is_wishlisted' => fn ($u) => $u->where('users.id', $userId)]);
                     $q->with('firstVolume');
@@ -101,7 +106,7 @@ final class EloquentSeriesRepository implements SeriesRepositoryInterface
             ]);
         } else {
             $baseQuery->with([
-                'editions' => fn ($q) => $q->with('firstVolume'),
+                'editions' => fn ($q) => $q->withReleasedVolumesCount()->with('firstVolume'),
                 'boxSets' => fn ($q) => $q->with('firstBox'),
             ]);
         }

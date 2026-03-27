@@ -49,9 +49,17 @@ class EditionMapper
             language: $eloquent->language,
             total_volumes: $eloquent->total_volumes,
             last_volume_number: isset($eloquent->last_volume_number) ? (int) $eloquent->last_volume_number : null,
-            released_volumes: isset($eloquent->released_volumes_count) ? (int) $eloquent->released_volumes_count : null,
+            released_volumes: isset($eloquent->released_volumes_count)
+                ? (int) $eloquent->released_volumes_count
+                : ($eloquent->relationLoaded('volumes')
+                    ? $eloquent->volumes->filter(fn ($v) => $v->published_date === null || $v->published_date <= now()->toDateString())->count()
+                    : null),
             is_finished: (bool) $eloquent->is_finished,
-            possessed_count: isset($eloquent->possessed_volumes_count) ? (int) $eloquent->possessed_volumes_count : null,
+            possessed_count: isset($eloquent->possessed_volumes_count)
+                ? (int) $eloquent->possessed_volumes_count
+                : ($eloquent->relationLoaded('volumes')
+                    ? $eloquent->volumes->filter(fn ($v) => (bool) ($v->is_owned ?? false))->count()
+                    : null),
             possessed_numbers: $possessed_numbers,
             volumes: $volumes,
             cover_url: $eloquent->relationLoaded('firstVolume') && $eloquent->firstVolume ? $eloquent->firstVolume->cover_url : null,

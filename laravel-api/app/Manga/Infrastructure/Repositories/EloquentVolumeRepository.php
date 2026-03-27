@@ -60,7 +60,7 @@ final class EloquentVolumeRepository implements VolumeRepositoryInterface
     public function findByEditionId(int $editionId, ?int $userId = null): array
     {
         $eloquentVolumes = EloquentVolume::where('edition_id', $editionId)
-            ->with(['edition.series'])
+            ->with(['edition' => fn ($q) => $q->withReleasedVolumesCount()->with('series')])
             ->when($userId, function ($query) use ($userId) {
                 $query->with(['users' => function ($q) use ($userId) {
                     $q->where('users.id', $userId);
@@ -89,7 +89,7 @@ final class EloquentVolumeRepository implements VolumeRepositoryInterface
     public function findByIsbnWithRelations(string $isbn): ?Volume
     {
         $eloquent = EloquentVolume::where('isbn', $isbn)
-            ->with(['edition.series'])
+            ->with(['edition' => fn ($q) => $q->withReleasedVolumesCount()->with('series')])
             ->first();
 
         return $eloquent ? $this->toDomain($eloquent) : null;

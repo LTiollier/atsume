@@ -6,6 +6,7 @@ namespace App\Manga\Infrastructure\EloquentModels;
 
 use App\User\Infrastructure\EloquentModels\User;
 use Database\Factories\EditionFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,5 +59,16 @@ class Edition extends Model
     public function wishlistedBy(): MorphToMany
     {
         return $this->morphToMany(User::class, 'wishlistable', 'wishlist_items')->withTimestamps();
+    }
+
+    /**
+     * @param  Builder<Edition>  $query
+     * @return Builder<Edition>
+     */
+    public function scopeWithReleasedVolumesCount(Builder $query): Builder
+    {
+        return $query->withCount(['volumes as released_volumes_count' => function ($q): void {
+            $q->whereNull('published_date')->orWhere('published_date', '<=', now()->toDateString());
+        }]);
     }
 }

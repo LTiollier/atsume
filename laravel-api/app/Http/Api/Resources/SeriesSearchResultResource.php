@@ -32,6 +32,7 @@ final class SeriesSearchResultResource extends JsonResource
                 'name' => $e->getName(),
                 'publisher' => $e->getPublisher(),
                 'total_volumes' => $e->getTotalVolumes(),
+                'released_volumes' => $e->getReleasedVolumes(),
                 'possessed_count' => $e->getPossessedCount(),
                 'cover_url' => $e->getCoverUrl(),
                 'is_wishlisted' => $e->isWishlisted(),
