@@ -103,6 +103,8 @@ const loadMoreSkeletons = (
 
 export function PlanningClient() {
     const sentinelRef = useRef<HTMLDivElement>(null);
+    const currentMonthRef = useRef<HTMLElement>(null);
+    const hasScrolled = useRef(false);
 
     const {
         data,
@@ -117,6 +119,13 @@ export function PlanningClient() {
     // Flatten all pages (js-combine-iterations)
     const allItems = useMemo(() => data?.pages.flatMap(p => p.data) ?? [], [data]);
     const groups = useMemo(() => groupByMonth(allItems), [allItems]);
+
+    // Scroll to current month once after initial load (rerender-use-ref-transient-values)
+    useEffect(() => {
+        if (hasScrolled.current || !currentMonthRef.current) return;
+        hasScrolled.current = true;
+        currentMonthRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }, [groups]);
 
     // IntersectionObserver for infinite scroll
     useEffect(() => {
@@ -188,7 +197,11 @@ export function PlanningClient() {
                 ) : (
                     <>
                         {groups.map(group => (
-                            <section key={group.key}>
+                            <section
+                                key={group.key}
+                                ref={group.isCurrentMonth ? currentMonthRef : undefined}
+                                style={group.isCurrentMonth ? { scrollMarginTop: '56px' } : undefined}
+                            >
                                 <MonthDivider label={group.label} isCurrentMonth={group.isCurrentMonth} />
                                 <div className="grid grid-cols-3 gap-3 lg:grid-cols-5 lg:gap-4">
                                     {group.items.map(item => (
