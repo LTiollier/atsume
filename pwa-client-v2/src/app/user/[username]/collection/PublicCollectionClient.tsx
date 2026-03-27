@@ -7,6 +7,7 @@ import { UserX } from 'lucide-react';
 
 import { usePublicProfileQuery, usePublicCollectionQuery } from '@/hooks/queries';
 import { useGroupedCollection } from '@/hooks/useGroupedCollection';
+import { countReleasedOwned, sumReleasedTotal } from '@/lib/collection';
 import { SeriesCard } from '@/components/cards/SeriesCard';
 import { SearchBar } from '@/components/forms/SearchBar';
 import { SkeletonCard } from '@/components/feedback/SkeletonCard';
@@ -159,16 +160,13 @@ export function PublicCollectionClient({ username }: PublicCollectionClientProps
             const coverUrl =
               volumes.find(v => v.cover_url)?.cover_url ?? series.cover_url;
 
-            // Total volumes: first tome with a known edition total
-            const totalVolumes =
-              volumes.find(v => v.edition?.total_volumes != null)
-                ?.edition?.total_volumes ?? null;
+            const totalVolumes = sumReleasedTotal(volumes);
 
             return (
               <SeriesCard
                 key={series.id}
                 series={series}
-                possessedCount={volumes.length}
+                possessedCount={countReleasedOwned(volumes)}
                 totalVolumes={totalVolumes}
                 href={`/series/${series.id}`}
                 coverUrl={coverUrl}

@@ -8,6 +8,7 @@ import { ChevronLeft, Heart, Package } from 'lucide-react';
 
 import { useSeriesQuery, useToggleWishlist } from '@/hooks/queries';
 import { useOffline } from '@/contexts/OfflineContext';
+import { editionReleasedTotal } from '@/lib/collection';
 import { SeriesCard } from '@/components/cards/SeriesCard';
 import { BoxCard } from '@/components/cards/BoxCard';
 import { VolumeGrid } from '@/components/cards/VolumeGrid';
@@ -101,7 +102,7 @@ function EditionCard({ edition, seriesId, onToggleWishlist, isPending }: Edition
           cover_url: edition.cover_url ?? null,
         }}
         possessedCount={edition.possessed_count ?? 0}
-        totalVolumes={edition.total_volumes}
+        totalVolumes={editionReleasedTotal(edition)}
         href={`/series/${seriesId}/edition/${edition.id}`}
         coverUrl={edition.cover_url}
       />

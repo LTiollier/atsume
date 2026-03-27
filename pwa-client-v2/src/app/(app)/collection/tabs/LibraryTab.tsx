@@ -4,6 +4,7 @@ import { useMemo, useState, useDeferredValue } from 'react';
 
 import { useVolumes, useReadingProgressQuery, useLoansQuery } from '@/hooks/queries';
 import { useGroupedCollection } from '@/hooks/useGroupedCollection';
+import { countReleasedOwned, sumReleasedTotal } from '@/lib/collection';
 import { SeriesCard } from '@/components/cards/SeriesCard';
 import { SearchBar } from '@/components/forms/SearchBar';
 import { SkeletonCard } from '@/components/feedback/SkeletonCard';
@@ -82,11 +83,7 @@ export function LibraryTab() {
               const coverUrl =
                 volumes.find(v => v.cover_url)?.cover_url ?? series.cover_url;
 
-              // Total volumes: first tome with a known edition total
-              // null = unknown total → SeriesCard hides the progress bar
-              const totalVolumes =
-                volumes.find(v => v.edition?.total_volumes != null)
-                  ?.edition?.total_volumes ?? null;
+              const totalVolumes = sumReleasedTotal(volumes);
 
               const readCount = volumes.filter(v => readVolumeIds.has(v.id)).length;
               const loanedCount = volumes.filter(v => loanedVolumeIds.has(v.id)).length;
@@ -95,7 +92,7 @@ export function LibraryTab() {
                 <SeriesCard
                   key={series.id}
                   series={series}
-                  possessedCount={volumes.length}
+                  possessedCount={countReleasedOwned(volumes)}
                   totalVolumes={totalVolumes}
                   href={href}
                   coverUrl={coverUrl}

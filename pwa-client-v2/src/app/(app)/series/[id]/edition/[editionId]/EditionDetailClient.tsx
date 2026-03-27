@@ -18,6 +18,7 @@ import {
   queryKeys,
 } from '@/hooks/queries';
 import { getApiErrorMessage } from '@/lib/error';
+import { countReleasedOwned, editionReleasedTotal } from '@/lib/collection';
 import { useMultiselect } from '@/hooks/useMultiselect';
 import { useLoanSheet } from '@/hooks/useLoanSheet';
 import { BackNav } from '@/components/collection/BackNav';
@@ -97,9 +98,9 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
   const { isLoanOpen, loanItems, openLoanSheet, closeLoanSheet } = useLoanSheet();
   const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
 
-  // Progress for header
-  const possessedCount = edition?.possessed_count ?? ownedSet.size;
-  const totalVolumes = edition?.total_volumes ?? null;
+  // Progress for header — exclude future volumes from both numerator and denominator
+  const possessedCount = countReleasedOwned(volumes);
+  const totalVolumes = edition ? editionReleasedTotal(edition) : null;
   const progressValue = totalVolumes && totalVolumes > 0
     ? Math.round((possessedCount / totalVolumes) * 100)
     : null;
