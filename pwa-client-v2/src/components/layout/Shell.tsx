@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 
 import { BottomNav } from './BottomNav';
 import { SidebarNav } from './SidebarNav';
@@ -20,8 +20,10 @@ interface ShellProps {
 export function Shell({ children }: ShellProps) {
   return (
     <div className="flex min-h-dvh">
-      {/* Sidebar desktop (lg+) — hidden on mobile via SidebarNav */}
-      <SidebarNav />
+      {/* Sidebar desktop (lg+) — Suspense required: usePathname() in dynamic routes */}
+      <Suspense fallback={null}>
+        <SidebarNav />
+      </Suspense>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
@@ -37,8 +39,10 @@ export function Shell({ children }: ShellProps) {
         </main>
       </div>
 
-      {/* Bottom nav mobile (lg:hidden inside BottomNav) */}
-      <BottomNav />
+      {/* Bottom nav mobile — Suspense required: usePathname() in dynamic routes */}
+      <Suspense fallback={null}>
+        <BottomNav />
+      </Suspense>
     </div>
   );
 }
