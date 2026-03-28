@@ -9,6 +9,28 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
+
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
+    const res = await fetch(`${apiUrl}/users/${username}`, {
+      next: { revalidate: 3600 },
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const name: string = json.data?.name ?? `@${username}`;
+      return {
+        title: `${name} (@${username}) — Atsume`,
+        description: `Collection publique de ${name} sur Atsume.`,
+        openGraph: {
+          title: `${name} (@${username}) — Atsume`,
+          description: `Collection publique de ${name} sur Atsume.`,
+        },
+      };
+    }
+  } catch {
+    // fallback ci-dessous
+  }
+
   return {
     title: `@${username} — Atsume`,
     description: `Collection publique de @${username} sur Atsume.`,

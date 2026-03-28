@@ -789,7 +789,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 |---|--------|--------|--------|
 | 4 | ~~Implémenter **Server Actions**~~ pour login/settings ✅ | Sécurité, DX | **Corrigé** |
 | 5 | ~~**Suspense boundary** autour de `BottomNav`/`SidebarNav` dans routes dynamiques~~ ✅ | CSR bailout | **Corrigé** |
-| 6 | **`generateMetadata()`** sur `series/[id]` et `user/[username]` | SEO/OG | 2h |
+| 6 | ~~**`generateMetadata()`** sur `series/[id]` et `user/[username]`~~ ✅ | SEO/OG | **Corrigé** |
 | 7 | **`priority` prop** sur les images LCP (premier fold) | LCP score | 30 min |
 
 ### Nice-to-have
