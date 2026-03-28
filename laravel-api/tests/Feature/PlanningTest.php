@@ -40,6 +40,32 @@ test('returns 401 when unauthenticated', function () {
     getJson('/api/planning')->assertUnauthorized();
 });
 
+// ─── Default date range ───────────────────────────────────────────────────────
+
+test('uses default range of -6 months to +2 years when no dates provided', function () {
+    $user = User::factory()->create();
+    $data = seriesOwnedBy($user);
+
+    // Within default range: 1 month from now
+    $inRange = Volume::factory()->create([
+        'edition_id' => $data['edition']->id,
+        'published_date' => now()->addMonth()->format('Y-m-d'),
+    ]);
+
+    // Outside default range: 3 years from now
+    Volume::factory()->create([
+        'edition_id' => $data['edition']->id,
+        'published_date' => now()->addYears(3)->format('Y-m-d'),
+    ]);
+
+    actingAs($user);
+
+    getJson('/api/planning')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $inRange->id);
+});
+
 // ─── Empty states ─────────────────────────────────────────────────────────────
 
 test('returns empty list when user has no owned series', function () {

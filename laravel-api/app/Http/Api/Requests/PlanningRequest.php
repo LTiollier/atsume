@@ -33,8 +33,8 @@ class PlanningRequest extends FormRequest
         /** @var User $user */
         $user = $this->user();
 
-        $defaultFrom = now()->subMonth()->format('Y-m-d');
-        $defaultTo = now()->addYear()->format('Y-m-d');
+        $defaultFrom = now()->subMonths(6)->format('Y-m-d');
+        $defaultTo = now()->addYears(2)->format('Y-m-d');
 
         return new PlanningFiltersDTO(
             userId: (int) $user->id,
