@@ -60,10 +60,14 @@ export function CollectionHub({ defaultTab }: CollectionHubProps) {
 
   return (
     <div className="flex flex-col">
-      {/* Tab bar — sticky below safe-area */}
+      {/* Tab bar — sticky below safe-area/notch */}
       <div
-        className="sticky top-0 z-10"
-        style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)' }}
+        className="sticky z-10"
+        style={{
+          top: 'env(safe-area-inset-top)',
+          background: 'var(--background)',
+          borderBottom: '1px solid var(--border)',
+        }}
       >
         <div
           role="tablist"
