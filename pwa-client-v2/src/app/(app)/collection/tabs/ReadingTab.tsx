@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Package } from 'lucide-react';
 
 import { useVolumes, useReadingProgressQuery, useBulkToggleReadingProgress } from '@/hooks/queries';
@@ -73,7 +74,11 @@ function SeriesProgressRow({ series, volumes, readSet }: SeriesProgressRowProps)
 
   const allRead = readCount === total && total > 0;
   const progress = total > 0 ? Math.round((readCount / total) * 100) : 0;
-  const coverUrl = volumes.find(v => v.cover_url)?.cover_url ?? series.cover_url;
+  const coverVolume = volumes.find(v => v.cover_url);
+  const coverUrl = coverVolume?.cover_url ?? series.cover_url;
+  const editionHref = coverVolume?.edition?.id != null
+    ? `/series/${series.id}/edition/${coverVolume.edition.id}`
+    : null;
 
   function handleToggle() {
     if (isOffline) return;
@@ -90,22 +95,43 @@ function SeriesProgressRow({ series, volumes, readSet }: SeriesProgressRowProps)
       style={{ borderColor: 'var(--border)' }}
     >
       {/* Series cover thumbnail */}
-      <div
-        className="shrink-0 w-12 relative overflow-hidden"
-        style={{
-          aspectRatio: '2/3',
-          background: 'var(--muted)',
-          borderRadius: 'var(--radius)',
-        }}
-      >
-        {coverUrl ? (
-          <Image src={coverUrl} alt={series.title} fill sizes="48px" className="object-cover" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Package size={16} aria-hidden style={{ color: 'var(--muted-foreground)' }} />
-          </div>
-        )}
-      </div>
+      {editionHref ? (
+        <Link
+          href={editionHref}
+          className="shrink-0 w-12 relative overflow-hidden block"
+          style={{
+            aspectRatio: '2/3',
+            background: 'var(--muted)',
+            borderRadius: 'var(--radius)',
+          }}
+          aria-label={`Voir l'édition de ${series.title}`}
+        >
+          {coverUrl ? (
+            <Image src={coverUrl} alt={series.title} fill sizes="48px" className="object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Package size={16} aria-hidden style={{ color: 'var(--muted-foreground)' }} />
+            </div>
+          )}
+        </Link>
+      ) : (
+        <div
+          className="shrink-0 w-12 relative overflow-hidden"
+          style={{
+            aspectRatio: '2/3',
+            background: 'var(--muted)',
+            borderRadius: 'var(--radius)',
+          }}
+        >
+          {coverUrl ? (
+            <Image src={coverUrl} alt={series.title} fill sizes="48px" className="object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Package size={16} aria-hidden style={{ color: 'var(--muted-foreground)' }} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Series info + progress bar */}
       <div className="flex-1 min-w-0">
