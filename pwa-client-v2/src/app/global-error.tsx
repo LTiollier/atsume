@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import FirefliesBackground from '@/components/FirefliesBackground';
+import FirefliesBackground from '@/components/FirefliesBackgroundLazy';
 
 export default function GlobalError({
   error,

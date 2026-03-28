@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { BookOpen, SearchX } from 'lucide-react';
-import FirefliesBackground from '@/components/FirefliesBackground';
+import FirefliesBackground from '@/components/FirefliesBackgroundLazy';
 
 export default function NotFound() {
   return (
