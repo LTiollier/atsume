@@ -780,7 +780,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 | # | Action | Impact | Effort |
 |---|--------|--------|--------|
 | 1 | ~~**Supprimer `import * as THREE`**~~ → **`next/dynamic`** sur `not-found` et `global-error` ✅ | −150 kb bundle | **Corrigé** |
-| 2 | **Ajouter `loading.tsx`** pour les routes principales | UX navigation | 2h |
+| 2 | ~~**Ajouter `loading.tsx`** pour les routes principales~~ ✅ | UX navigation | **Corrigé** |
 | 3 | **Corriger `retry` config** avec backoff exponentiel | Stabilité réseau | 30 min |
 
 ### Important (semaine suivante)
