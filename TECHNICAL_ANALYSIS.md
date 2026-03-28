@@ -796,7 +796,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 
 | # | Action | Impact | Effort |
 |---|--------|--------|--------|
-| 8 | Configurer **bundle analyzer** | Monitoring bundle | 30 min |
+| 8 | ~~Configurer **bundle analyzer**~~ ✅ | Monitoring bundle | **Corrigé** |
 | 9 | Remplacer **Axios par `fetch` natif** | −15 kb, meilleure intégration Next.js | 4h |
 | 10 | Ajouter **monitoring d'erreurs** (Sentry) | Production debugging | 2h |
 | 11 | **`React.memo`** sur `SeriesCard`, `BoxCard` | Performances listes | 1h |
