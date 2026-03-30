@@ -5,7 +5,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
-import { Globe, Shield, Loader2, ExternalLink, AlertTriangle } from 'lucide-react';
+import { Globe, Shield, Loader2, ExternalLink, AlertTriangle, Bell } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -51,6 +51,20 @@ const sectionAppearanceHeader = (
     </h2>
     <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
       Choisissez le thème et l&apos;accent couleur de l&apos;interface. Les changements sont instantanés.
+    </p>
+  </div>
+);
+
+const sectionNotificationsHeader = (
+  <div className="mb-5">
+    <h2
+      className="text-xs font-semibold uppercase mb-1"
+      style={{ color: 'var(--muted-foreground)', letterSpacing: '0.08em' }}
+    >
+      Notifications
+    </h2>
+    <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+      Choisissez comment Atsume vous tient informé.
     </p>
   </div>
 );
@@ -117,6 +131,10 @@ export function SettingsClient() {
   const usernameValue = useWatch({ control, name: 'username' });
   const isPublic = useWatch({ control, name: 'is_public' });
 
+  // Notifications preference — derived from server state (no local copy needed)
+  // Toggle is disabled during isPending, so no optimistic update required
+  const notifyPlanning = user?.notify_planning_releases ?? false;
+
   const canSave = isDirty && !isPending && !(isPublic && !usernameValue.trim());
 
   // Auto-save helpers — silent on success, toast only on error
@@ -128,6 +146,7 @@ export function SettingsClient() {
         is_public: isPublic,
         theme: newTheme,
         palette,
+        notify_planning_releases: notifyPlanning,
       },
       {
         onSuccess: (updatedUser) => updateUser(updatedUser),
@@ -143,6 +162,23 @@ export function SettingsClient() {
         is_public: isPublic,
         theme,
         palette: newPalette,
+        notify_planning_releases: notifyPlanning,
+      },
+      {
+        onSuccess: (updatedUser) => updateUser(updatedUser),
+        onError: (err) => toast.error(getApiErrorMessage(err, 'Erreur lors de la mise à jour')),
+      },
+    );
+  }
+
+  function handleNotifyPlanningChange() {
+    saveSettings(
+      {
+        username: usernameValue.trim() || null,
+        is_public: isPublic,
+        theme,
+        palette,
+        notify_planning_releases: !notifyPlanning,
       },
       {
         onSuccess: (updatedUser) => updateUser(updatedUser),
@@ -153,7 +189,7 @@ export function SettingsClient() {
 
   function onSubmit(data: SettingsFormValues) {
     saveSettings(
-      { username: data.username.trim() || null, is_public: data.is_public, theme, palette },
+      { username: data.username.trim() || null, is_public: data.is_public, theme, palette, notify_planning_releases: notifyPlanning },
       {
         onSuccess: (updatedUser) => {
           updateUser(updatedUser);
@@ -370,6 +406,48 @@ export function SettingsClient() {
             </div>
           </div>
         </form>
+      </motion.section>
+
+      {/* ── Section Notifications ── */}
+      <motion.section
+        variants={sectionVariants}
+        initial="initial"
+        animate="animate"
+        aria-label="Notifications"
+      >
+        {sectionNotificationsHeader}
+
+        <div
+          className="rounded-[calc(var(--radius)*2)] overflow-hidden"
+          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+        >
+          <div className="px-5 py-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <Bell size={16} aria-hidden style={{ color: 'var(--primary)', marginTop: 2 }} />
+                <div className="min-w-0">
+                  <label
+                    htmlFor="notify-planning-toggle"
+                    className="block text-sm font-semibold mb-0.5"
+                    style={{ color: 'var(--foreground)', cursor: 'pointer' }}
+                  >
+                    Sorties planning
+                  </label>
+                  <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                    Recevez un email chaque semaine avec vos sorties manga à venir.
+                  </p>
+                </div>
+              </div>
+
+              <ToggleSwitch
+                id="notify-planning-toggle"
+                checked={notifyPlanning}
+                onToggle={handleNotifyPlanningChange}
+                disabled={isPending}
+              />
+            </div>
+          </div>
+        </div>
       </motion.section>
 
       {/* ── Section Sécurité ── */}

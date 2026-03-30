@@ -7,4 +7,5 @@ export interface User {
     is_public: boolean;
     theme: string;
     palette: string;
+    notify_planning_releases: boolean;
 }

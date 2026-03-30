@@ -50,6 +50,7 @@ const profileSchema = z.object({
   is_public: z.boolean(),
   theme: z.string(),
   palette: z.string(),
+  notify_planning_releases: z.boolean(),
 })
 
 export async function updateProfileAction(data: {
@@ -57,6 +58,7 @@ export async function updateProfileAction(data: {
   is_public: boolean
   theme: string
   palette: string
+  notify_planning_releases: boolean
 }): Promise<User> {
   const parsed = profileSchema.safeParse({ ...data, username: data.username ?? '' })
   if (!parsed.success) throw new Error(parsed.error.issues[0].message)

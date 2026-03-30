@@ -10,6 +10,7 @@ export const UserSchema = z.object({
     is_public: z.boolean(),
     theme: z.string(),
     palette: z.string(),
+    notify_planning_releases: z.boolean(),
 });
 
 export const AuthResponseSchema = z.object({
