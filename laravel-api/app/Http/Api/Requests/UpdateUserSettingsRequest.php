@@ -28,6 +28,7 @@ class UpdateUserSettingsRequest extends FormRequest
             'is_public' => ['required', 'boolean'],
             'theme' => ['required', 'string', 'in:void,light,iro'],
             'palette' => ['required', 'string', 'in:oni,kitsune,kaminari,matcha,sakura,katana,mangaka'],
+            'notify_planning_releases' => ['required', 'boolean'],
         ];
     }
 
@@ -43,7 +44,8 @@ class UpdateUserSettingsRequest extends FormRequest
             username: is_string($username) ? $username : null,
             isPublic: $this->boolean('is_public'),
             theme: $this->string('theme')->toString(),
-            palette: $this->string('palette')->toString()
+            palette: $this->string('palette')->toString(),
+            notifyPlanningReleases: $this->boolean('notify_planning_releases'),
         );
     }
 }

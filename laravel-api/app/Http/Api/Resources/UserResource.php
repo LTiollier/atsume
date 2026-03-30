@@ -27,6 +27,7 @@ final class UserResource extends JsonResource
             'email_verified_at' => $this->resource->getEmailVerifiedAt(),
             'theme' => $this->resource->getTheme(),
             'palette' => $this->resource->getPalette(),
+            'notify_planning_releases' => $this->resource->getNotifyPlanningReleases(),
         ];
     }
 }

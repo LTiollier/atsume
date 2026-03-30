@@ -21,6 +21,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             'password' => $user->getPassword(),
             'theme' => $user->getTheme(),
             'palette' => $user->getPalette(),
+            'notify_planning_releases' => $user->getNotifyPlanningReleases(),
         ]);
 
         return new User(
@@ -32,7 +33,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
             palette: $eloquentUser->palette,
-            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String(),
+            notifyPlanningReleases: $eloquentUser->notify_planning_releases,
         );
     }
 
@@ -53,7 +55,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
             palette: $eloquentUser->palette,
-            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String(),
+            notifyPlanningReleases: $eloquentUser->notify_planning_releases,
         );
     }
 
@@ -74,7 +77,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
             palette: $eloquentUser->palette,
-            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String(),
+            notifyPlanningReleases: $eloquentUser->notify_planning_releases,
         );
     }
 
@@ -95,7 +99,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
             palette: $eloquentUser->palette,
-            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String(),
+            notifyPlanningReleases: $eloquentUser->notify_planning_releases,
         );
     }
 
@@ -111,6 +116,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             'password' => $user->getPassword(),
             'theme' => $user->getTheme(),
             'palette' => $user->getPalette(),
+            'notify_planning_releases' => $user->getNotifyPlanningReleases(),
         ]);
 
         return new User(
@@ -122,7 +128,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
             palette: $eloquentUser->palette,
-            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String(),
+            notifyPlanningReleases: $eloquentUser->notify_planning_releases,
         );
     }
 
@@ -160,7 +167,8 @@ final class EloquentUserRepository implements UserRepositoryInterface
             isPublic: $eloquentUser->is_public,
             theme: $eloquentUser->theme,
             palette: $eloquentUser->palette,
-            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String()
+            emailVerifiedAt: $eloquentUser->email_verified_at?->toIso8601String(),
+            notifyPlanningReleases: $eloquentUser->notify_planning_releases,
         );
     }
 }

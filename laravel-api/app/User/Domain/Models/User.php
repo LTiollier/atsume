@@ -24,6 +24,8 @@ final class User
 
     private string $palette;
 
+    private bool $notifyPlanningReleases;
+
     public function __construct(
         string $name,
         string $email,
@@ -33,7 +35,8 @@ final class User
         bool $isPublic = false,
         string $theme = 'void',
         string $palette = 'ember',
-        ?string $emailVerifiedAt = null
+        ?string $emailVerifiedAt = null,
+        bool $notifyPlanningReleases = false,
     ) {
         $this->name = $name;
         $this->email = $email;
@@ -44,6 +47,7 @@ final class User
         $this->theme = $theme;
         $this->palette = $palette;
         $this->emailVerifiedAt = $emailVerifiedAt;
+        $this->notifyPlanningReleases = $notifyPlanningReleases;
     }
 
     public function getId(): ?int
@@ -94,5 +98,10 @@ final class User
     public function getPalette(): string
     {
         return $this->palette;
+    }
+
+    public function getNotifyPlanningReleases(): bool
+    {
+        return $this->notifyPlanningReleases;
     }
 }

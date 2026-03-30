@@ -27,6 +27,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $password
  * @property string $theme
  * @property string $palette
+ * @property bool $notify_planning_releases
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -50,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'theme',
         'palette',
+        'notify_planning_releases',
     ];
 
     /**
@@ -72,6 +74,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'is_public' => 'boolean',
+            'notify_planning_releases' => 'boolean',
             'password' => 'hashed',
         ];
     }

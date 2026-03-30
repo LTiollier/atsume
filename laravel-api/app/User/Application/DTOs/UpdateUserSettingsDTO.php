@@ -12,5 +12,6 @@ final readonly class UpdateUserSettingsDTO
         public bool $isPublic,
         public string $theme,
         public string $palette,
+        public bool $notifyPlanningReleases,
     ) {}
 }
