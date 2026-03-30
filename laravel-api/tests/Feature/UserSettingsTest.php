@@ -15,6 +15,7 @@ it('updates user settings successfully', function () {
         'is_public' => true,
         'theme' => 'void',
         'palette' => 'oni',
+        'notify_planning_releases' => false,
     ]);
 
     $response->assertOk()
@@ -24,6 +25,7 @@ it('updates user settings successfully', function () {
                 'is_public' => true,
                 'theme' => 'void',
                 'palette' => 'oni',
+                'notify_planning_releases' => false,
             ],
         ]);
 
@@ -50,6 +52,7 @@ it('prevents duplicate usernames', function () {
         'is_public' => true,
         'theme' => 'void',
         'palette' => 'oni',
+        'notify_planning_releases' => false,
     ]);
 
     $response->assertUnprocessable()
@@ -67,6 +70,7 @@ it('allows updating settings without changing username', function () {
         'is_public' => true,
         'theme' => 'void',
         'palette' => 'oni',
+        'notify_planning_releases' => false,
     ]);
 
     $response->assertOk();
@@ -88,6 +92,7 @@ it('persists theme and palette choices', function () {
         'is_public' => false,
         'theme' => 'light',
         'palette' => 'kaminari',
+        'notify_planning_releases' => false,
     ]);
 
     $response->assertOk()
@@ -113,6 +118,7 @@ it('rejects invalid theme', function () {
         'is_public' => false,
         'theme' => 'dark',
         'palette' => 'oni',
+        'notify_planning_releases' => false,
     ]);
 
     $response->assertUnprocessable()
@@ -130,6 +136,7 @@ it('accepts iro as a valid theme', function () {
         'is_public' => false,
         'theme' => 'iro',
         'palette' => 'oni',
+        'notify_planning_releases' => false,
     ]);
 
     $response->assertOk()
@@ -151,6 +158,7 @@ it('rejects invalid palette', function () {
         'is_public' => false,
         'theme' => 'void',
         'palette' => 'pink',
+        'notify_planning_releases' => false,
     ]);
 
     $response->assertUnprocessable()
