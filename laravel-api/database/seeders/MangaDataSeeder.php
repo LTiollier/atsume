@@ -5290,6 +5290,8 @@ class MangaDataSeeder extends Seeder
             150, 131, 100, 153, 67, 6, 169, 156, 160, 38, 46,
             // Last 5 volumes of One Piece
             1, 14, 13, 62, 3,
+            // My Hero Academia #1, #2, #3
+            259, 249, 233,
         ];
 
         $userVolumes = array_map(function ($volumeId) {
@@ -5342,6 +5344,26 @@ class MangaDataSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // --- loans — My Hero Academia to Jean Preinte ---
+        $mhaLoanId = DB::table('loans')->insertGetId([
+            'user_id' => 1,
+            'borrower_name' => 'Jean Preinte',
+            'loaned_at' => now(),
+            'returned_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        foreach ([259, 249, 233] as $volumeId) {
+            DB::table('loan_items')->insert([
+                'loan_id' => $mhaLoanId,
+                'loanable_type' => 'volume',
+                'loanable_id' => $volumeId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         // Reset sequences for PostgreSQL
         if (DB::getDriverName() === 'pgsql') {
