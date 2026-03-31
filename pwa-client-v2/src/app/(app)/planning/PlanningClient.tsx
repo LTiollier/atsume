@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import { CalendarDays, RefreshCw } from 'lucide-react';
 
 import { usePlanningQuery } from '@/hooks/queries';
@@ -104,6 +104,7 @@ const loadMoreSkeletons = (
 export function PlanningClient() {
     const sentinelRef = useRef<HTMLDivElement>(null);
     const hasScrolled = useRef(false);
+    const [isReady, setIsReady] = useState(false);
 
     const {
         data,
@@ -153,8 +154,20 @@ export function PlanningClient() {
         // Use requestAnimationFrame to ensure the DOM layout is stable
         requestAnimationFrame(() => {
             node.scrollIntoView({ behavior: 'instant', block: 'start' });
+            // Small delay to ensure the scroll is done and layout shift finished
+            setTimeout(() => {
+                setIsReady(true);
+            }, 100);
         });
     }, []);
+
+    // Safety fallback: if everything is loaded and we still aren't "ready", show content
+    useEffect(() => {
+        if (!isReady && !isLoading && !isFetchingNextPage && targetMonthKey && hasScrolled.current) {
+            const timer = setTimeout(() => setIsReady(true), 500);
+            return () => clearTimeout(timer);
+        }
+    }, [isReady, isLoading, isFetchingNextPage, targetMonthKey]);
 
     // Automatically fetch next pages until target month is found (eliminating-waterfalls)
     useEffect(() => {
@@ -180,87 +193,104 @@ export function PlanningClient() {
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     return (
-        <div className="flex flex-col min-h-screen" style={{ background: 'var(--background)' }}>
-            {/* Sticky header */}
-            <header
-                className="sticky top-0 z-10 flex items-center px-4 h-14"
-                style={{
-                    background: 'color-mix(in oklch, var(--background) 85%, transparent)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    borderBottom: '1px solid color-mix(in oklch, var(--border) 50%, transparent)',
-                }}
+        <div className="flex flex-col min-h-screen relative">
+            {/* 
+                SKELETON OVERLAY
+                This covers the screen until the auto-scroll is finished.
+            */}
+            {!isReady && (
+                <div className="fixed inset-0 z-50 px-4 pt-4 pb-safe flex flex-col" style={{ background: 'var(--background)' }}>
+                    <header className="h-14 flex items-center mb-4">
+                        <div className="h-7 w-32 rounded skeleton" />
+                    </header>
+                    {initialSkeletons}
+                </div>
+            )}
+
+            <div 
+                className="flex-1 flex flex-col transition-opacity duration-300 ease-in-out" 
+                style={{ opacity: isReady ? 1 : 0, pointerEvents: isReady ? 'auto' : 'none' }}
             >
-                <h1
-                    className="text-xl font-bold"
-                    style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}
+                <header
+                    className="sticky top-0 z-10 flex items-center px-4 h-14"
+                    style={{
+                        background: 'color-mix(in oklch, var(--background) 85%, transparent)',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                        borderBottom: '1px solid color-mix(in oklch, var(--border) 50%, transparent)',
+                    }}
                 >
-                    Planning
-                </h1>
-            </header>
+                    <h1
+                        className="text-xl font-bold"
+                        style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}
+                    >
+                        Planning
+                    </h1>
+                </header>
 
-            {/* Content */}
-            <div className="flex-1 px-4 pt-4 pb-safe">
-                {isLoading ? (
-                    initialSkeletons
-                ) : isError ? (
-                    <div className="flex flex-col items-center gap-4 py-16 text-center">
-                        <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                            Impossible de charger le planning.
-                        </p>
-                        <button
-                            type="button"
-                            onClick={() => refetch()}
-                            className="inline-flex items-center gap-2 h-9 px-4 rounded text-sm font-medium transition-opacity hover:opacity-80"
-                            style={{
-                                background: 'var(--secondary)',
-                                color: 'var(--foreground)',
-                                border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius)',
-                            }}
-                        >
-                            <RefreshCw size={14} aria-hidden />
-                            Réessayer
-                        </button>
-                    </div>
-                ) : allItems.length === 0 ? (
-                    <EmptyState
-                        icon={CalendarDays}
-                        title="Aucune sortie prévue"
-                        description="Ajoutez des mangas à votre collection pour voir leurs prochaines sorties."
-                        action={{ label: 'Rechercher', href: '/search' }}
-                    />
-                ) : (
-                    <>
-                        {groups.map(group => (
-                            <section
-                                key={group.key}
-                                id={`month-${group.key}`}
-                                ref={group.key === targetMonthKey ? setScrollTarget : undefined}
-                                style={group.key === targetMonthKey ? { scrollMarginTop: '56px' } : undefined}
-                            >
-                                <MonthDivider label={group.label} isCurrentMonth={group.isCurrentMonth} />
-                                <div className="grid grid-cols-3 gap-3 lg:grid-cols-5 lg:gap-4">
-                                    {group.items.map(item => (
-                                        <PlanningCard key={`${item.type}-${item.id}`} item={item} />
-                                    ))}
-                                </div>
-                            </section>
-                        ))}
-
-                        {/* Sentinel */}
-                        <div ref={sentinelRef} className="h-4" />
-                        {isFetchingNextPage && loadMoreSkeletons}
-                        {!hasNextPage && allItems.length > 0 && (
-                            <p
-                                className="text-center text-xs py-6"
-                                style={{ color: 'var(--muted-foreground)' }}
-                            >
-                                Fin du planning disponible
+                {/* Content */}
+                <div className="flex-1 px-4 pt-4 pb-safe">
+                    {isLoading && allItems.length === 0 ? (
+                        initialSkeletons
+                    ) : isError && allItems.length === 0 ? (
+                        <div className="flex flex-col items-center gap-4 py-16 text-center">
+                            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+                                Impossible de charger le planning.
                             </p>
-                        )}
-                    </>
-                )}
+                            <button
+                                type="button"
+                                onClick={() => refetch()}
+                                className="inline-flex items-center gap-2 h-9 px-4 rounded text-sm font-medium transition-opacity hover:opacity-80"
+                                style={{
+                                    background: 'var(--secondary)',
+                                    color: 'var(--foreground)',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 'var(--radius)',
+                                }}
+                            >
+                                <RefreshCw size={14} aria-hidden />
+                                Réessayer
+                            </button>
+                        </div>
+                    ) : allItems.length === 0 && !isLoading ? (
+                        <EmptyState
+                            icon={CalendarDays}
+                            title="Aucune sortie prévue"
+                            description="Ajoutez des mangas à votre collection pour voir leurs prochaines sorties."
+                            action={{ label: 'Rechercher', href: '/search' }}
+                        />
+                    ) : (
+                        <>
+                            {groups.map(group => (
+                                <section
+                                    key={group.key}
+                                    id={`month-${group.key}`}
+                                    ref={group.key === targetMonthKey ? setScrollTarget : undefined}
+                                    style={group.key === targetMonthKey ? { scrollMarginTop: '56px' } : undefined}
+                                >
+                                    <MonthDivider label={group.label} isCurrentMonth={group.isCurrentMonth} />
+                                    <div className="grid grid-cols-3 gap-3 lg:grid-cols-5 lg:gap-4">
+                                        {group.items.map(item => (
+                                            <PlanningCard key={`${item.type}-${item.id}`} item={item} />
+                                        ))}
+                                    </div>
+                                </section>
+                            ))}
+
+                            {/* Sentinel */}
+                            <div ref={sentinelRef} className="h-4" />
+                            {isFetchingNextPage && loadMoreSkeletons}
+                            {!hasNextPage && allItems.length > 0 && (
+                                <p
+                                    className="text-center text-xs py-6"
+                                    style={{ color: 'var(--muted-foreground)' }}
+                                >
+                                    Fin du planning disponible
+                                </p>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
