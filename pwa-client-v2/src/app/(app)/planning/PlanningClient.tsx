@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { CalendarDays, RefreshCw } from 'lucide-react';
 
 import { usePlanningQuery } from '@/hooks/queries';
@@ -103,7 +103,6 @@ const loadMoreSkeletons = (
 
 export function PlanningClient() {
     const sentinelRef = useRef<HTMLDivElement>(null);
-    const currentMonthRef = useRef<HTMLElement>(null);
     const hasScrolled = useRef(false);
 
     const {
@@ -141,20 +140,21 @@ export function PlanningClient() {
         return groups[0].key;
     }, [groups]);
 
-    // Scroll to target month once after initial load (rerender-use-ref-transient-values)
-    useEffect(() => {
-        if (hasScrolled.current || !currentMonthRef.current || !targetMonthKey) return;
-        
-        // Use requestAnimationFrame to ensure the DOM is ready and laid out
-        const timer = requestAnimationFrame(() => {
-            if (currentMonthRef.current) {
-                hasScrolled.current = true;
-                currentMonthRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
-            }
-        });
+    /**
+     * Callback ref for the target month (rerender-use-ref-transient-values).
+     * Using a callback ref is more robust than useEffect + ref in production/slow networks.
+     */
+    const setScrollTarget = useCallback((node: HTMLElement | null) => {
+        if (!node || hasScrolled.current) return;
 
-        return () => cancelAnimationFrame(timer);
-    }, [targetMonthKey]);
+        // Mark as scrolled immediately to prevent multiple attempts
+        hasScrolled.current = true;
+
+        // Use requestAnimationFrame to ensure the DOM layout is stable
+        requestAnimationFrame(() => {
+            node.scrollIntoView({ behavior: 'instant', block: 'start' });
+        });
+    }, []);
 
     // IntersectionObserver for infinite scroll
     useEffect(() => {
@@ -228,7 +228,8 @@ export function PlanningClient() {
                         {groups.map(group => (
                             <section
                                 key={group.key}
-                                ref={group.key === targetMonthKey ? currentMonthRef : undefined}
+                                id={`month-${group.key}`}
+                                ref={group.key === targetMonthKey ? setScrollTarget : undefined}
                                 style={group.key === targetMonthKey ? { scrollMarginTop: '56px' } : undefined}
                             >
                                 <MonthDivider label={group.label} isCurrentMonth={group.isCurrentMonth} />
