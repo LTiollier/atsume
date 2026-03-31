@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
+
     /**
      * Run the migrations.
      */
@@ -17,8 +19,8 @@ return new class extends Migration
         Schema::rename('manga_loans', 'loans');
 
         Schema::table('loans', function (Blueprint $table) {
-            $table->string('loanable_type')->after('user_id');
-            $table->unsignedBigInteger('loanable_id')->after('loanable_type');
+            $table->string('loanable_type')->nullable()->after('user_id');
+            $table->unsignedBigInteger('loanable_id')->nullable()->after('loanable_type');
             $table->index(['loanable_type', 'loanable_id']);
         });
 
@@ -29,10 +31,27 @@ return new class extends Migration
         ]);
 
         Schema::table('loans', function (Blueprint $table) {
-            // PostgreSQL doesn't automatically rename constraints when renaming tables in some versions/drivers
-            // or Laravel expects the name based on the current table name.
-            // Since it failed with 'loans_volume_id_foreign', we try the original name.
-            $table->dropForeign('manga_loans_volume_id_foreign');
+            $table->string('loanable_type')->nullable(false)->change();
+            $table->unsignedBigInteger('loanable_id')->nullable(false)->change();
+        });
+
+        // PostgreSQL doesn't automatically rename constraints when renaming tables in some versions/drivers
+        // or Laravel expects the name based on the current table name.
+        try {
+            Schema::table('loans', function (Blueprint $table) {
+                $table->dropForeign('manga_loans_volume_id_foreign');
+            });
+        } catch (\Throwable $e) {
+            try {
+                Schema::table('loans', function (Blueprint $table) {
+                    $table->dropForeign('loans_volume_id_foreign');
+                });
+            } catch (\Throwable $e) {
+                // Fallback to the default name Laravel would generate
+            }
+        }
+
+        Schema::table('loans', function (Blueprint $table) {
             $table->dropColumn('volume_id');
         });
     }

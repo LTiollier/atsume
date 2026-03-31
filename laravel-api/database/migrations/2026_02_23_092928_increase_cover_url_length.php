@@ -27,6 +27,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('UPDATE series SET cover_url = LEFT(cover_url, 255)');
+            DB::statement('UPDATE volumes SET cover_url = LEFT(cover_url, 255)');
+        }
+
         Schema::table('series', function (Blueprint $table) {
             $table->string('cover_url')->nullable()->change();
         });

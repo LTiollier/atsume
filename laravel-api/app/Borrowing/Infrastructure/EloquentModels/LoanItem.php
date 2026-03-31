@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 final class LoanItem extends Model
 {
+    public $incrementing = false;
+
+    protected $primaryKey = null;
+
     protected $fillable = ['loan_id', 'loanable_type', 'loanable_id'];
 
     /**

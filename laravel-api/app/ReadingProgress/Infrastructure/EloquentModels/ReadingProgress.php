@@ -13,6 +13,10 @@ class ReadingProgress extends Model
 {
     protected $table = 'reading_progress';
 
+    public $incrementing = false;
+
+    protected $primaryKey = null;
+
     protected $fillable = [
         'user_id',
         'volume_id',

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
+
     /**
      * Run the migrations.
      */
@@ -31,11 +33,28 @@ return new class extends Migration
         Schema::table('wishlist_items', function (Blueprint $table) {
             $table->string('wishlistable_type')->nullable(false)->change();
             $table->unsignedBigInteger('wishlistable_id')->nullable(false)->change();
+        });
 
-            $table->dropUnique('wishlist_volumes_user_id_volume_id_unique');
-            $table->dropForeign('wishlist_volumes_volume_id_foreign');
+        try {
+            Schema::table('wishlist_items', function (Blueprint $table) {
+                $table->dropUnique('wishlist_volumes_user_id_volume_id_unique');
+            });
+        } catch (\Throwable $e) {}
+
+        try {
+            Schema::table('wishlist_items', function (Blueprint $table) {
+                $table->dropForeign('wishlist_volumes_volume_id_foreign');
+            });
+        } catch (\Throwable $e) {
+            try {
+                Schema::table('wishlist_items', function (Blueprint $table) {
+                    $table->dropForeign('wishlist_items_volume_id_foreign');
+                });
+            } catch (\Throwable $e) {}
+        }
+
+        Schema::table('wishlist_items', function (Blueprint $table) {
             $table->dropColumn('volume_id');
-
             $table->unique(['user_id', 'wishlistable_id', 'wishlistable_type'], 'wishlist_items_user_wishlistable_unique');
         });
     }

@@ -27,12 +27,17 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('series', function (Blueprint $table) {
-            $table->json('authors')->nullable()->change();
-        });
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE series ALTER COLUMN authors TYPE json USING to_json(authors)');
+            DB::statement('ALTER TABLE volumes ALTER COLUMN authors TYPE json USING to_json(authors)');
+        } else {
+            Schema::table('series', function (Blueprint $table) {
+                $table->json('authors')->nullable()->change();
+            });
 
-        Schema::table('volumes', function (Blueprint $table) {
-            $table->json('authors')->nullable()->change();
-        });
+            Schema::table('volumes', function (Blueprint $table) {
+                $table->json('authors')->nullable()->change();
+            });
+        }
     }
 };
