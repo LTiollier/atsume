@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { BookUp, CheckCircle, Package } from 'lucide-react';
+import { BookOpen, BookUp, CheckCircle, Package } from 'lucide-react';
 
 import { formatShortDate, isFutureDate } from '@/lib/utils';
 import type { Volume } from '@/types/volume';
@@ -35,7 +35,7 @@ export function VolumeActionListRow({
   return (
     <button
       type="button"
-      className="relative flex items-center gap-3 w-full py-3 border-b last:border-b-0 text-left transition-colors"
+      className="flex items-center gap-3 w-full py-3 border-b last:border-b-0 text-left transition-colors"
       style={{
         borderColor: 'var(--border)',
         background: isSelected ? 'color-mix(in oklch, var(--primary) 10%, transparent)' : 'transparent',
@@ -44,16 +44,6 @@ export function VolumeActionListRow({
       aria-pressed={isSelected}
       aria-label={`${volume.title}${volume.number ? ` — tome ${volume.number}` : ''}${isLoaned ? ' — prêté' : ''}`}
     >
-      {/* Read indicator strip */}
-      <div
-        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-r"
-        style={{
-          background: isRead && !isSelected ? 'var(--color-read)' : 'transparent',
-          transition: 'background 0.15s',
-        }}
-        aria-hidden
-      />
-
       {/* Thumbnail */}
       <div
         className="shrink-0 w-10 relative overflow-hidden"
@@ -104,29 +94,40 @@ export function VolumeActionListRow({
         ) : null}
       </div>
 
-      {/* Status badges (right side) */}
-      <div className="shrink-0 flex items-center gap-1.5">
-        {isLoaned && !isSelected ? (
-          <span
-            className="flex items-center justify-center w-[22px] h-[22px] rounded"
-            style={{ background: 'var(--color-loaned)' }}
-            aria-label="Prêté"
-          >
-            <BookUp size={12} style={{ color: 'var(--background)' }} aria-hidden />
-          </span>
-        ) : null}
-        {!isOwned ? (
-          <span
-            className="px-1.5 py-0.5 text-[10px] font-semibold rounded"
-            style={{
-              background: 'color-mix(in oklch, var(--muted-foreground) 15%, transparent)',
-              color: 'var(--muted-foreground)',
-            }}
-          >
-            Manquant
-          </span>
-        ) : null}
-      </div>
+      {/* Status badges (right side) — rendering-conditional-render : ternaires, pas && */}
+      {!isSelected ? (
+        <div className="shrink-0 flex items-center gap-1.5">
+          {isRead ? (
+            <span
+              className="flex items-center justify-center w-[22px] h-[22px] rounded"
+              style={{ background: 'var(--color-read)' }}
+              aria-label="Lu"
+            >
+              <BookOpen size={12} style={{ color: 'var(--background)' }} aria-hidden />
+            </span>
+          ) : null}
+          {isLoaned ? (
+            <span
+              className="flex items-center justify-center w-[22px] h-[22px] rounded"
+              style={{ background: 'var(--color-loaned)' }}
+              aria-label="Prêté"
+            >
+              <BookUp size={12} style={{ color: 'var(--background)' }} aria-hidden />
+            </span>
+          ) : null}
+          {!isOwned ? (
+            <span
+              className="px-1.5 py-0.5 text-[10px] font-semibold rounded"
+              style={{
+                background: 'color-mix(in oklch, var(--muted-foreground) 15%, transparent)',
+                color: 'var(--muted-foreground)',
+              }}
+            >
+              Manquant
+            </span>
+          ) : null}
+        </div>
+      ) : null}
     </button>
   );
 }
