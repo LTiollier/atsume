@@ -20,7 +20,7 @@ class UpdateUserSettingsActionTest extends TestCase
 
         $existingUser = new User('Test User', 'test@example.com', 'password', 1);
 
-        $dto = new UpdateUserSettingsDTO(1, 'new_username', true, 'light', 'kaminari', true);
+        $dto = new UpdateUserSettingsDTO(1, 'new_username', true, 'light', 'kaminari', true, 'cover', 'cover');
 
         $userRepository->expects($this->once())
             ->method('findById')
@@ -50,7 +50,7 @@ class UpdateUserSettingsActionTest extends TestCase
         $userRepository = $this->createMock(UserRepositoryInterface::class);
         $action = new UpdateUserSettingsAction($userRepository);
 
-        $dto = new UpdateUserSettingsDTO(999, 'new_username', true, 'void', 'oni', false);
+        $dto = new UpdateUserSettingsDTO(999, 'new_username', true, 'void', 'oni', false, 'cover', 'cover');
 
         $userRepository->expects($this->once())
             ->method('findById')

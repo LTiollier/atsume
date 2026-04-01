@@ -16,6 +16,8 @@ it('updates user settings successfully', function () {
         'theme' => 'void',
         'palette' => 'oni',
         'notify_planning_releases' => false,
+        'view_mode_mobile' => 'cover',
+        'view_mode_desktop' => 'cover',
     ]);
 
     $response->assertOk()
@@ -53,6 +55,8 @@ it('prevents duplicate usernames', function () {
         'theme' => 'void',
         'palette' => 'oni',
         'notify_planning_releases' => false,
+        'view_mode_mobile' => 'cover',
+        'view_mode_desktop' => 'cover',
     ]);
 
     $response->assertUnprocessable()
@@ -71,6 +75,8 @@ it('allows updating settings without changing username', function () {
         'theme' => 'void',
         'palette' => 'oni',
         'notify_planning_releases' => false,
+        'view_mode_mobile' => 'cover',
+        'view_mode_desktop' => 'cover',
     ]);
 
     $response->assertOk();
@@ -93,6 +99,8 @@ it('persists theme and palette choices', function () {
         'theme' => 'light',
         'palette' => 'kaminari',
         'notify_planning_releases' => false,
+        'view_mode_mobile' => 'cover',
+        'view_mode_desktop' => 'cover',
     ]);
 
     $response->assertOk()
@@ -119,6 +127,8 @@ it('rejects invalid theme', function () {
         'theme' => 'dark',
         'palette' => 'oni',
         'notify_planning_releases' => false,
+        'view_mode_mobile' => 'cover',
+        'view_mode_desktop' => 'cover',
     ]);
 
     $response->assertUnprocessable()
@@ -137,6 +147,8 @@ it('accepts iro as a valid theme', function () {
         'theme' => 'iro',
         'palette' => 'oni',
         'notify_planning_releases' => false,
+        'view_mode_mobile' => 'cover',
+        'view_mode_desktop' => 'cover',
     ]);
 
     $response->assertOk()
@@ -159,6 +171,8 @@ it('rejects invalid palette', function () {
         'theme' => 'void',
         'palette' => 'pink',
         'notify_planning_releases' => false,
+        'view_mode_mobile' => 'cover',
+        'view_mode_desktop' => 'cover',
     ]);
 
     $response->assertUnprocessable()
