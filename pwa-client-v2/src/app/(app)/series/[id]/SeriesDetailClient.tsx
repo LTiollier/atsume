@@ -1,9 +1,10 @@
 'use client';
 
+import { useDeferredValue } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, Heart, Package } from 'lucide-react';
 
 import { useSeriesQuery, useToggleWishlist } from '@/hooks/queries';
@@ -11,9 +12,12 @@ import { useOffline } from '@/contexts/OfflineContext';
 import { editionReleasedTotal } from '@/lib/collection';
 import { SeriesCard } from '@/components/cards/SeriesCard';
 import { BoxCard } from '@/components/cards/BoxCard';
+import { EditionListRow } from '@/components/cards/EditionListRow';
+import { BoxSetListRow } from '@/components/cards/BoxSetListRow';
 import { VolumeGrid } from '@/components/cards/VolumeGrid';
 import { EmptyState } from '@/components/feedback/EmptyState';
-import { sectionVariants } from '@/lib/motion';
+import { sectionVariants, viewTransitionVariants } from '@/lib/motion';
+import { useViewMode } from '@/contexts/ViewModeContext';
 import type { Edition, BoxSet } from '@/types/volume';
 
 // ─── Skeletons hoisted at module level (rendering-hoist-jsx) ─────────────────
@@ -150,6 +154,10 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
   const { data: series, isLoading, isError } = useSeriesQuery(seriesId);
   const toggleWishlist = useToggleWishlist();
 
+  // rerender-use-deferred-value : garde l'ancienne vue visible pendant le switch
+  const viewMode         = useViewMode();
+  const deferredViewMode = useDeferredValue(viewMode);
+
   // Derived during render — no useEffect (rerender-derived-state-no-effect)
   const editions: Edition[] = [...(series?.editions ?? [])].sort(
     (a, b) => (b.possessed_count ?? 0) - (a.possessed_count ?? 0),
@@ -263,23 +271,46 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
               >
                 Éditions ({editions.length})
               </h2>
-              <VolumeGrid variant="series">
-                {editions.map((edition, index) => (
-                  <EditionCard
-                    key={edition.id}
-                    edition={edition}
-                    seriesId={seriesId}
-                    onToggleWishlist={() => toggleWishlist.mutate({
-                      id: edition.id,
-                      type: 'edition',
-                      isCurrentlyWishlisted: edition.is_wishlisted ?? false,
-                      seriesId,
-                    })}
-                    isPending={toggleWishlist.isPending}
-                    priority={index < 4}
-                  />
-                ))}
-              </VolumeGrid>
+              <AnimatePresence mode="wait" initial={false}>
+                {deferredViewMode === 'cover' ? (
+                  <motion.div key="cover" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                    <VolumeGrid variant="series">
+                      {editions.map((edition, index) => (
+                        <EditionCard
+                          key={edition.id}
+                          edition={edition}
+                          seriesId={seriesId}
+                          onToggleWishlist={() => toggleWishlist.mutate({
+                            id: edition.id,
+                            type: 'edition',
+                            isCurrentlyWishlisted: edition.is_wishlisted ?? false,
+                            seriesId,
+                          })}
+                          isPending={toggleWishlist.isPending}
+                          priority={index < 4}
+                        />
+                      ))}
+                    </VolumeGrid>
+                  </motion.div>
+                ) : (
+                  <motion.div key="list" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                    {editions.map(edition => (
+                      <EditionListRow
+                        key={edition.id}
+                        edition={edition}
+                        seriesId={seriesId}
+                        onToggleWishlist={() => toggleWishlist.mutate({
+                          id: edition.id,
+                          type: 'edition',
+                          isCurrentlyWishlisted: edition.is_wishlisted ?? false,
+                          seriesId,
+                        })}
+                        wishlistPending={toggleWishlist.isPending}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.section>
           )}
 
@@ -297,15 +328,31 @@ export function SeriesDetailClient({ seriesId }: SeriesDetailClientProps) {
               >
                 Coffrets ({boxSets.length})
               </h2>
-              <VolumeGrid variant="series">
-                {boxSets.map(boxSet => (
-                  <BoxSetCard
-                    key={boxSet.id}
-                    boxSet={boxSet}
-                    seriesId={seriesId}
-                  />
-                ))}
-              </VolumeGrid>
+              <AnimatePresence mode="wait" initial={false}>
+                {deferredViewMode === 'cover' ? (
+                  <motion.div key="cover" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                    <VolumeGrid variant="series">
+                      {boxSets.map(boxSet => (
+                        <BoxSetCard
+                          key={boxSet.id}
+                          boxSet={boxSet}
+                          seriesId={seriesId}
+                        />
+                      ))}
+                    </VolumeGrid>
+                  </motion.div>
+                ) : (
+                  <motion.div key="list" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                    {boxSets.map(boxSet => (
+                      <BoxSetListRow
+                        key={boxSet.id}
+                        boxSet={boxSet}
+                        seriesId={seriesId}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.section>
           )}
         </>

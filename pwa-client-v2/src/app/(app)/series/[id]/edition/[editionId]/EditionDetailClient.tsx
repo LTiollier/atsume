@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useDeferredValue } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Package } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -26,10 +26,12 @@ import { DetailHeader, gridSkeleton } from '@/components/collection/DetailHeader
 import { UnifiedActionBar } from '@/components/collection/UnifiedActionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { VolumeActionCard } from '@/components/collection/VolumeActionCard';
+import { VolumeActionListRow } from '@/components/collection/VolumeActionListRow';
 import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
-import { sectionVariants } from '@/lib/motion';
+import { sectionVariants, viewTransitionVariants } from '@/lib/motion';
+import { useViewMode } from '@/contexts/ViewModeContext';
 import type { Volume } from '@/types/volume';
 
 interface EditionDetailClientProps {
@@ -97,6 +99,10 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
 
   const { isLoanOpen, loanItems, openLoanSheet, closeLoanSheet } = useLoanSheet();
   const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
+
+  // rerender-use-deferred-value : garde l'ancienne vue visible pendant le switch
+  const viewMode         = useViewMode();
+  const deferredViewMode = useDeferredValue(viewMode);
 
   // Progress for header — exclude future volumes from both numerator and denominator
   const possessedCount = countReleasedOwned(volumes);
@@ -249,18 +255,49 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
             )}
           </div>
 
-          <div className={`volume-grid ${selectedIds.size > 0 ? 'pb-28' : ''}`}>
-            {volumes.map(volume => (
-              <VolumeActionCard
-                key={volume.id}
-                volume={volume}
-                isRead={readSet.has(volume.id)}
-                isLoaned={loanedSet.has(volume.id)}
-                isSelected={selectedIds.has(volume.id)}
-                onToggle={handleToggle}
-              />
-            ))}
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            {deferredViewMode === 'cover' ? (
+              <motion.div
+                key="cover"
+                variants={viewTransitionVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className={`volume-grid ${selectedIds.size > 0 ? 'pb-28' : ''}`}
+              >
+                {volumes.map(volume => (
+                  <VolumeActionCard
+                    key={volume.id}
+                    volume={volume}
+                    isRead={readSet.has(volume.id)}
+                    isLoaned={loanedSet.has(volume.id)}
+                    isSelected={selectedIds.has(volume.id)}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="list"
+                variants={viewTransitionVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className={selectedIds.size > 0 ? 'pb-28' : ''}
+              >
+                {volumes.map(volume => (
+                  <VolumeActionListRow
+                    key={volume.id}
+                    volume={volume}
+                    isRead={readSet.has(volume.id)}
+                    isLoaned={loanedSet.has(volume.id)}
+                    isSelected={selectedIds.has(volume.id)}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.section>
       )}
 

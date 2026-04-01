@@ -471,6 +471,277 @@ function SearchBoxSetCard({ boxSet, onClick }: SearchBoxSetCardProps) {
   );
 }
 
+// ─── SearchEditionListRow — Vue Liste Level 1 (rerender-no-inline-components) ─
+
+interface SearchEditionListRowProps {
+  edition:           SearchEdition;
+  onClick:           (edition: SearchEdition) => void;
+  onToggleWishlist:  () => void;
+  wishlistPending:   boolean;
+}
+
+function SearchEditionListRow({ edition, onClick, onToggleWishlist, wishlistPending }: SearchEditionListRowProps) {
+  const possessed  = edition.possessed_count ?? 0;
+  const total      = edition.total_volumes ?? 0;
+  const hasTotal   = edition.possessed_count !== null && total > 0;
+  const countLabel = hasTotal ? `${possessed} / ${total} vol.` : total > 0 ? `${total} vol.` : null;
+  const pct        = hasTotal ? Math.min((possessed / total) * 100, 100) : 0;
+  const canWishlist = possessed === 0;
+
+  return (
+    <div
+      className="flex items-center gap-3 py-3 border-b last:border-b-0"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      <button
+        type="button"
+        className="flex items-center gap-3 flex-1 min-w-0 text-left"
+        onClick={() => onClick(edition)}
+        aria-label={`Voir l'édition ${edition.name}`}
+      >
+        <div
+          className="shrink-0 w-12 relative overflow-hidden"
+          style={{ aspectRatio: '2/3', background: 'var(--muted)', borderRadius: 'var(--radius)' }}
+        >
+          {edition.cover_url ? (
+            <Image src={edition.cover_url} alt={edition.name} fill sizes="48px" className="object-cover" />
+          ) : seriesCoverFallback}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold truncate leading-tight" style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}>
+            {edition.name}
+          </p>
+          {edition.publisher ? (
+            <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--muted-foreground)' }}>
+              {edition.publisher}
+            </p>
+          ) : null}
+          {countLabel ? (
+            <p className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
+              {countLabel}
+            </p>
+          ) : null}
+          {hasTotal ? (
+            <div className="volume-progress mt-1.5" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+              <div className="h-full" style={{ width: `${pct}%`, background: 'color-mix(in oklch, var(--primary) 25%, transparent)', float: 'left' }} />
+            </div>
+          ) : null}
+        </div>
+        <ChevronRight size={14} aria-hidden className="shrink-0 opacity-50" style={{ color: 'var(--muted-foreground)' }} />
+      </button>
+      {canWishlist ? (
+        <button
+          type="button"
+          onClick={e => { e.stopPropagation(); onToggleWishlist(); }}
+          disabled={wishlistPending}
+          className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-opacity disabled:opacity-50 hover:opacity-80"
+          aria-label={edition.is_wishlisted ? 'Retirer de la wishlist' : 'Ajouter à la wishlist'}
+        >
+          <Heart size={14} fill={edition.is_wishlisted ? 'var(--color-wishlist)' : 'none'} style={{ color: edition.is_wishlisted ? 'var(--color-wishlist)' : 'var(--muted-foreground)' }} aria-hidden />
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+// ─── SearchBoxSetListRow — Vue Liste Level 1 (rerender-no-inline-components) ──
+
+interface SearchBoxSetListRowProps {
+  boxSet:            SearchBoxSet;
+  onClick:           (boxSet: SearchBoxSet) => void;
+  onToggleWishlist:  () => void;
+  wishlistPending:   boolean;
+}
+
+function SearchBoxSetListRow({ boxSet, onClick, onToggleWishlist, wishlistPending }: SearchBoxSetListRowProps) {
+  const isComplete  = boxSet.total_boxes > 0 && boxSet.possessed_count >= boxSet.total_boxes;
+  const countLabel  = boxSet.possessed_count > 0
+    ? `${boxSet.possessed_count} / ${boxSet.total_boxes} boîte${boxSet.total_boxes > 1 ? 's' : ''}`
+    : `${boxSet.total_boxes} boîte${boxSet.total_boxes > 1 ? 's' : ''}`;
+  const pct         = boxSet.total_boxes > 0 ? Math.min((boxSet.possessed_count / boxSet.total_boxes) * 100, 100) : 0;
+  const canWishlist = !isComplete;
+
+  return (
+    <div
+      className="flex items-center gap-3 py-3 border-b last:border-b-0"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      <button
+        type="button"
+        className="flex items-center gap-3 flex-1 min-w-0 text-left"
+        onClick={() => onClick(boxSet)}
+        aria-label={`Voir le coffret ${boxSet.title}`}
+      >
+        <div
+          className="shrink-0 w-12 relative overflow-hidden"
+          style={{ aspectRatio: '2/3', background: 'var(--muted)', borderRadius: 'var(--radius)' }}
+        >
+          {boxSet.cover_url ? (
+            <Image src={boxSet.cover_url} alt={boxSet.title} fill sizes="48px" className="object-cover" />
+          ) : boxCoverFallback}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold truncate leading-tight" style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}>
+            {boxSet.title}
+          </p>
+          {boxSet.publisher ? (
+            <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--muted-foreground)' }}>
+              {boxSet.publisher}
+            </p>
+          ) : null}
+          <p className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
+            {countLabel}
+          </p>
+          {boxSet.total_boxes > 0 ? (
+            <div className="volume-progress mt-1.5" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+              <div className="h-full" style={{ width: `${pct}%`, background: 'color-mix(in oklch, var(--primary) 25%, transparent)', float: 'left' }} />
+            </div>
+          ) : null}
+        </div>
+        <ChevronRight size={14} aria-hidden className="shrink-0 opacity-50" style={{ color: 'var(--muted-foreground)' }} />
+      </button>
+      {canWishlist ? (
+        <button
+          type="button"
+          onClick={e => { e.stopPropagation(); onToggleWishlist(); }}
+          disabled={wishlistPending}
+          className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-opacity disabled:opacity-50 hover:opacity-80"
+          aria-label={boxSet.is_wishlisted ? 'Retirer de la wishlist' : 'Ajouter à la wishlist'}
+        >
+          <Heart size={14} fill={boxSet.is_wishlisted ? 'var(--color-wishlist)' : 'none'} style={{ color: boxSet.is_wishlisted ? 'var(--color-wishlist)' : 'var(--muted-foreground)' }} aria-hidden />
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+// ─── SearchVolumeListRow — Vue Liste Level 2a (rerender-no-inline-components) ─
+
+interface SearchVolumeListRowProps {
+  volume:     Volume;
+  isSelected: boolean;
+  onToggle:   (volume: Volume) => void;
+}
+
+function SearchVolumeListRow({ volume, isSelected, onToggle }: SearchVolumeListRowProps) {
+  const isNonOwned    = !volume.is_owned;
+  const isInteractive = isNonOwned;
+
+  return (
+    <button
+      type="button"
+      className="flex items-center gap-3 w-full py-3 border-b last:border-b-0 text-left transition-colors"
+      style={{
+        borderColor: 'var(--border)',
+        background: isSelected ? 'color-mix(in oklch, var(--primary) 10%, transparent)' : 'transparent',
+        cursor: isInteractive ? 'pointer' : 'default',
+      }}
+      onClick={() => { if (isInteractive) onToggle(volume); }}
+      aria-pressed={isSelected}
+      aria-label={`${volume.title}${volume.number ? ` — tome ${volume.number}` : ''}`}
+    >
+      <div
+        className="shrink-0 w-10 relative overflow-hidden"
+        style={{
+          aspectRatio: '2/3',
+          background: 'var(--muted)',
+          borderRadius: 'var(--radius)',
+          filter: isNonOwned && !isSelected ? 'grayscale(70%) brightness(0.7)' : undefined,
+        }}
+      >
+        {volume.cover_url ? (
+          <Image src={volume.cover_url} alt={volume.title ?? `Tome ${volume.number}`} fill sizes="40px" className="object-cover" />
+        ) : volumeCoverFallback}
+        {isSelected ? (
+          <div aria-hidden className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ background: 'color-mix(in oklch, var(--primary) 40%, transparent)' }}>
+            <CheckCircle size={14} style={{ color: 'white' }} />
+          </div>
+        ) : null}
+        {isNonOwned && !isSelected ? (
+          <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: 'oklch(0% 0 0 / 0.45)' }} />
+        ) : null}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold truncate leading-tight" style={{ fontFamily: 'var(--font-display)', color: isNonOwned ? 'var(--muted-foreground)' : 'var(--foreground)' }}>
+          {volume.number ? `#${volume.number} — ` : ''}{volume.title}
+        </p>
+        {isNonOwned ? (
+          <span className="inline-block px-1.5 py-0.5 mt-0.5 text-[10px] font-semibold rounded" style={{ background: 'color-mix(in oklch, var(--muted-foreground) 15%, transparent)', color: 'var(--muted-foreground)' }}>
+            Manquant
+          </span>
+        ) : null}
+      </div>
+    </button>
+  );
+}
+
+// ─── SearchBoxListRow — Vue Liste Level 2b (rerender-no-inline-components) ────
+
+interface SearchBoxListRowProps {
+  box:        Box;
+  isSelected: boolean;
+  onToggle:   (box: Box) => void;
+}
+
+function SearchBoxListRow({ box, isSelected, onToggle }: SearchBoxListRowProps) {
+  const isNonOwned    = !box.is_owned;
+  const isInteractive = isNonOwned;
+  const volumeCount   = box.total_volumes ?? box.volumes?.length;
+  const metaParts     = [box.number ? `Boîte ${box.number}` : null, volumeCount ? `${volumeCount} vol.` : null].filter(Boolean);
+
+  return (
+    <button
+      type="button"
+      className="flex items-center gap-3 w-full py-3 border-b last:border-b-0 text-left transition-colors"
+      style={{
+        borderColor: 'var(--border)',
+        background: isSelected ? 'color-mix(in oklch, var(--primary) 10%, transparent)' : 'transparent',
+        cursor: isInteractive ? 'pointer' : 'default',
+      }}
+      onClick={() => { if (isInteractive) onToggle(box); }}
+      aria-pressed={isSelected}
+      aria-label={box.title}
+    >
+      <div
+        className="shrink-0 w-10 relative overflow-hidden"
+        style={{
+          aspectRatio: '2/3',
+          background: 'var(--muted)',
+          borderRadius: 'var(--radius)',
+          filter: isNonOwned && !isSelected ? 'grayscale(70%) brightness(0.7)' : undefined,
+        }}
+      >
+        {box.cover_url ? (
+          <Image src={box.cover_url} alt={box.title} fill sizes="40px" className="object-cover" />
+        ) : boxCoverFallback}
+        {isSelected ? (
+          <div aria-hidden className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ background: 'color-mix(in oklch, var(--primary) 40%, transparent)' }}>
+            <CheckCircle size={14} style={{ color: 'white' }} />
+          </div>
+        ) : null}
+        {isNonOwned && !isSelected ? (
+          <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: 'oklch(0% 0 0 / 0.45)' }} />
+        ) : null}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold truncate leading-tight" style={{ fontFamily: 'var(--font-display)', color: isNonOwned ? 'var(--muted-foreground)' : 'var(--foreground)' }}>
+          {box.title}
+        </p>
+        {metaParts.length > 0 ? (
+          <p className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
+            {metaParts.join(' · ')}
+          </p>
+        ) : null}
+        {isNonOwned ? (
+          <span className="inline-block px-1.5 py-0.5 mt-0.5 text-[10px] font-semibold rounded" style={{ background: 'color-mix(in oklch, var(--muted-foreground) 15%, transparent)', color: 'var(--muted-foreground)' }}>
+            Manquant
+          </span>
+        ) : null}
+      </div>
+    </button>
+  );
+}
+
 // ─── SeriesEditionsView — Level 1, mirrors SeriesDetailClient ─────────────────
 
 interface SeriesEditionsViewProps {
@@ -483,6 +754,10 @@ interface SeriesEditionsViewProps {
 function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: SeriesEditionsViewProps) {
   const queryClient = useQueryClient();
   const toggleWishlist = useToggleWishlist();
+
+  // rerender-use-deferred-value : garde l'ancienne vue visible pendant le switch
+  const viewMode         = useViewMode();
+  const deferredViewMode = useDeferredValue(viewMode);
 
   function optimisticUpdateSearch(updater: (s: SeriesSearchResult) => SeriesSearchResult) {
     queryClient.setQueriesData<PaginatedSeriesSearchResult>(
@@ -569,20 +844,38 @@ function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: S
           >
             Éditions ({series.editions.length})
           </h3>
-          <VolumeGrid variant="series">
-            {series.editions.map(edition => (
-              <div key={edition.id} className="relative">
-                <SearchEditionCard edition={edition} onClick={onEditionClick} />
-                {(edition.possessed_count ?? 0) === 0 && (
-                  <WishlistButton
-                    isWishlisted={edition.is_wishlisted ?? false}
-                    onToggle={() => handleToggleEditionWishlist(edition)}
-                    isPending={toggleWishlist.isPending}
+          <AnimatePresence mode="wait" initial={false}>
+            {deferredViewMode === 'cover' ? (
+              <motion.div key="cover" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                <VolumeGrid variant="series">
+                  {series.editions.map(edition => (
+                    <div key={edition.id} className="relative">
+                      <SearchEditionCard edition={edition} onClick={onEditionClick} />
+                      {(edition.possessed_count ?? 0) === 0 && (
+                        <WishlistButton
+                          isWishlisted={edition.is_wishlisted ?? false}
+                          onToggle={() => handleToggleEditionWishlist(edition)}
+                          isPending={toggleWishlist.isPending}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </VolumeGrid>
+              </motion.div>
+            ) : (
+              <motion.div key="list" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                {series.editions.map(edition => (
+                  <SearchEditionListRow
+                    key={edition.id}
+                    edition={edition}
+                    onClick={onEditionClick}
+                    onToggleWishlist={() => handleToggleEditionWishlist(edition)}
+                    wishlistPending={toggleWishlist.isPending}
                   />
-                )}
-              </div>
-            ))}
-          </VolumeGrid>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.section>
       )}
 
@@ -594,20 +887,38 @@ function SeriesEditionsView({ series, onBack, onEditionClick, onBoxSetClick }: S
           >
             Coffrets ({series.box_sets.length})
           </h3>
-          <VolumeGrid variant="series">
-            {series.box_sets.map(bs => (
-              <div key={bs.id} className="relative">
-                <SearchBoxSetCard boxSet={bs} onClick={onBoxSetClick} />
-                {bs.possessed_count < bs.total_boxes && (
-                  <WishlistButton
-                    isWishlisted={bs.is_wishlisted ?? false}
-                    onToggle={() => handleToggleBoxSetWishlist(bs)}
-                    isPending={toggleWishlist.isPending}
+          <AnimatePresence mode="wait" initial={false}>
+            {deferredViewMode === 'cover' ? (
+              <motion.div key="cover" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                <VolumeGrid variant="series">
+                  {series.box_sets.map(bs => (
+                    <div key={bs.id} className="relative">
+                      <SearchBoxSetCard boxSet={bs} onClick={onBoxSetClick} />
+                      {bs.possessed_count < bs.total_boxes && (
+                        <WishlistButton
+                          isWishlisted={bs.is_wishlisted ?? false}
+                          onToggle={() => handleToggleBoxSetWishlist(bs)}
+                          isPending={toggleWishlist.isPending}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </VolumeGrid>
+              </motion.div>
+            ) : (
+              <motion.div key="list" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                {series.box_sets.map(bs => (
+                  <SearchBoxSetListRow
+                    key={bs.id}
+                    boxSet={bs}
+                    onClick={onBoxSetClick}
+                    onToggleWishlist={() => handleToggleBoxSetWishlist(bs)}
+                    wishlistPending={toggleWishlist.isPending}
                   />
-                )}
-              </div>
-            ))}
-          </VolumeGrid>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.section>
       )}
 
@@ -832,6 +1143,10 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
   const { data: fullEdition, isLoading } = useEditionQuery(edition.id);
   const addBulk = useAddBulkToCollection();
 
+  // rerender-use-deferred-value : garde l'ancienne vue visible pendant le switch
+  const viewMode         = useViewMode();
+  const deferredViewMode = useDeferredValue(viewMode);
+
   // Dialog management
   const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
 
@@ -1014,16 +1329,31 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
             )}
           </div>
 
-          <div className={`volume-grid ${selectedNumbers.size > 0 ? 'pb-28' : ''}`}>
-            {volumes.map(volume => (
-              <SearchVolumeCard
-                key={ volume.id}
-                volume={volume}
-                isSelected={selectedNumbers.has(parseNumber(volume) ?? -1)}
-                onToggle={handleToggle}
-              />
-            ))}
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            {deferredViewMode === 'cover' ? (
+              <motion.div key="cover" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit" className={`volume-grid ${selectedNumbers.size > 0 ? 'pb-28' : ''}`}>
+                {volumes.map(volume => (
+                  <SearchVolumeCard
+                    key={volume.id}
+                    volume={volume}
+                    isSelected={selectedNumbers.has(parseNumber(volume) ?? -1)}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div key="list" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit" className={selectedNumbers.size > 0 ? 'pb-28' : ''}>
+                {volumes.map(volume => (
+                  <SearchVolumeListRow
+                    key={volume.id}
+                    volume={volume}
+                    isSelected={selectedNumbers.has(parseNumber(volume) ?? -1)}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       ) : null}
 
@@ -1059,6 +1389,10 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
   const queryClient = useQueryClient();
   const { data: fullBoxSet, isLoading } = useBoxSetQuery(boxSet.id);
   const addBox = useAddBoxToCollection();
+
+  // rerender-use-deferred-value : garde l'ancienne vue visible pendant le switch
+  const viewMode         = useViewMode();
+  const deferredViewMode = useDeferredValue(viewMode);
 
   // Dialog management
   const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
@@ -1240,16 +1574,33 @@ function SearchBoxSetDetailView({ boxSet, seriesTitle, onBack }: SearchBoxSetDet
             )}
           </div>
 
-          <VolumeGrid variant="series" className={selectedBoxIds.size > 0 ? 'pb-28' : undefined}>
-            {boxes.map(box => (
-              <SearchBoxCard
-                key={box.id}
-                box={box}
-                isSelected={selectedBoxIds.has(box.id)}
-                onToggle={handleToggle}
-              />
-            ))}
-          </VolumeGrid>
+          <AnimatePresence mode="wait" initial={false}>
+            {deferredViewMode === 'cover' ? (
+              <motion.div key="cover" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                <VolumeGrid variant="series" className={selectedBoxIds.size > 0 ? 'pb-28' : undefined}>
+                  {boxes.map(box => (
+                    <SearchBoxCard
+                      key={box.id}
+                      box={box}
+                      isSelected={selectedBoxIds.has(box.id)}
+                      onToggle={handleToggle}
+                    />
+                  ))}
+                </VolumeGrid>
+              </motion.div>
+            ) : (
+              <motion.div key="list" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit" className={selectedBoxIds.size > 0 ? 'pb-28' : ''}>
+                {boxes.map(box => (
+                  <SearchBoxListRow
+                    key={box.id}
+                    box={box}
+                    isSelected={selectedBoxIds.has(box.id)}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       ) : null}
 

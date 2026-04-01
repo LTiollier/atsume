@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useDeferredValue } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Package2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -24,11 +24,13 @@ import { DetailHeader, gridSkeleton } from '@/components/collection/DetailHeader
 import { UnifiedActionBar } from '@/components/collection/UnifiedActionBar';
 import { LoanSheet } from '@/components/collection/LoanSheet';
 import { BoxItemCard } from '@/components/collection/BoxItemCard';
+import { BoxItemListRow } from '@/components/collection/BoxItemListRow';
 import { VolumeGrid } from '@/components/cards/VolumeGrid';
 import { ConfirmationDialog } from '@/components/feedback/ConfirmationDialog';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
-import { sectionVariants } from '@/lib/motion';
+import { sectionVariants, viewTransitionVariants } from '@/lib/motion';
+import { useViewMode } from '@/contexts/ViewModeContext';
 import type { Box } from '@/types/volume';
 
 interface BoxSetDetailClientProps {
@@ -83,6 +85,10 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
 
   const { isLoanOpen, loanItems, openLoanSheet, closeLoanSheet } = useLoanSheet();
   const { isOpen, setIsOpen, confirm, handleConfirm, config } = useConfirmationDialog();
+
+  // rerender-use-deferred-value : garde l'ancienne vue visible pendant le switch
+  const viewMode         = useViewMode();
+  const deferredViewMode = useDeferredValue(viewMode);
 
   // ── 3-state select-all cycle ─────────────────────────────────────────────────
 
@@ -225,25 +231,58 @@ export function BoxSetDetailClient({ seriesId: _seriesId, boxSetId }: BoxSetDeta
             )}
           </div>
 
-          <VolumeGrid variant="series" className={selectedIds.size > 0 ? 'pb-28' : undefined}>
-            {boxes.map(box => (
-              <BoxItemCard
-                key={box.id}
-                box={box}
-                isLoaned={loanedSet.has(box.id)}
-                isSelected={selectedIds.has(box.id)}
-                onToggle={handleToggle}
-                isWishlisted={box.is_wishlisted ?? false}
-                onToggleWishlist={() => toggleWishlist.mutate({
-                  id: box.id,
-                  type: 'box',
-                  isCurrentlyWishlisted: box.is_wishlisted ?? false,
-                  boxSetId,
-                })}
-                wishlistPending={toggleWishlist.isPending}
-              />
-            ))}
-          </VolumeGrid>
+          <AnimatePresence mode="wait" initial={false}>
+            {deferredViewMode === 'cover' ? (
+              <motion.div key="cover" variants={viewTransitionVariants} initial="initial" animate="animate" exit="exit">
+                <VolumeGrid variant="series" className={selectedIds.size > 0 ? 'pb-28' : undefined}>
+                  {boxes.map(box => (
+                    <BoxItemCard
+                      key={box.id}
+                      box={box}
+                      isLoaned={loanedSet.has(box.id)}
+                      isSelected={selectedIds.has(box.id)}
+                      onToggle={handleToggle}
+                      isWishlisted={box.is_wishlisted ?? false}
+                      onToggleWishlist={() => toggleWishlist.mutate({
+                        id: box.id,
+                        type: 'box',
+                        isCurrentlyWishlisted: box.is_wishlisted ?? false,
+                        boxSetId,
+                      })}
+                      wishlistPending={toggleWishlist.isPending}
+                    />
+                  ))}
+                </VolumeGrid>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="list"
+                variants={viewTransitionVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className={selectedIds.size > 0 ? 'pb-28' : ''}
+              >
+                {boxes.map(box => (
+                  <BoxItemListRow
+                    key={box.id}
+                    box={box}
+                    isLoaned={loanedSet.has(box.id)}
+                    isSelected={selectedIds.has(box.id)}
+                    onToggle={handleToggle}
+                    isWishlisted={box.is_wishlisted ?? false}
+                    onToggleWishlist={() => toggleWishlist.mutate({
+                      id: box.id,
+                      type: 'box',
+                      isCurrentlyWishlisted: box.is_wishlisted ?? false,
+                      boxSetId,
+                    })}
+                    wishlistPending={toggleWishlist.isPending}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.section>
       )}
 
