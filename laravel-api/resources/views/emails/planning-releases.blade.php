@@ -65,8 +65,8 @@
                             <tr>
                                 {{-- Cover --}}
                                 <td class="release-cover" width="68" valign="top" style="padding: 12px 8px 12px 12px;">
-                                    @if ($release->coverUrl)
-                                        <img src="{{ $release->coverUrl }}" width="56" height="82" alt="{{ $release->seriesTitle }}"
+                                    @if ($release->getCoverUrl())
+                                        <img src="{{ $release->getCoverUrl() }}" width="56" height="82" alt="{{ $release->getSeriesTitle() }}"
                                              style="display: block; width: 56px; height: 82px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(255,255,255,0.08);" />
                                     @else
                                         <div style="width: 56px; height: 82px; background-color: #1a1a28; border-radius: 2px; border: 1px solid rgba(255,255,255,0.08);"></div>
@@ -77,18 +77,18 @@
                                 <td valign="middle" style="padding: 14px 8px;">
                                     {{-- Type badge --}}
                                     <p style="margin: 0 0 6px;">
-                                        <span style="display: inline; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: {{ $accentColor }}; border: 1px solid {{ $accentColor }}; padding: 2px 6px; border-radius: 2px;">{{ $release->type === 'volume' ? 'Manga' : 'Coffret' }}</span>
+                                        <span style="display: inline; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: {{ $accentColor }}; border: 1px solid {{ $accentColor }}; padding: 2px 6px; border-radius: 2px;">{{ $release->getType() === 'volume' ? 'Manga' : 'Coffret' }}</span>
                                     </p>
                                     {{-- Series title --}}
-                                    <p style="margin: 0 0 3px; font-size: 14px; font-weight: 700; color: #e8e8f0; line-height: 1.3;">{{ $release->seriesTitle }}</p>
+                                    <p style="margin: 0 0 3px; font-size: 14px; font-weight: 700; color: #e8e8f0; line-height: 1.3;">{{ $release->getSeriesTitle() }}</p>
                                     {{-- Edition + volume number --}}
                                     <p style="margin: 0; font-size: 12px; color: #5a5a78; line-height: 1.4;">
-                                        @if ($release->editionTitle)
-                                            {{ $release->editionTitle }}@if ($release->number) &nbsp;·&nbsp; Tome {{ $release->number }}@endif
-                                        @elseif ($release->number)
-                                            Tome {{ $release->number }}
+                                        @if ($release->getEditionTitle())
+                                            {{ $release->getEditionTitle() }}@if ($release->getNumber()) &nbsp;·&nbsp; Tome {{ $release->getNumber() }}@endif
+                                        @elseif ($release->getNumber())
+                                            Tome {{ $release->getNumber() }}
                                         @endif
-                                        @if ($release->isLastVolume)
+                                        @if ($release->isLastVolume())
                                             &nbsp;<span style="color: {{ $accentColor }}; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;">Dernier tome</span>
                                         @endif
                                     </p>
@@ -98,10 +98,10 @@
                                 <td class="release-date-col" width="90" valign="middle" align="right" style="padding: 14px 14px 14px 8px;">
                                     <p style="margin: 0 0 3px; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #4a4a68;">Sortie</p>
                                     <p style="margin: 0; font-size: 16px; font-weight: 700; color: #e8e8f0; line-height: 1.1;">
-                                        {{ \Carbon\Carbon::parse($release->releaseDate)->locale('fr')->isoFormat('D') }}
+                                        {{ \Carbon\Carbon::parse($release->getReleaseDate())->locale('fr')->isoFormat('D') }}
                                     </p>
                                     <p style="margin: 0; font-size: 11px; color: #7070a0; text-transform: uppercase; letter-spacing: 1px;">
-                                        {{ \Carbon\Carbon::parse($release->releaseDate)->locale('fr')->isoFormat('MMM') }}
+                                        {{ \Carbon\Carbon::parse($release->getReleaseDate())->locale('fr')->isoFormat('MMM') }}
                                     </p>
                                 </td>
                             </tr>
