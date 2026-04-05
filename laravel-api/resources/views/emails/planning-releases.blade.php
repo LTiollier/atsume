@@ -49,7 +49,7 @@
                         <p style="margin: 0 0 20px; font-size: 22px; font-weight: 700; color: #f0f0e8; line-height: 1.2;">{{ $userName }}</p>
 
                         <p style="margin: 0 0 28px; font-size: 14px; color: #7070a0; line-height: 1.7;">
-                            {{ count($releases) }} sortie{{ count($releases) > 1 ? 's' : '' }} vous attende{{ count($releases) > 1 ? 'nt' : '' }} dans les <span style="color: #c0c0d8; font-weight: 600;">7 prochains jours</span>.
+                            {{ count($releases) }} sortie{{ count($releases) > 1 ? 's' : '' }} vous attende{{ count($releases) > 1 ? 'nt' : '' }} <span style="color: #c0c0d8; font-weight: 600;">aujourd'hui</span>.
                         </p>
 
                         {{-- Divider --}}

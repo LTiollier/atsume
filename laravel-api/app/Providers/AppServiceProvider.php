@@ -8,7 +8,7 @@ use App\Borrowing\Domain\Repositories\LoanItemRepositoryInterface;
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use App\Borrowing\Infrastructure\Repositories\EloquentLoanItemRepository;
 use App\Borrowing\Infrastructure\Repositories\EloquentLoanRepository;
-use App\Console\Commands\SendPlanningReleasesCommand;
+use App\Console\Commands\SendDailyReleasesCommand;
 use App\Manga\Domain\Events\BoxAddedToCollection;
 use App\Manga\Domain\Events\EditionAddedToCollection;
 use App\Manga\Domain\Events\VolumeAddedToCollection;
@@ -242,7 +242,7 @@ class AppServiceProvider extends ServiceProvider
                 SyncAllMangaCollecSeriesCommand::class,
                 SyncMangaCollecSeriesCommand::class,
                 SyncMangaCollecSeriesByUuidCommand::class,
-                SendPlanningReleasesCommand::class,
+                SendDailyReleasesCommand::class,
             ]);
         }
 

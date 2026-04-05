@@ -29,7 +29,7 @@ final class PlanningReleasesMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Vos sorties manga de la semaine — Atsume',
+            subject: 'Vos sorties manga du jour — Atsume',
         );
     }
 

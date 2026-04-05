@@ -12,18 +12,17 @@ use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
-final class SendPlanningReleasesCommand extends Command
+final class SendDailyReleasesCommand extends Command
 {
-    protected $signature = 'planning:send-releases
+    protected $signature = 'planning:send-daily-releases
                             {--dry-run : Log without sending emails}';
 
-    protected $description = 'Send upcoming planning release notifications to subscribed users';
+    protected $description = 'Send today\'s planning release notifications to subscribed users';
 
     public function handle(ListPlanningAction $listPlanningAction): int
     {
         $isDryRun = $this->option('dry-run');
-        $from = now()->toDateString();
-        $to = now()->addDays(7)->toDateString();
+        $today = now()->toDateString();
 
         $users = User::where('notify_planning_releases', true)
             ->whereNotNull('email_verified_at')
@@ -35,8 +34,8 @@ final class SendPlanningReleasesCommand extends Command
         foreach ($users as $user) {
             $result = $listPlanningAction->execute(new PlanningFiltersDTO(
                 userId: $user->id,
-                from: $from,
-                to: $to,
+                from: $today,
+                to: $today,
                 perPage: 50,
                 cursor: null,
             ));
@@ -69,7 +68,7 @@ final class SendPlanningReleasesCommand extends Command
             $sent++;
         }
 
-        $this->info("planning:send-releases — sent: {$sent}, skipped (no releases): {$skipped}");
+        $this->info("planning:send-daily-releases — sent: {$sent}, skipped (no releases): {$skipped}");
 
         return self::SUCCESS;
     }
