@@ -10,6 +10,7 @@ use App\Manga\Infrastructure\Mail\PlanningReleasesMail;
 use App\Providers\AppServiceProvider;
 use App\User\Infrastructure\EloquentModels\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 final class SendDailyReleasesCommand extends Command
@@ -21,6 +22,8 @@ final class SendDailyReleasesCommand extends Command
 
     public function handle(ListPlanningAction $listPlanningAction): int
     {
+        Log::info('planning:send-daily-releases — starting');
+
         $isDryRun = $this->option('dry-run');
         $today = now()->toDateString();
 

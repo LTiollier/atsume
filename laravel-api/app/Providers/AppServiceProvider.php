@@ -56,10 +56,14 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Telescope\TelescopeServiceProvider as LaravelTelescopeServiceProvider;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -91,6 +95,16 @@ final class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Mail::extend('brevo', function (array $config) {
+            return (new BrevoTransportFactory(null, HttpClient::create()))->create(
+                new Dsn(
+                    'brevo+api',
+                    'default',
+                    $config['key'] ?? config('services.brevo.key')
+                )
+            );
+        });
+
         $this->configureRateLimiting();
 
         Relation::morphMap([

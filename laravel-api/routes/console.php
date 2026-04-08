@@ -7,5 +7,6 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command(SendDailyReleasesCommand::class)
     ->dailyAt('06:00')
+    ->timezone('Europe/Paris')
     ->withoutOverlapping()
     ->runInBackground();
