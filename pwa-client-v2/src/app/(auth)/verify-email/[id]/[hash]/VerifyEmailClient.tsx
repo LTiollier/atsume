@@ -44,7 +44,7 @@ export function VerifyEmailClient() {
         setMessage('Votre email a été vérifié avec succès ! Redirection...');
 
         setTimeout(() => {
-          router.push('/collection?verified=1');
+          router.push('/login?verified=1');
         }, 2000);
       } catch (err) {
         setStatus('error');

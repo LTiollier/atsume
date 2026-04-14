@@ -161,11 +161,17 @@ final class AppServiceProvider extends ServiceProvider
             /** @var int $expire */
             $expire = config('auth.verification.expire', 60);
 
+            /** @var string $appUrl */
+            $appUrl = config('app.url');
+            URL::forceRootUrl($appUrl);
+
             $temporarySignedUrl = URL::temporarySignedRoute(
                 'verification.verify',
                 now()->addMinutes($expire),
                 ['id' => $id, 'hash' => $hash]
             );
+
+            URL::forceRootUrl(null);
 
             $urlParts = parse_url($temporarySignedUrl);
             $queryString = $urlParts['query'] ?? '';

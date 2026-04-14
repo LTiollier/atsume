@@ -81,7 +81,7 @@ final class AuthController
         /** @var string $frontendUrl */
         $frontendUrl = config('app.frontend_url');
 
-        return redirect($frontendUrl.'/dashboard?verified=1');
+        return redirect($frontendUrl.'/login?verified=1');
     }
 
     public function sendVerificationNotification(Request $request, SendVerificationNotificationAction $action): JsonResponse

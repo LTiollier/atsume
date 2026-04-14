@@ -27,7 +27,7 @@ test('a user can verify their email even if not authenticated', function () {
     expect($user->hasVerifiedEmail())->toBeTrue();
 
     $frontendUrl = config('app.frontend_url');
-    $response->assertRedirect($frontendUrl.'/dashboard?verified=1');
+    $response->assertRedirect($frontendUrl.'/login?verified=1');
 });
 
 test('a user can verify their email via JSON request', function () {

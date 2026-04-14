@@ -14,5 +14,5 @@ export const authService = {
         api.post('/auth/email/verification-notification'),
 
     verifyEmail: (id: string, hash: string, expires: string, signature: string) =>
-        api.get(`/auth/verify-email/${id}/${hash}?expires=${expires}&signature=${signature}`),
+        api.get(`/auth/verify-email/${id}/${hash}`, { params: { expires, signature } }),
 };
