@@ -69,6 +69,9 @@ export const EditionListRow = memo(function EditionListRow({
           ) : null}
           <p className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
             {countLabel}
+            <span className="opacity-70 before:content-['·'] before:mx-1">
+              {edition.is_finished ? 'Terminée' : 'En cours'}
+            </span>
           </p>
           {total !== null && total > 0 ? (
             <div

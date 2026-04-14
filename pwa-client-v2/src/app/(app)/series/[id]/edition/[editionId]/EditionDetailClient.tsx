@@ -211,6 +211,7 @@ export function EditionDetailClient({ seriesId: _seriesId, editionId }: EditionD
             label: `${possessedCount} / ${totalVolumes} vol. possédés`,
             ariaLabel: `${possessedCount} volumes sur ${totalVolumes} possédés`,
           } : null}
+          statusLabel={edition.is_finished ? 'Terminée' : 'En cours'}
           fallbackIcon={<Package size={24} aria-hidden style={{ color: 'var(--muted-foreground)' }} />}
         />
       ) : (

@@ -45,6 +45,7 @@ export interface Edition {
     language: string | null;
     total_volumes: number | null;
     released_volumes: number | null;
+    is_finished?: boolean;
     possessed_count?: number | null;
     possessed_numbers?: number[];
     cover_url?: string | null;
@@ -82,6 +83,7 @@ export interface SearchEdition {
     name: string;
     publisher: string | null;
     total_volumes: number | null;
+    is_finished?: boolean;
     possessed_count: number | null;
     cover_url: string | null;
     is_wishlisted: boolean;

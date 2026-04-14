@@ -131,6 +131,7 @@ function EditionCard({ edition, seriesId, onToggleWishlist, isPending, priority 
         href={`/series/${seriesId}/edition/${edition.id}`}
         coverUrl={edition.cover_url}
         priority={priority}
+        statusLabel={edition.is_finished ? 'Terminée' : 'En cours'}
       />
       {(edition.possessed_count ?? 0) === 0 && (
         <WishlistButton

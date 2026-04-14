@@ -448,6 +448,11 @@ function SearchEditionCard({ edition, onClick }: SearchEditionCardProps) {
         {countLabel && (
           <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
             {countLabel}
+            {edition.is_finished !== undefined && (
+              <span className="opacity-70 before:content-['·'] before:mx-1">
+                {edition.is_finished ? 'Terminée' : 'En cours'}
+              </span>
+            )}
           </p>
         )}
         {hasTotal && (
@@ -585,6 +590,11 @@ function SearchEditionListRow({ edition, onClick, onToggleWishlist, wishlistPend
           {countLabel ? (
             <p className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
               {countLabel}
+              {edition.is_finished !== undefined && (
+                <span className="opacity-70 before:content-['·'] before:mx-1">
+                  {edition.is_finished ? 'Terminée' : 'En cours'}
+                </span>
+              )}
             </p>
           ) : null}
           {hasTotal ? (
@@ -1345,6 +1355,11 @@ function SearchEditionDetailView({ edition, seriesTitle, onBack }: SearchEdition
                 </div>
                 <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
                   {possessedCount} / {totalVolumes} vol. possédés
+                  {fullEdition.is_finished !== undefined && (
+                    <span className="opacity-70 before:content-['·'] before:mx-1">
+                      {fullEdition.is_finished ? 'Terminée' : 'En cours'}
+                    </span>
+                  )}
                 </p>
               </>
             )}

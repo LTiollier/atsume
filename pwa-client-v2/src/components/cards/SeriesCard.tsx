@@ -29,6 +29,8 @@ interface SeriesCardProps {
   loanedCount?: number;
   /** Précharger l'image — à activer sur les cards du premier fold (LCP) */
   priority?: boolean;
+  /** Label de statut (e.g. "Terminée", "En cours") */
+  statusLabel?: string | null;
 }
 
 export const SeriesCard = memo(function SeriesCard({
@@ -40,6 +42,7 @@ export const SeriesCard = memo(function SeriesCard({
   readCount = 0,
   loanedCount = 0,
   priority = false,
+  statusLabel,
 }: SeriesCardProps) {
   const cover = coverUrl ?? series.cover_url;
 
@@ -88,6 +91,11 @@ export const SeriesCard = memo(function SeriesCard({
         </p>
         <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
           {countLabel}
+          {statusLabel && (
+            <span className="opacity-70 before:content-['·'] before:mx-1">
+              {statusLabel}
+            </span>
+          )}
         </p>
 
         {/* Barre segmentée — masquée si total inconnu */}

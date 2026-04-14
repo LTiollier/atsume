@@ -66,6 +66,7 @@ interface DetailHeaderProps {
   subtitle?: string | null;
   progress?: ProgressInfo | null;
   fallbackIcon: ReactNode;
+  statusLabel?: string | null;
 }
 
 export function DetailHeader({
@@ -75,6 +76,7 @@ export function DetailHeader({
   subtitle,
   progress,
   fallbackIcon,
+  statusLabel,
 }: DetailHeaderProps) {
   if (isLoading) return headerSkeleton;
 
@@ -124,6 +126,11 @@ export function DetailHeader({
             </div>
             <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
               {progress.label}
+              {statusLabel && (
+                <span className="opacity-70 before:content-['·'] before:mx-1">
+                  {statusLabel}
+                </span>
+              )}
             </p>
           </>
         )}

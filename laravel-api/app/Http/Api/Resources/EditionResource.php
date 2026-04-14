@@ -28,6 +28,7 @@ final class EditionResource extends JsonResource
             'last_volume_number' => $this->resource->getLastVolumeNumber(),
             'released_volumes' => $this->resource->getReleasedVolumes(),
             'possessed_count' => $this->resource->getPossessedCount(),
+            'is_finished' => $this->resource->isFinished(),
             'is_wishlisted' => $this->resource->isWishlisted(),
             'cover_url' => $this->resource->getCoverUrl(),
             'possessed_numbers' => $this->when($this->resource->getPossessedNumbers() !== [], $this->resource->getPossessedNumbers()),
