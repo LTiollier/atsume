@@ -232,6 +232,44 @@ test('import updates last_volume_number on edition re-import', function () {
     expect($edition->last_volume_number)->toBe(5);
 });
 
+test('import correctly handles is_finished based on not_finished and last_volume_number', function () {
+    $service = app(MangaCollecSeriesImportService::class);
+    $uuid = 'series-uuid-is-finished-robust';
+
+    // 1. not_finished = false BUT last_volume_number = null => should be ONGOING (false)
+    $detail1 = buildDetail($uuid, 'Robust Finished Test', [
+        'editions' => [
+            [
+                'id' => 'edition-uuid-1',
+                'title' => 'Standard',
+                'publisher_id' => 'pub-1',
+                'not_finished' => false,
+                'last_volume_number' => null,
+            ],
+        ],
+    ]);
+    $service->import($uuid, $detail1);
+    $series = EloquentSeries::where('api_id', $uuid)->first();
+    $edition = $series->editions->first();
+    expect((bool) $edition->is_finished)->toBe(false);
+
+    // 2. not_finished = false AND last_volume_number = 36 => should be FINISHED (true)
+    $detail2 = buildDetail($uuid, 'Robust Finished Test', [
+        'editions' => [
+            [
+                'id' => 'edition-uuid-1',
+                'title' => 'Standard',
+                'publisher_id' => 'pub-1',
+                'not_finished' => false,
+                'last_volume_number' => 36,
+            ],
+        ],
+    ]);
+    $service->import($uuid, $detail2);
+    $edition->refresh();
+    expect((bool) $edition->is_finished)->toBe(true);
+});
+
 test('import sets last_volume_number to null when absent from API response', function () {
     $service = app(MangaCollecSeriesImportService::class);
     $uuid = 'series-uuid-last-vol-null';

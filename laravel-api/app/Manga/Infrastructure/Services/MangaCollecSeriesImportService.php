@@ -102,6 +102,13 @@ class MangaCollecSeriesImportService
                     : null;
                 $isFinished = ! ((bool) ($editionData['not_finished'] ?? true));
 
+                // Safety check: many ongoing series in MangaCollec incorrectly return not_finished=false.
+                // However, they usually don't have a last_volume_number set yet.
+                // If we think it's finished but there's no last volume number, assume it's ongoing.
+                if ($isFinished && ! isset($editionData['last_volume_number'])) {
+                    $isFinished = false;
+                }
+
                 $edition = $this->editionRepository->findByNameAndSeries($editionName, $series->getId());
                 if (! $edition) {
                     $edition = $this->editionRepository->create(new CreateEditionDTO(
