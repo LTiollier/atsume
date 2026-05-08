@@ -1,0 +1,267 @@
+name: CI/CD Deploy O2switch (Next.js & Laravel)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  # --- JOB 1 & 2 : CI TESTS ---
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./laravel-api
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: pcov
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Setup .env for testing
+        run: |
+          cp .env.ci .env
+          cp .env.ci .env.testing
+
+      - name: Generate key
+        run: php artisan key:generate
+          
+      - name: Run Migrations
+        run: php artisan migrate --force --seed
+
+      - name: Execute tests
+        run: ./vendor/bin/pest
+
+      - name: Check code style (Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Static code analysis (Larastan)
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./pwa-client-v2
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: pwa-client-v2/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check code style and types
+        run: npm run ci
+
+      - name: Build Next.js application
+        run: npm run build
+
+  # --- JOB 3 : BUILD FRONTEND FOR DEPLOYMENT ---
+  build-node:
+    needs: [frontend-ci]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: './pwa-client-v2/package-lock.json'
+
+      - name: Install & Build
+        run: |
+          cd pwa-client-v2
+          npm ci
+          npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          HOSTNAME: "127.0.0.1"
+          NEXT_OUTPUT: "standalone"
+          API_URL: ${{ secrets.API_URL }}
+
+      - name: Prepare Artifact
+        run: |
+          mkdir -p node_deploy
+          cp -r pwa-client-v2/.next/standalone/. node_deploy/
+          mkdir -p node_deploy/.next/static
+          cp -r pwa-client-v2/.next/static/. node_deploy/.next/static/
+
+          if [ -d "pwa-client-v2/public" ]; then
+            mkdir -p node_deploy/public
+            cp -r pwa-client-v2/public/. node_deploy/public/
+          fi
+
+          tar -czf node-build.tar.gz -C node_deploy .
+
+      - name: Upload Node Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-build
+          path: node-build.tar.gz
+
+  # --- JOB 4 : BUILD LARAVEL FOR DEPLOYMENT ---
+  build-laravel:
+    needs: [backend-ci]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, bcmath, gd, zip, dom, curl, libxml, openssl
+
+      - name: Install Composer Dependencies
+        run: |
+          cd laravel-api
+          composer install --no-dev --optimize-autoloader
+
+      - name: Prepare Laravel Artifact
+        run: |
+          tar -czf laravel-build.tar.gz \
+            --exclude='laravel-api/bootstrap/cache/*.php' \
+            --exclude='laravel-api/storage/framework/views/*' \
+            --exclude='laravel-api/storage/framework/cache/data/*' \
+            --exclude='laravel-api/storage/framework/sessions/*' \
+            --exclude='laravel-api/storage/logs/*' \
+            -C laravel-api .
+
+      - name: Upload Laravel Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: laravel-build
+          path: laravel-build.tar.gz
+
+  # --- JOB 5 : DEPLOY ---
+  deploy:
+    needs: [build-node, build-laravel]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Node Build
+        uses: actions/download-artifact@v4
+        with:
+          name: node-build
+          path: ./deploy-node-archive
+
+      - name: Extract Node Build
+        run: |
+          mkdir -p ./deploy-node
+          tar -xzf ./deploy-node-archive/node-build.tar.gz -C ./deploy-node
+
+      - name: Download Laravel Build
+        uses: actions/download-artifact@v4
+        with:
+          name: laravel-build
+          path: ./deploy-laravel-archive
+
+      - name: Extract Laravel Build
+        run: |
+          mkdir -p ./deploy-laravel
+          tar -xzf ./deploy-laravel-archive/laravel-build.tar.gz -C ./deploy-laravel
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_O2SWITCH_PRIVATE_KEY }}
+          known_hosts: unnecessary
+          if_key_exists: fail
+
+      - name: Get Public IP
+        id: ip
+        run: echo "ipv4=$(curl -s https://api.ipify.org)" >> $GITHUB_OUTPUT
+
+      - name: Removing all whitelisted IP
+        run: |
+          curl -sm 45 -H'Authorization: cpanel ${{ secrets.SSH_O2SWITCH_USER }}:${{ secrets.CPANEL_API_TOKEN }}' \
+          'https://${{ secrets.CPANEL_SERVER }}:2083/execute/SshWhitelist/remove_all'
+
+      - name: Whitelist IP on o2switch
+        run: |
+          curl -sm 45 -H'Authorization: cpanel ${{ secrets.SSH_O2SWITCH_USER }}:${{ secrets.CPANEL_API_TOKEN }}' \
+          "https://${{ secrets.CPANEL_SERVER }}:2083/execute/SshWhitelist/add?address=${{ steps.ip.outputs.ipv4 }}&port=22"
+
+      - name: Whitelist No-IP (accès local)
+        run: |
+          NOIP_ADDR=$(dig +short ${{ secrets.NOIP_HOSTNAME }} | tail -n1)
+          curl -sm 45 -H'Authorization: cpanel ${{ secrets.SSH_O2SWITCH_USER }}:${{ secrets.CPANEL_API_TOKEN }}' \
+          "https://${{ secrets.CPANEL_SERVER }}:2083/execute/SshWhitelist/add?address=${NOIP_ADDR}&port=22"
+
+      - name: Making sure the IP is whitelisted
+        run: |
+          curl -sm 45 -H'Authorization: cpanel ${{ secrets.SSH_O2SWITCH_USER }}:${{ secrets.CPANEL_API_TOKEN }}' \
+          "https://${{ secrets.CPANEL_SERVER }}:2083/execute/SshWhitelist/list" | grep "${{ steps.ip.outputs.ipv4 }}"
+
+      - name: Deploy Frontend via rsync
+        run: |
+          # Note: Adjust the target paths based on project requirements
+          rsync -avz --timeout=60 -e "ssh -p 22 -o StrictHostKeyChecking=no" \
+            --delete \
+            --exclude '.htaccess' \
+            --exclude '.env' \
+            --exclude 'laravel-api/' \
+            ./deploy-node/ \
+            ${{ secrets.SSH_O2SWITCH_USER }}@${{ secrets.CPANEL_SERVER }}:/home/${{ secrets.SSH_O2SWITCH_USER }}/atsume.ltiollier.fr/
+
+      - name: Trigger Node.js Restart
+        run: |
+          ssh -p 22 -o StrictHostKeyChecking=no ${{ secrets.SSH_O2SWITCH_USER }}@${{ secrets.CPANEL_SERVER }} \
+            "mkdir -p /home/${{ secrets.SSH_O2SWITCH_USER }}/atsume.ltiollier.fr/tmp && touch /home/${{ secrets.SSH_O2SWITCH_USER }}/atsume.ltiollier.fr/tmp/restart.txt"
+
+      - name: Deploy Backend via rsync
+        run: |
+          rsync -avz --timeout=60 -e "ssh -p 22 -o StrictHostKeyChecking=no" \
+            --delete \
+            --exclude '.env' \
+            --exclude 'bootstrap/cache/*.php' \
+            ./deploy-laravel/ \
+            ${{ secrets.SSH_O2SWITCH_USER }}@${{ secrets.CPANEL_SERVER }}:/home/${{ secrets.SSH_O2SWITCH_USER }}/api.atsume.ltiollier.fr/
+
+      - name: Post-deploy Laravel setup
+        run: |
+          ssh -p 22 -o StrictHostKeyChecking=no ${{ secrets.SSH_O2SWITCH_USER }}@${{ secrets.CPANEL_SERVER }} bash << 'EOF'
+            set -e
+            APP=/home/${{ secrets.SSH_O2SWITCH_USER }}/api.atsume.ltiollier.fr
+
+            mkdir -p $APP/storage/framework/{views,sessions,cache/data}
+            mkdir -p $APP/storage/app/{private,public}
+            mkdir -p $APP/storage/logs
+            mkdir -p $APP/bootstrap/cache
+
+            chmod -R 775 $APP/storage $APP/bootstrap/cache
+
+            cd $APP && php artisan config:cache
+            cd $APP && php artisan route:cache
+            cd $APP && php artisan view:cache
+          EOF

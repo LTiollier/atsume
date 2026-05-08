@@ -7,3 +7,4 @@ laravel-api/open4goods-isbn-dataset.csv
 !.github/
 /laravel-api/.claude/settings.local.json
 **/__pycache__
+.idea/*
