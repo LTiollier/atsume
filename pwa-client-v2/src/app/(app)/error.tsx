@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Error({
   error,
@@ -12,6 +13,10 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error(error);
+    toast.error(error.message || "Une erreur est survenue", {
+        description: error.digest ? `Digest: #${error.digest}` : undefined,
+        duration: 10000,
+    });
   }, [error]);
 
   return (
