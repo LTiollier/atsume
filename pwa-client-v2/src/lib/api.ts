@@ -4,7 +4,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL
     ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api')
         ? process.env.NEXT_PUBLIC_API_URL
         : `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api`)
-    : 'http://localhost:8000/api';
+    : null;
+
+if (!BASE_URL && typeof window !== 'undefined') {
+    console.error('NEXT_PUBLIC_API_URL is not defined');
+}
 
 /** Enveloppe standard des réponses Laravel API Resources */
 export type ApiResponse<T> = { data: T };
