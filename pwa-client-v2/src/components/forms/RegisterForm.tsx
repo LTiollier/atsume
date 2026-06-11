@@ -16,8 +16,8 @@ import { FormField } from './FormField';
 
 const registerSchema = z
   .object({
-    name: z.string().min(2, 'Minimum 2 caractères').max(100),
-    email: z.string().email('Email invalide'),
+    name: z.string().trim().min(2, 'Minimum 2 caractères').max(100),
+    email: z.string().trim().toLowerCase().email('Email invalide'),
     password: z.string().min(8, 'Minimum 8 caractères'),
     password_confirmation: z.string(),
   })
@@ -36,6 +36,7 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -44,19 +45,34 @@ export function RegisterForm() {
   function onSubmit(data: RegisterFormValues) {
     startTransition(async () => {
       try {
-        const { user, token } = await registerAction(
+        const result = await registerAction(
           data.name,
           data.email,
           data.password,
           data.password_confirmation,
         );
+
+        if (!result.ok) {
+          if (result.field) {
+            setError(result.field, { message: result.error });
+          } else {
+            toast.error(result.error);
+          }
+          return;
+        }
+
         // Store token client-side (localStorage + auth_check cookie for middleware)
-        tokenStorage.setToken(token);
-        login(user);
-        toast.success(`Bienvenue, ${user.name} !`);
+        tokenStorage.setToken(result.token);
+        login(result.user);
+        toast.success(`Bienvenue, ${result.user.name} !`);
         router.push('/collection');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Erreur lors de la création du compte');
+        console.error('[registerAction] échec inattendu :', err);
+        const digest = (err as { digest?: string } | undefined)?.digest;
+        toast.error('Erreur serveur lors de la création du compte.', {
+          description: digest ? `Digest : #${digest}` : undefined,
+          duration: 10000,
+        });
       }
     });
   }
@@ -75,8 +91,12 @@ export function RegisterForm() {
       <FormField
         label="Email"
         type="email"
-        placeholder="vous@exemple.com"
+        inputMode="email"
         autoComplete="email"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        placeholder="vous@exemple.com"
         error={errors.email?.message}
         {...register('email')}
       />

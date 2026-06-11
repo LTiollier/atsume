@@ -21,16 +21,20 @@ const AUTH_COOKIE_OPTIONS = {
 }
 
 // ─── Schemas (server-side validation — input never reaches the API if invalid) ─
+//
+// `.trim().toLowerCase()` sur l'email : iOS Safari (autofill / autocapitalisation)
+// peut injecter une majuscule ou un espace. La base Postgres étant sensible à la
+// casse, "Ltiollier30@…" ≠ "ltiollier30@…" → 401. On normalise pour éviter ça.
 
 const loginSchema = z.object({
-  email: z.string().email('Email invalide'),
+  email: z.string().trim().toLowerCase().email('Email invalide'),
   password: z.string().min(1, 'Mot de passe requis'),
 })
 
 const registerSchema = z
   .object({
-    name: z.string().min(2, 'Minimum 2 caractères').max(100),
-    email: z.string().email('Email invalide'),
+    name: z.string().trim().min(2, 'Minimum 2 caractères').max(100),
+    email: z.string().trim().toLowerCase().email('Email invalide'),
     password: z.string().min(8, 'Minimum 8 caractères'),
     password_confirmation: z.string(),
   })
@@ -39,12 +43,19 @@ const registerSchema = z
     path: ['password_confirmation'],
   })
 
-// ─── Return type — client receives user + token (token stored in localStorage) ─
+// ─── Return type ────────────────────────────────────────────────────────────────
+//
+// IMPORTANT : on RETOURNE les erreurs attendues au lieu de les `throw`.
+// En build production, toute erreur levée dans une Server Action est masquée par
+// React ("An error occurred in the Server Components render…" + digest), donc un
+// `throw new Error('Email ou mot de passe incorrect')` n'arrive jamais au client
+// avec son vrai message. Un résultat structuré contourne cette redaction.
 
-export interface AuthActionResult {
-  user: User
-  token: string
-}
+type AuthField = 'email' | 'password' | 'name' | 'password_confirmation'
+
+export type AuthActionResult =
+  | { ok: true; user: User; token: string }
+  | { ok: false; error: string; field?: AuthField }
 
 // ─── Shared fetch helper ───────────────────────────────────────────────────────
 
@@ -52,40 +63,52 @@ async function callAuthApi(
   endpoint: string,
   payload: Record<string, string>,
 ): Promise<AuthActionResult> {
-  const res = await fetch(`${getApiUrl()}${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(payload),
-    cache: 'no-store',
-  })
+  let res: Response
+  try {
+    res = await fetch(`${getApiUrl()}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+    })
+  } catch (err) {
+    console.error('[auth] échec réseau vers', getApiUrl() + endpoint, err)
+    return { ok: false, error: 'Impossible de joindre le serveur. Réessayez.' }
+  }
 
-  const body = await res.json().catch(() => ({}))
+  const body = await res.json().catch(() => ({} as Record<string, unknown>))
 
   if (!res.ok) {
-    const message =
-      body.message ??
-      (res.status === 401 || res.status === 422
-        ? 'Email ou mot de passe incorrect'
-        : 'Erreur de connexion')
-    throw new Error(message)
+    const message = typeof body.message === 'string' ? body.message : undefined
+    if (res.status === 401 || res.status === 422) {
+      return { ok: false, error: message ?? 'Email ou mot de passe incorrect', field: 'password' }
+    }
+    console.error('[auth] réponse API', res.status, body)
+    return { ok: false, error: message ?? 'Erreur de connexion' }
   }
 
   const validated = AuthResponseSchema.safeParse(body)
-  if (!validated.success) throw new Error('Réponse serveur inattendue')
+  if (!validated.success) {
+    console.error('[auth] réponse inattendue', validated.error)
+    return { ok: false, error: 'Réponse serveur inattendue' }
+  }
 
   // HTTP-only server cookie — lets settings Server Actions call the API
   // without the client needing to pass the token as a parameter
   const cookieStore = await cookies()
   cookieStore.set('auth_token', validated.data.token, AUTH_COOKIE_OPTIONS)
 
-  return { user: validated.data.user, token: validated.data.token }
+  return { ok: true, user: validated.data.user, token: validated.data.token }
 }
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
 
 export async function loginAction(email: string, password: string): Promise<AuthActionResult> {
   const parsed = loginSchema.safeParse({ email, password })
-  if (!parsed.success) throw new Error(parsed.error.issues[0].message)
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    return { ok: false, error: issue.message, field: issue.path[0] as AuthField }
+  }
   return callAuthApi('/auth/login', parsed.data)
 }
 
@@ -96,7 +119,10 @@ export async function registerAction(
   password_confirmation: string,
 ): Promise<AuthActionResult> {
   const parsed = registerSchema.safeParse({ name, email, password, password_confirmation })
-  if (!parsed.success) throw new Error(parsed.error.issues[0].message)
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    return { ok: false, error: issue.message, field: issue.path[0] as AuthField }
+  }
   return callAuthApi('/auth/register', parsed.data as Record<string, string>)
 }
 

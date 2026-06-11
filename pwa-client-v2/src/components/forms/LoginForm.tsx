@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { FormField } from './FormField';
 
 const loginSchema = z.object({
-  email: z.string().email('Email invalide'),
+  email: z.string().trim().toLowerCase().email('Email invalide'),
   password: z.string().min(1, 'Mot de passe requis'),
 });
 
@@ -38,19 +38,31 @@ export function LoginForm() {
   function onSubmit(data: LoginFormValues) {
     startTransition(async () => {
       try {
-        const { user, token } = await loginAction(data.email, data.password);
+        const result = await loginAction(data.email, data.password);
+
+        if (!result.ok) {
+          // Erreur attendue, retournée par la Server Action (vrai message, pas redacted)
+          if (result.field === 'email' || result.field === 'password') {
+            setError(result.field, { message: result.error });
+          } else {
+            toast.error(result.error);
+          }
+          return;
+        }
+
         // Store token client-side (localStorage + auth_check cookie for middleware)
-        tokenStorage.setToken(token);
-        login(user);
-        toast.success("Bienvenue ! Redirection en cours...");
+        tokenStorage.setToken(result.token);
+        login(result.user);
+        toast.success('Bienvenue ! Redirection en cours...');
         window.location.href = '/collection';
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Erreur de connexion';
-        if (message === 'Email ou mot de passe incorrect') {
-          setError('password', { message });
-        } else {
-          toast.error(message);
-        }
+        // Filet de sécurité : erreur serveur inattendue (redacted en prod + digest)
+        console.error('[loginAction] échec inattendu :', err);
+        const digest = (err as { digest?: string } | undefined)?.digest;
+        toast.error('Erreur serveur lors de la connexion.', {
+          description: digest ? `Digest : #${digest}` : undefined,
+          duration: 10000,
+        });
       }
     });
   }
@@ -60,8 +72,12 @@ export function LoginForm() {
       <FormField
         label="Email"
         type="email"
-        placeholder="vous@exemple.com"
+        inputMode="email"
         autoComplete="email"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        placeholder="vous@exemple.com"
         error={errors.email?.message}
         {...register('email')}
       />
