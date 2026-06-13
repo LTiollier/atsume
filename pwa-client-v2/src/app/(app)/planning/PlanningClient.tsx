@@ -239,7 +239,7 @@ export function PlanningClient() {
                 style={{ opacity: isReady ? 1 : 0, pointerEvents: isReady ? 'auto' : 'none' }}
             >
                 <header
-                    className="sticky top-0 z-10 flex items-center px-4 h-14"
+                    className="sticky top-0 z-20 flex items-center px-4 h-14"
                     style={{
                         background: 'color-mix(in oklch, var(--background) 85%, transparent)',
                         backdropFilter: 'blur(12px)',
