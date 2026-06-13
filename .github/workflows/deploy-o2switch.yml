@@ -261,6 +261,8 @@ jobs:
 
             chmod -R 775 $APP/storage $APP/bootstrap/cache
 
+            cd $APP && php artisan migrate --force
+
             cd $APP && php artisan config:cache
             cd $APP && php artisan route:cache
             cd $APP && php artisan view:cache
