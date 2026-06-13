@@ -5243,7 +5243,15 @@ class MangaDataSeeder extends Seeder
                         DB::statement("SELECT setval('".$seq->sequence_name."', ?, true)", [(int) $maxId]);
                     }
                 } catch (Exception $e) {
-                    // Skip
+                    // Never swallow silently: an unresynced sequence later causes
+                    // duplicate-PK violations (SQLSTATE 23505) on the next insert.
+                    $this->command->warn(sprintf(
+                        'Failed to reset sequence "%s" for %s.%s: %s',
+                        $seq->sequence_name,
+                        $seq->table_name,
+                        $seq->column_name,
+                        $e->getMessage(),
+                    ));
                 }
             }
         }
