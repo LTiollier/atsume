@@ -27,6 +27,7 @@ class Volume extends Model
         'title',
         'published_date',
         'cover_url',
+        'sort_order',
     ];
 
     /**
