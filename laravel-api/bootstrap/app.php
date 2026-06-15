@@ -20,7 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Illuminate\Foundation\Configuration\Middleware $middleware): void {})
+    ->withMiddleware(function (Illuminate\Foundation\Configuration\Middleware $middleware): void {
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\IsAdmin::class,
+        ]);
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (VolumeNotFoundException $e): JsonResponse {
             return response()->json(['message' => $e->getMessage()], 404);

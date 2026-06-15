@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Admin\Domain\Repositories\AdminRepositoryInterface;
+use App\Admin\Domain\Services\JobStatusServiceInterface;
+use App\Admin\Infrastructure\Repositories\EloquentAdminRepository;
+use App\Admin\Infrastructure\Services\JobStatusService;
 use App\Borrowing\Domain\Repositories\LoanItemRepositoryInterface;
 use App\Borrowing\Domain\Repositories\LoanRepositoryInterface;
 use App\Borrowing\Infrastructure\Repositories\EloquentLoanItemRepository;
@@ -49,6 +53,7 @@ use App\User\Infrastructure\Repositories\EloquentUserRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -83,6 +88,8 @@ final class AppServiceProvider extends ServiceProvider
         UserRepositoryInterface::class => EloquentUserRepository::class,
         VolumeResolverServiceInterface::class => VolumeResolverService::class,
         ReadingProgressRepositoryInterface::class => EloquentReadingProgressRepository::class,
+        AdminRepositoryInterface::class => EloquentAdminRepository::class,
+        JobStatusServiceInterface::class => JobStatusService::class,
     ];
 
     public function register(): void
@@ -126,6 +133,19 @@ final class AppServiceProvider extends ServiceProvider
         Event::listen(
             BoxAddedToCollection::class,
             RemoveBoxFromWishlistOnCollection::class,
+        );
+
+        Event::listen(
+            CommandFinished::class,
+            function (CommandFinished $event) {
+                if (in_array($event->command, [
+                    'planning:send-daily-releases',
+                    'app:sync-all-series',
+                    'app:sync-series',
+                ])) {
+                    $this->app->make(JobStatusService::class)->trackRun($event->command);
+                }
+            }
         );
 
         ResetPassword::toMailUsing(function (mixed $notifiable, string $token) {

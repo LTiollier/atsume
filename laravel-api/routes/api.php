@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Api\Admin\AdminDashboardController;
 use App\Http\Api\Controllers\AuthController;
 use App\Http\Api\Controllers\BoxCollectionController;
 use App\Http\Api\Controllers\CatalogController;
@@ -108,6 +109,11 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     // Planning
     Route::get('/planning', [PlanningController::class, 'index']);
+
+    // Admin
+    Route::middleware('admin')->prefix('/admin')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    });
 
     // Wishlist
     Route::prefix('/wishlist')->group(function () {
