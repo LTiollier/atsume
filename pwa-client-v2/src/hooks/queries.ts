@@ -4,6 +4,7 @@ import { loanService } from "@/services/loan.service";
 import { wishlistService } from "@/services/wishlist.service";
 import { readingProgressService } from "@/services/readingProgress.service";
 import { userService } from "@/services/user.service";
+import { adminService } from "@/services/admin.service";
 import { updateProfileAction, updateEmailAction, updatePasswordAction } from "@/app/actions/settings";
 import { planningService } from "@/services/planning.service";
 import { Loan, Volume, Series, PlanningResponse } from "@/types/volume";
@@ -24,6 +25,7 @@ export const queryKeys = {
     search: (query: string, page: number) => ["search", query, page] as const,
     publicCollection: (username: string) => ["publicCollection", username] as const,
     publicProfile: (username: string) => ["publicProfile", username] as const,
+    adminDashboard: ["admin", "dashboard"] as const,
 };
 
 // ─── Collection ────────────────────────────────────────────────────────────────
@@ -565,5 +567,15 @@ export function usePublicCollectionQuery(username: string) {
         queryFn: () => userService.getPublicCollection(username),
         enabled: !!username,
         staleTime: 5 * 60 * 1000,
+    });
+}
+
+// ─── Admin ────────────────────────────────────────────────────────────────────
+
+export function useAdminDashboard() {
+    return useQuery({
+        queryKey: queryKeys.adminDashboard,
+        queryFn: adminService.getDashboard,
+        staleTime: 60 * 1000, // 1 minute
     });
 }

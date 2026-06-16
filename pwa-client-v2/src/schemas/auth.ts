@@ -13,6 +13,7 @@ export const UserSchema = z.object({
     notify_planning_releases: z.boolean(),
     view_mode_mobile: z.enum(['cover', 'list']).default('cover'),
     view_mode_desktop: z.enum(['cover', 'list']).default('cover'),
+    is_admin: z.boolean(),
 });
 
 export const AuthResponseSchema = z.object({

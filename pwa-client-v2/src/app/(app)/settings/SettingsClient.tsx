@@ -119,6 +119,7 @@ function ToggleSwitch({ checked, onToggle, id, disabled }: ToggleSwitchProps) {
 
 import { EmailSettingsForm } from '@/components/settings/EmailSettingsForm';
 import { PasswordSettingsForm } from '@/components/settings/PasswordSettingsForm';
+import { AdminDashboardCard } from '@/components/settings/AdminDashboardCard';
 
 // ─── SettingsClient ───────────────────────────────────────────────────────────
 
@@ -530,6 +531,30 @@ export function SettingsClient() {
           </div>
         </div>
       </motion.section>
+
+      {/* ── Section Admin (Conditional) ── */}
+      {user?.is_admin && (
+        <motion.section
+          variants={sectionVariants}
+          initial="initial"
+          animate="animate"
+          aria-label="Administration"
+        >
+          <div className="mb-5">
+            <h2
+              className="text-xs font-semibold uppercase mb-1"
+              style={{ color: 'var(--muted-foreground)', letterSpacing: '0.08em' }}
+            >
+              Administration
+            </h2>
+            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+              Suivi de l&apos;activité globale et de la santé du système.
+            </p>
+          </div>
+
+          <AdminDashboardCard />
+        </motion.section>
+      )}
 
       {/* ── Section Sécurité ── */}
       <motion.section

@@ -10,4 +10,5 @@ export interface User {
     notify_planning_releases: boolean;
     view_mode_mobile: string;
     view_mode_desktop: string;
+    is_admin: boolean;
 }
