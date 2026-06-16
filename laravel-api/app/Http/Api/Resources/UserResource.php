@@ -30,6 +30,7 @@ final class UserResource extends JsonResource
             'notify_planning_releases' => $this->resource->getNotifyPlanningReleases(),
             'view_mode_mobile' => $this->resource->getViewModeMobile(),
             'view_mode_desktop' => $this->resource->getViewModeDesktop(),
+            'is_admin' => $this->resource->isAdmin(),
         ];
     }
 }

@@ -31,6 +31,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property bool $notify_planning_releases
  * @property string $view_mode_mobile
  * @property string $view_mode_desktop
+ * @property bool $is_admin
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -57,6 +58,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'notify_planning_releases',
         'view_mode_mobile',
         'view_mode_desktop',
+        'is_admin',
     ];
 
     /**
@@ -81,6 +83,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_public' => 'boolean',
             'notify_planning_releases' => 'boolean',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 

@@ -30,6 +30,8 @@ final class User
 
     private string $viewModeDesktop;
 
+    private bool $isAdmin;
+
     public function __construct(
         string $name,
         string $email,
@@ -43,6 +45,7 @@ final class User
         bool $notifyPlanningReleases = false,
         string $viewModeMobile = 'cover',
         string $viewModeDesktop = 'cover',
+        bool $isAdmin = false,
     ) {
         $this->name = $name;
         $this->email = $email;
@@ -56,6 +59,7 @@ final class User
         $this->notifyPlanningReleases = $notifyPlanningReleases;
         $this->viewModeMobile = $viewModeMobile;
         $this->viewModeDesktop = $viewModeDesktop;
+        $this->isAdmin = $isAdmin;
     }
 
     public function getId(): ?int
@@ -121,5 +125,10 @@ final class User
     public function getViewModeDesktop(): string
     {
         return $this->viewModeDesktop;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->isAdmin;
     }
 }

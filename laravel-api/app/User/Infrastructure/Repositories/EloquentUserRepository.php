@@ -24,6 +24,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             'notify_planning_releases' => $user->getNotifyPlanningReleases(),
             'view_mode_mobile' => $user->getViewModeMobile(),
             'view_mode_desktop' => $user->getViewModeDesktop(),
+            'is_admin' => $user->isAdmin(),
         ]);
 
         return new User(
@@ -39,6 +40,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             notifyPlanningReleases: $eloquentUser->notify_planning_releases,
             viewModeMobile: $eloquentUser->view_mode_mobile,
             viewModeDesktop: $eloquentUser->view_mode_desktop,
+            isAdmin: $eloquentUser->is_admin,
         );
     }
 
@@ -63,6 +65,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             notifyPlanningReleases: $eloquentUser->notify_planning_releases,
             viewModeMobile: $eloquentUser->view_mode_mobile,
             viewModeDesktop: $eloquentUser->view_mode_desktop,
+            isAdmin: $eloquentUser->is_admin,
         );
     }
 
@@ -87,6 +90,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             notifyPlanningReleases: $eloquentUser->notify_planning_releases,
             viewModeMobile: $eloquentUser->view_mode_mobile,
             viewModeDesktop: $eloquentUser->view_mode_desktop,
+            isAdmin: $eloquentUser->is_admin,
         );
     }
 
@@ -111,6 +115,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             notifyPlanningReleases: $eloquentUser->notify_planning_releases,
             viewModeMobile: $eloquentUser->view_mode_mobile,
             viewModeDesktop: $eloquentUser->view_mode_desktop,
+            isAdmin: $eloquentUser->is_admin,
         );
     }
 
@@ -129,6 +134,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             'notify_planning_releases' => $user->getNotifyPlanningReleases(),
             'view_mode_mobile' => $user->getViewModeMobile(),
             'view_mode_desktop' => $user->getViewModeDesktop(),
+            'is_admin' => $user->isAdmin(),
         ]);
 
         return new User(
@@ -144,6 +150,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             notifyPlanningReleases: $eloquentUser->notify_planning_releases,
             viewModeMobile: $eloquentUser->view_mode_mobile,
             viewModeDesktop: $eloquentUser->view_mode_desktop,
+            isAdmin: $eloquentUser->is_admin,
         );
     }
 
@@ -185,6 +192,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             notifyPlanningReleases: $eloquentUser->notify_planning_releases,
             viewModeMobile: $eloquentUser->view_mode_mobile,
             viewModeDesktop: $eloquentUser->view_mode_desktop,
+            isAdmin: $eloquentUser->is_admin,
         );
     }
 }

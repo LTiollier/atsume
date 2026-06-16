@@ -26,6 +26,7 @@ test('a user can register and registration event is dispatched', function () {
                 'id',
                 'name',
                 'email',
+                'is_admin',
             ],
             'token',
         ]);
