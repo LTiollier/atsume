@@ -8,7 +8,7 @@ jobs:
   # --- JOB 1 & 2 : CI TESTS ---
   backend-ci:
     name: Backend CI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ./laravel-api
@@ -62,7 +62,7 @@ jobs:
 
   frontend-ci:
     name: Frontend CI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ./pwa-client-v2
@@ -88,7 +88,7 @@ jobs:
   # --- JOB 3 : BUILD FRONTEND FOR DEPLOYMENT ---
   build-node:
     needs: [frontend-ci]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -133,7 +133,7 @@ jobs:
   # --- JOB 4 : BUILD LARAVEL FOR DEPLOYMENT ---
   build-laravel:
     needs: [backend-ci]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -167,7 +167,7 @@ jobs:
   # --- JOB 5 : DEPLOY ---
   deploy:
     needs: [build-node, build-laravel]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Download Node Build
         uses: actions/download-artifact@v4
