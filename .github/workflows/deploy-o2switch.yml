@@ -99,6 +99,9 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './pwa-client-v2/package-lock.json'
 
+      - name: Get Short SHA
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
       - name: Install & Build
         run: |
           cd pwa-client-v2
@@ -109,6 +112,7 @@ jobs:
           HOSTNAME: "127.0.0.1"
           NEXT_OUTPUT: "standalone"
           API_URL: ${{ secrets.API_URL }}
+          GIT_HASH: ${{ env.SHORT_SHA }}
 
       - name: Prepare Artifact
         run: |
