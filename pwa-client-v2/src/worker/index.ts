@@ -6,7 +6,6 @@ declare const self: ServiceWorkerGlobalScope;
 
 // Noms de caches connus — mettre à jour si un cache est renommé entre déploiements
 const KNOWN_CACHES = [
-  "api-cache",
   "pages-cache",
   "next-static",
   "images-cache",
@@ -31,4 +30,11 @@ self.addEventListener("activate", (event: ExtendableEvent) => {
       )
     )
   );
+});
+
+// Logs de débogage pour les requêtes fetch
+self.addEventListener('fetch', (event: any) => {
+    if (event.request.url.includes('/api/')) {
+        console.log(`[SW] Fetch request: ${event.request.method} ${event.request.url}`);
+    }
 });

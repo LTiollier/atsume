@@ -32,20 +32,20 @@ const withPWA = withPWAInit({
         },
       },
       // API : NetworkFirst avec fallback offline — 5s timeout, 24h, 150 entrées
-      // v2 : renommé api-cache-v2 pour invalider les loans avec l'ancien schema
-      {
-        urlPattern: ({ request, url }: { request: Request; url: URL }) =>
-          request.method === 'GET' && /^https:\/\/.*\/api\/.*$/.test(url.href),
-        handler: "NetworkFirst",
-        options: {
-          cacheName: "api-cache-v2",
-          expiration: {
-            maxEntries: 150,
-            maxAgeSeconds: 60 * 60 * 24,
-          },
-          networkTimeoutSeconds: 5,
-        },
-      },
+      // v3 : renommé api-cache-v3 pour forcer la réinitialisation suite à des soucis PWA persistants
+      // {
+      //   urlPattern: ({ request, url }: { request: Request; url: URL }) =>
+      //     request.method === 'GET' && /^https:\/\/.*\/api\/.*$/.test(url.href),
+      //   handler: "NetworkFirst",
+      //   options: {
+      //     cacheName: "api-cache-v3",
+      //     expiration: {
+      //       maxEntries: 150,
+      //       maxAgeSeconds: 60 * 60 * 24,
+      //     },
+      //     networkTimeoutSeconds: 5,
+      //   },
+      // },
       // Chunks JS/CSS Next.js : CacheFirst — versionnés par hash, 365 jours
       {
         urlPattern: /^\/_next\/static\/.*/,

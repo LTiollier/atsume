@@ -1,6 +1,8 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { useState } from "react";
 
 export function ReactQueryProvider({ children }: { children: React.ReactNode }) {
@@ -32,9 +34,29 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
             })
     );
 
+    // Initialisation paresseuse du persister sans useEffect
+    const [persister] = useState(() =>
+        typeof window !== 'undefined'
+            ? createSyncStoragePersister({
+                storage: window.localStorage,
+            })
+            : null
+    );
+
+    if (!persister) {
+        return (
+            <QueryClientProvider client={queryClient}>
+                {children}
+            </QueryClientProvider>
+        );
+    }
+
     return (
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{ persister }}
+        >
             {children}
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
     );
 }
