@@ -642,6 +642,11 @@ export function SettingsClient() {
 
         <MangaCollecImportCard />
       </motion.section>
+
+      {/* ── Version ── */}
+      <div className="text-center text-xs" style={{ color: 'var(--muted-foreground)' }}>
+        Version: {process.env.NEXT_PUBLIC_GIT_HASH}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 import withBundleAnalyzer from "@next/bundle-analyzer";
+import { execSync } from "child_process";
 
+const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
@@ -102,6 +104,9 @@ const nextConfig: NextConfig = {
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
   turbopack: {
     root: __dirname,
+  },
+  env: {
+    NEXT_PUBLIC_GIT_HASH: gitHash,
   },
   images: {
     remotePatterns: [
