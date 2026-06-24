@@ -73,7 +73,7 @@ export function LoginForm() {
         label="Email"
         type="email"
         inputMode="email"
-        autoComplete="email"
+        autoComplete="username"
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck={false}
