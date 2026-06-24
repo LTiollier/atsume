@@ -59,6 +59,7 @@ async function request<T>(
         if (qsStr) url += `?${qsStr}`;
     }
 
+    console.log(`[API] ${method} ${url}`, { headers: buildHeaders(), body: options.body });
     const res = await fetch(url, {
         method,
         headers: buildHeaders(),
@@ -71,6 +72,7 @@ async function request<T>(
         : await res.text();
 
     if (!res.ok) {
+        console.error(`[API] Error ${res.status} on ${method} ${url}`, { data });
         // Redirect to /login on 401, sauf endpoints d'auth (login/register)
         if (res.status === 401 && typeof window !== 'undefined' && !path.includes('/auth/')) {
             tokenStorage.clear();
