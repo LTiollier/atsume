@@ -23,6 +23,8 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
 
     public int $maxExceptions = 3;
 
+    public int $timeout = 60;
+
     public function retryUntil(): DateTime
     {
         return now()->addHours(2);
@@ -31,7 +33,7 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
     /** @return array<int, RateLimited> */
     public function middleware(): array
     {
-        return [new RateLimited('mangacollec-api')];
+        return [new RateLimited('mangacollec_import')];
     }
 
     public function __construct(
@@ -48,6 +50,8 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
 
         Log::info("Starting import for series {$this->seriesApiId}");
 
+        $detail = null;
+
         try {
             $detail = $scraperService->getSeriesDetail($this->seriesApiId);
             if ($detail !== null) {
@@ -58,6 +62,7 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
                 'error' => $e->getMessage(),
                 'class' => get_class($e),
                 'series_id' => $this->seriesApiId,
+                'detail_keys' => $detail ? array_keys($detail) : null,
                 'stack' => $e->getTraceAsString(),
             ]);
             throw $e;
