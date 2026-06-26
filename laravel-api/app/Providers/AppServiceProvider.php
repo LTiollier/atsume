@@ -250,8 +250,14 @@ final class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($request->ip());
         });
 
-        RateLimiter::for('mangacollec_import', function (Request $request) {
-            return Limit::perHour(2)->by($request->user()?->id ?: $request->ip());
+        RateLimiter::for('mangacollec_import', function (object $request) {
+            return Limit::perHour(2)->by(
+                $request instanceof Request ? ($request->user()?->id ?: $request->ip()) : 'job'
+            );
+        });
+
+        RateLimiter::for('mangacollec_sync', function (object $request) {
+            return Limit::perMinute(60)->by('job');
         });
     }
 

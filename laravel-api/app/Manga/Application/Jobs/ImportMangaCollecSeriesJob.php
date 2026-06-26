@@ -33,7 +33,7 @@ final class ImportMangaCollecSeriesJob implements ShouldQueue
     /** @return array<int, RateLimited> */
     public function middleware(): array
     {
-        return [new RateLimited('mangacollec_import')];
+        return [new RateLimited('mangacollec_sync')];
     }
 
     public function __construct(
